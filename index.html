@@ -1075,10 +1075,7 @@
   <script>
   document.addEventListener("DOMContentLoaded", function () {
     const el = document.getElementById("heroTitle");
-
-    // 원하는 문구 (줄바꿈은 \n 으로 처리)
     const text = "앞선 선택,\n대학이 달라진다!";
-
     let index = 0;
 
     function type() {
@@ -1086,14 +1083,16 @@
         const char = text[index];
 
         if (char === "\n") {
-          // 줄바꿈 처리
           el.innerHTML += "<br />";
         } else {
           el.innerHTML += char;
         }
 
         index++;
-        setTimeout(type, 120); // 속도 조절 (ms) : 숫자 줄이면 더 빠르게
+        setTimeout(type, 120);
+      } else {
+        // 글자 출력이 끝나면 클래스 추가
+        el.classList.add("done");
       }
     }
 
