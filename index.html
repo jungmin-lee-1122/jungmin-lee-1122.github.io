@@ -193,7 +193,24 @@
       font-weight: 800;
       line-height: 1.3;
       margin-bottom: 16px;
+      position: relative;
+      display: inline-block;
     }
+
+    .hero-title::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #fff;           /* 배경색에 맞게 조정 (다크배너면 흰색, 밝으면 네이비 등) */
+  margin-left: 4px;
+  animation: blink 0.8s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
 
     .hero-subtitle {
       font-size: 16px;
@@ -671,23 +688,23 @@
           대학이 달라진다!
         </h1>
         <p class="hero-subtitle">
-          완벽한 관리 시스템 · 1:1 수학책임담임제 · 소수정예 수준별 선택형 맞춤수업<br />
-          재수생의 하루를 처음부터 끝까지 설계합니다.
+          오직, 학생만을 생각합니다.
         </p>
 
         <div class="hero-badges">
           <span class="hero-badge">강의 만족도 96% 이상</span>
-          <span class="hero-badge">한 선생님 15명 책임 관리</span>
-          <span class="hero-badge">국/영/수 일일 테스트</span>
+          <span class="hero-badge">완벽한 관리 시스템</span>
+          <span class="hero-badge">1:1 수학책임담임제</span>
+          <span class="hero-badge">일일테스트 & 피드백</span>
         </div>
 
         <div class="hero-cta">
           <a href="#contact" class="btn btn-primary">입학 상담 신청</a>
           <a href="#program" class="btn btn-outline">연간 프로그램 보기</a>
         </div>
-        <div class="hero-note">
+        <!--<div class="hero-note">
           지금 상담 신청 시, 0학기 진단 TEST & 학습 컨설팅 제공
-        </div>
+        </div>-->
       </div>
 
       <!--<div class="hero-visual">
@@ -1050,5 +1067,35 @@
   <footer>
     © 평촌종로학원 재수종합반 · 오직, 학생만을 생각합니다.
   </footer>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const el = document.getElementById("heroTitle");
+
+    // 원하는 문구 (줄바꿈은 \n 으로 처리)
+    const text = "앞선 선택,\n대학이 달라진다!";
+
+    let index = 0;
+
+    function type() {
+      if (index < text.length) {
+        const char = text[index];
+
+        if (char === "\n") {
+          // 줄바꿈 처리
+          el.innerHTML += "<br />";
+        } else {
+          el.innerHTML += char;
+        }
+
+        index++;
+        setTimeout(type, 120); // 속도 조절 (ms) : 숫자 줄이면 더 빠르게
+      }
+    }
+
+    type();
+  });
+</script>
+
 </body>
 </html>
