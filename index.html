@@ -371,7 +371,25 @@
       border: 1px solid var(--color-border);
       box-shadow: var(--shadow-soft);
       position: relative;
+      opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  will-change: opacity, transform;
+      
     }
+
+    .timeline.visible .timeline-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 순차적으로 슈르륵 */
+.timeline.visible .timeline-item:nth-child(1) { transition-delay: 0s; }
+.timeline.visible .timeline-item:nth-child(2) { transition-delay: .08s; }
+.timeline.visible .timeline-item:nth-child(3) { transition-delay: .16s; }
+.timeline.visible .timeline-item:nth-child(4) { transition-delay: .24s; }
 
     .timeline-badge {
       position: absolute;
@@ -1123,23 +1141,24 @@
 
   // 카드 슬라이드
     document.addEventListener("DOMContentLoaded", () => {
-    const grid = document.querySelector(".grid-4");
-    if (!grid) return;
+  // 애니메이션 적용할 그룹들(그리드, 타임라인 등)
+  const groups = document.querySelectorAll(".grid-4, .timeline");
+  if (!groups.length) return;
 
-    const io = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            grid.classList.add("visible");
-            observer.unobserve(entry.target); // 한 번만 실행되게
-          }
-        });
-      },
-      { threshold: 0.8 } // 20% 정도 보이면 실행
-    );
+  const io = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible"); // grid-4 또는 timeline에 visible 추가
+          observer.unobserve(entry.target);      // 한 번만 실행되게
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
 
-    io.observe(grid);
-  });
+  groups.forEach(group => io.observe(group));
+});
 </script>
 
 </body>
