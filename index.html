@@ -305,12 +305,18 @@
     }
 
     .feature-card {
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--color-border);
   opacity: 0;
   transform: translateY(40px);
   transition:
     opacity 0.6s ease-out,
     transform 0.6s ease-out;
   will-change: opacity, transform;
+      
 }
 
 /* grid-4에 visible 클래스가 붙으면 순차 등장 */
@@ -946,7 +952,7 @@
   <section id="teachers">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">한 선생님이 15명만 관리하는 1:1 책임 임담임제</h2>
+        <h2 class="section-title">한 선생님이 15명만 관리하는 1:1 수학책임담임제</h2>
         <p class="section-subtitle">
           수학과 탐구 과목까지, 학생 한 명 한 명의 약점을 끝까지 책임집니다.
         </p>
@@ -956,7 +962,7 @@
         <div class="teacher-card">
           <div class="teacher-photo"></div>
           <div class="teacher-name">박상진 선생님</div>
-          <div class="teacher-role">수학 책임 임담임</div>
+          <div class="teacher-role">수학 책임 담임</div>
           <div class="teacher-text">
             개념의 핵심을 짚어 주는 설명과 꼼꼼한 과제 점검으로<br />
             수학 1등급 완성을 목표로 지도합니다.
@@ -1127,7 +1133,7 @@
           }
         });
       },
-      { threshold: 0.2 } // 20% 정도 보이면 실행
+      { threshold: 0.8 } // 20% 정도 보이면 실행
     );
 
     io.observe(grid);
