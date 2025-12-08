@@ -305,31 +305,26 @@
     }
 
     .feature-card {
-      background-color: #ffffff;
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--color-border);
-        opacity: 0;
-  transform: translate3d(0, 50px, 0) scale(0.9) rotate(3deg);
-  transition: all 0.7s cubic-bezier(.25,.8,.25,1);
-  --x: calc(-40px + (80px * random()));
-  --y: calc(-40px + (80px * random()));
-  --r: calc(-10deg + (20deg * random()));
-  transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(.9);
-
-    }
-
-    .feature-card.show {
-  opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1) rotate(0);
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  will-change: opacity, transform;
 }
 
-/* 살짝 딜레이 주면 더 자연스러움 */
-.feature-card:nth-child(1) { transition-delay: .05s; }
-.feature-card:nth-child(2) { transition-delay: .12s; }
-.feature-card:nth-child(3) { transition-delay: .18s; }
-.feature-card:nth-child(4) { transition-delay: .24s; }
+/* grid-4에 visible 클래스가 붙으면 순차 등장 */
+.grid-4.visible .feature-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 카드별 약간씩 딜레이 줘서 슈루룩~ */
+.grid-4.visible .feature-card:nth-child(1) { transition-delay: 0.0s; }
+.grid-4.visible .feature-card:nth-child(2) { transition-delay: 0.08s; }
+.grid-4.visible .feature-card:nth-child(3) { transition-delay: 0.16s; }
+.grid-4.visible .feature-card:nth-child(4) { transition-delay: 0.24s; }
+
 
     .feature-icon {
       width: 32px;
@@ -1120,29 +1115,23 @@
 
   // 카드 슬라이드
     document.addEventListener("DOMContentLoaded", () => {
-  const cards = document.querySelectorAll(".feature-card");
+    const grid = document.querySelector(".grid-4");
+    if (!grid) return;
 
-  // 랜덤 초기 변환값 넣기
-  cards.forEach(card => {
-    const x = (Math.random() * 80 - 40).toFixed();
-    const y = (Math.random() * 80 - 40).toFixed();
-    const r = (Math.random() * 20 - 10).toFixed();
+    const io = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            grid.classList.add("visible");
+            observer.unobserve(entry.target); // 한 번만 실행되게
+          }
+        });
+      },
+      { threshold: 0.2 } // 20% 정도 보이면 실행
+    );
 
-    card.style.transform =
-      `translate(${x}px, ${y}px) rotate(${r}deg) scale(.9)`;
+    io.observe(grid);
   });
-
-  // 스크롤 진입 시 show 클래스 부여
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("show");
-      }
-    });
-  }, { threshold: 0.2 });
-
-  cards.forEach(card => io.observe(card));
-});
 </script>
 
 </body>
