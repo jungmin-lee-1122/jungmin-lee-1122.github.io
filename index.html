@@ -300,153 +300,221 @@
     /* =====================
        카드 그리드 (차별점)
        ===================== */
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-    }
-
     .feature-card {
-      background-color: #ffffff;
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--color-border);
   opacity: 0;
   transform: translateY(40px);
   transition:
     opacity 0.6s ease-out,
     transform 0.6s ease-out;
   will-change: opacity, transform;
-      
 }
 
-/* grid-4에 visible 클래스가 붙으면 순차 등장 */
 .grid-4.visible .feature-card {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* 카드별 약간씩 딜레이 줘서 슈루룩~ */
-.grid-4.visible .feature-card:nth-child(1) { transition-delay: 0.0s; }
+.grid-4.visible .feature-card:nth-child(1) { transition-delay: 0s; }
 .grid-4.visible .feature-card:nth-child(2) { transition-delay: 0.08s; }
 .grid-4.visible .feature-card:nth-child(3) { transition-delay: 0.16s; }
 .grid-4.visible .feature-card:nth-child(4) { transition-delay: 0.24s; }
 
+/* =========================================
+   연간 학습 프로그램 섹션 스타일
+   (#program 안에 있는 디자인 전체)
+   ========================================= */
 
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 11px;
-      background-color: #e7ecfa;
-      margin-bottom: 12px;
-    }
+.program-section {
+  background-color: #f5f7fb;
+}
 
-    .feature-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #111;
-    }
+/* ----- 상단 비전/요약 박스 ----- */
 
-    .feature-text {
-      font-size: 13px;
-      color: var(--color-text-muted);
-    }
+.program-vision {
+  max-width: 980px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
 
-    /* =====================
-       타임라인 (연간 프로그램)
-       ===================== */
-    .timeline {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 18px;
-      margin-top: 24px;
-    }
+.program-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 24px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #cedaf5, #aebfe8);
+  color: #23345d;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
 
-    .timeline-item {
-      background-color: #ffffff;
-      border-radius: var(--radius-lg);
-      padding: 18px;
-      border: 1px solid var(--color-border);
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      opacity: 0;
+.program-vision-inner {
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  border: 1px solid #e1e5f2;
+  padding: 26px 32px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 24px;
+  position: relative;
+}
+
+.program-vision-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: #edf0f8;
+  transform: translateX(-50%);
+}
+
+.vision-item h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.vision-item p {
+  font-size: 13px;
+  color: #666;
+}
+
+/* 가운데 아래로 내려가는 파란 화살표 */
+.program-arrow {
+  width: 140px;
+  height: 68px;
+  margin: 20px auto 0;
+  background: linear-gradient(180deg, #3c63d4, #1d3c7a);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  box-shadow: 0 12px 30px rgba(52, 86, 184, 0.45);
+}
+
+/* ----- 하단 학기별 로드맵 카드 ----- */
+
+.program-roadmap {
+  margin-top: 40px;
+}
+
+.roadmap-track {
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* 아래쪽 흐릿한 라인 */
+.roadmap-track::before {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 40px;
+  height: 4px;
+  background: #e1e4ef;
+  border-radius: 999px;
+}
+
+/* 카드 4개 가로 배치 */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 18px;
+
+  /* 슬라이드 인 애니메이션 트리거용 (IntersectionObserver가 .visible 붙여줌) */
+}
+
+/* 로드맵 카드 스타일 */
+.timeline-item {
+  position: relative;
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  border: 1px solid #e1e5f2;
+  padding: 22px 20px 68px;
+  font-size: 13px;
+
+  /* 슬라이드 인 초기 상태 */
+  opacity: 0;
   transform: translateY(40px);
   transition:
     opacity 0.6s ease-out,
     transform 0.6s ease-out;
   will-change: opacity, transform;
-      
-    }
+}
 
-    .timeline.visible .timeline-item {
+.term-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.term-divider {
+  width: 40px;
+  height: 2px;
+  background-color: #d3d9ec;
+  margin-bottom: 10px;
+}
+
+.term-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  color: #555;
+}
+
+.term-list li {
+  position: relative;
+  padding-left: 12px;
+  margin-bottom: 6px;
+}
+
+.term-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #3c63d4;
+  font-size: 13px;
+}
+
+/* 원형 학기 배지 */
+.term-badge-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+}
+
+.term-badge {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #1d3c7a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  border: 3px solid #f5f7fb;
+}
+
+/* 타임라인 슬라이드 인 애니메이션 발동 상태 */
+.timeline.visible .timeline-item {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* 순차적으로 슈르륵 */
 .timeline.visible .timeline-item:nth-child(1) { transition-delay: 0s; }
-.timeline.visible .timeline-item:nth-child(2) { transition-delay: .08s; }
-.timeline.visible .timeline-item:nth-child(3) { transition-delay: .16s; }
-.timeline.visible .timeline-item:nth-child(4) { transition-delay: .24s; }
+.timeline.visible .timeline-item:nth-child(2) { transition-delay: 0.08s; }
+.timeline.visible .timeline-item:nth-child(3) { transition-delay: 0.16s; }
+.timeline.visible .timeline-item:nth-child(4) { transition-delay: 0.24s; }
 
-    .timeline-badge {
-      position: absolute;
-      top: -13px;
-      left: 16px;
-      background-color: var(--color-primary);
-      color: #fff;
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 999px;
-    }
-
-    .timeline-title {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .timeline-period {
-      font-size: 12px;
-      color: var(--color-text-muted);
-      margin-bottom: 8px;
-    }
-
-    .timeline-text {
-      font-size: 13px;
-      color: #444;
-    }
-
-    /* =====================
-       리스트 블록 (하루 루틴 / 운영)
-       ===================== */
-    .pill-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    .pill-item {
-      background-color: #ffffff;
-      border-radius: 999px;
-      padding: 12px 18px;
-      font-size: 13px;
-      border: 1px solid var(--color-border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background-color: var(--color-primary);
-    }
 
     /* =====================
        2컬럼 레이아웃 (관리 시스템)
@@ -832,55 +900,108 @@
   <!-- =====================
        섹션 2 : 연간 학습 프로그램
        ===================== -->
-  <section id="program">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">한 해 전체가 계획되는 학습 로드맵</h2>
-        <p class="section-subtitle">
-          0학기부터 수능 직전 FINAL까지, 단계별 목표가 분명합니다.
-        </p>
+  <section id="program" class="program-section">
+  <div class="container">
+
+    <div class="section-header">
+      <h2 class="section-title">연간 학습 프로그램</h2>
+      <p class="section-subtitle">
+        0학기부터 수능 직전까지, 단계별 목표가 분명한 연간 학습 로드맵입니다.
+      </p>
+    </div>
+
+    <!-- 상단 비전/로드맵 요약 박스 -->
+    <div class="program-vision">
+      <div class="program-pill">연간 학습 로드맵</div>
+
+      <div class="program-vision-inner">
+        <div class="vision-item">
+          <h3>기초부터 수능까지 이어지는 커리큘럼</h3>
+          <p>
+            0학기 기본 개념부터 실전 FINAL까지<br />
+            학기별 목표에 맞춰 체계적으로 설계된 연간 과정입니다.
+          </p>
+        </div>
+        <div class="vision-item">
+          <h3>시기별 목표와 전략을 한눈에</h3>
+          <p>
+            각 학기마다 집중해야 할 과목과 내용이 명확해<br />
+            재수 생활 전체의 흐름을 쉽게 파악할 수 있습니다.
+          </p>
+        </div>
       </div>
 
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-badge">0학기 (6주)</div>
-          <div class="timeline-title">기본 개념 완성</div>
-          <div class="timeline-period">국·수·영 기반 다지기</div>
-          <div class="timeline-text">
-            전 과목 기본 개념을 빠짐없이 점검하고<br />
-            재수 학습의 출발선을 맞춰 주는 기간입니다.
+      <!-- 가운데 아래로 내려가는 화살표 -->
+      <div class="program-arrow"></div>
+    </div>
+
+    <!-- 하단 학기별 로드맵 -->
+    <div class="program-roadmap">
+      <div class="roadmap-track">
+        <div class="timeline">
+          <!-- 0학기 -->
+          <div class="timeline-item">
+            <h3 class="term-title">0학기 · 기본 개념 완성</h3>
+            <div class="term-divider"></div>
+            <ul class="term-list">
+              <li>국·수·영 진단 TEST로 현재 수준 파악</li>
+              <li>전 범위 기본 개념 총정리</li>
+              <li>재수 학습 습관 및 시간 관리 훈련</li>
+            </ul>
+            <div class="term-badge-wrap">
+              <div class="term-badge">0학기</div>
+            </div>
           </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-badge">1학기 (18주)</div>
-          <div class="timeline-title">원리·개념 중심 / 6월 평가원 대비</div>
-          <div class="timeline-period">심화 개념 + 유형 학습</div>
-          <div class="timeline-text">
-            과목별 개념을 완성하고 주요 유형을 반복 훈련합니다.<br />
-            6월 평가원 모의고사에서의 첫 성적을 목표로 합니다.
+
+          <!-- 1학기 -->
+          <div class="timeline-item">
+            <h3 class="term-title">1학기 · 원리·개념 심화 / 6월 평가원 대비</h3>
+            <div class="term-divider"></div>
+            <ul class="term-list">
+              <li>과목별 심화 개념 & 핵심 유형 학습</li>
+              <li>6월 평가원 모의고사 목표 점수 설정</li>
+              <li>주간 모의고사로 실전 감각 키우기</li>
+            </ul>
+            <div class="term-badge-wrap">
+              <div class="term-badge">1학기</div>
+            </div>
           </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-badge">2학기 (13주)</div>
-          <div class="timeline-title">실전 적용 / 9월 평가원 대비</div>
-          <div class="timeline-period">고난도·실전 문제 훈련</div>
-          <div class="timeline-text">
-            기출·모의고사를 중심으로 실전 감각을 키우고<br />
-            약점을 보완하는 집중 프로그램이 진행됩니다.
+
+          <!-- 2학기 -->
+          <div class="timeline-item">
+            <h3 class="term-title">2학기 · 실전 적용 / 9월 평가원 대비</h3>
+            <div class="term-divider"></div>
+            <ul class="term-list">
+              <li>기출·모의고사 집중 분석</li>
+              <li>취약 단원 보완을 위한 맞춤 수업</li>
+              <li>9월 평가원 성적 기준 재설계</li>
+            </ul>
+            <div class="term-badge-wrap">
+              <div class="term-badge">2학기</div>
+            </div>
           </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-badge">3학기 (7.5주)</div>
-          <div class="timeline-title">총정리 & FINAL</div>
-          <div class="timeline-period">수능 직전 마무리</div>
-          <div class="timeline-text">
-            예상 문제풀이 및 FINAL 특강을 통해<br />
-            실수 최소화, 최종 점수 극대화를 목표로 합니다.
+
+          <!-- 3학기 -->
+          <div class="timeline-item">
+            <h3 class="term-title">3학기 · FINAL / 수능 직전 대비</h3>
+            <div class="term-divider"></div>
+            <ul class="term-list">
+              <li>과목별 FINAL 특강 & 예상 문제풀이</li>
+              <li>실수 줄이기를 위한 마무리 점검</li>
+              <li>개인별 컨디션 관리 & 시험 전략 수립</li>
+            </ul>
+            <div class="term-badge-wrap">
+              <div class="term-badge">3학기</div>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
-  </section>
+
+  </div>
+</section>
+
 
   <!-- =====================
        섹션 3 : 하루 루틴 / 운영 시스템
@@ -1141,7 +1262,7 @@
 
   // 카드 슬라이드
     document.addEventListener("DOMContentLoaded", () => {
-  // 애니메이션 적용할 그룹들(그리드, 타임라인 등)
+  // 스르륵 애니메이션 적용할 그룹들: 차별점 카드(.grid-4), 로드맵(.timeline)
   const groups = document.querySelectorAll(".grid-4, .timeline");
   if (!groups.length) return;
 
@@ -1149,12 +1270,12 @@
     (entries, observer) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add("visible"); // grid-4 또는 timeline에 visible 추가
-          observer.unobserve(entry.target);      // 한 번만 실행되게
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target); // 한 번만 실행
         }
       });
     },
-    { threshold: 0.9 }
+    { threshold: 0.2 }
   );
 
   groups.forEach(group => io.observe(group));
