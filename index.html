@@ -309,6 +309,57 @@
   will-change: opacity, transform;
 }
 
+/* 학원의 차별점 카드 레이아웃 + 스타일 */
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* 여기서는 모양만 잡아주고, 애니메이션(opacity/transform)은 그대로 유지 */
+.feature-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #d7dcea;
+}
+
+/* 카드 안 내용 스타일 */
+.feature-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  background-color: #e7ecfa;
+  margin-bottom: 12px;
+}
+
+.feature-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.feature-text {
+  font-size: 13px;
+  color: #666;
+}
+
+/* 반응형: 태블릿에서 2열, 모바일에서 1열 */
+@media (max-width: 992px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .grid-4.visible .feature-card {
   opacity: 1;
   transform: translateY(0);
@@ -514,6 +565,43 @@
 .timeline.visible .timeline-item:nth-child(2) { transition-delay: 0.08s; }
 .timeline.visible .timeline-item:nth-child(3) { transition-delay: 0.16s; }
 .timeline.visible .timeline-item:nth-child(4) { transition-delay: 0.24s; }
+
+    /* 공부만 하면 됩니다… pill 카드 레이아웃 */
+.pill-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
+/* 한 줄씩 둥근 알약 카드 */
+.pill-item {
+  background-color: #ffffff;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 13px;
+  border: 1px solid #d7dcea;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  color: #444;
+}
+
+.pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background-color: #1d3c7a; /* 메인 네이비 */
+}
+
+/* 반응형: 모바일에서 한 줄로 */
+@media (max-width: 768px) {
+  .pill-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 
     /* =====================
