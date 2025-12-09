@@ -65,14 +65,14 @@
     }
 
     .section-title {
-      font-size: 28px;
+      font-size: 50px;
       font-weight: 800;
       color: #111;
       margin-bottom: 12px;
     }
 
     .section-subtitle {
-      font-size: 15px;
+      font-size: 25px;
       color: var(--color-text-muted);
     }
 
@@ -307,6 +307,37 @@
     opacity 0.6s ease-out,
     transform 0.6s ease-out;
   will-change: opacity, transform;
+}
+
+    .section-illustration {
+ display: flex;
+  justify-content: center;
+  margin: 80px auto;
+}
+
+.section-illustration img {
+ max-width: 380px;
+  height: auto;
+  display: block;
+}
+
+
+    /* === Fade Down Animation === */
+
+.fade-down {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.fade-down.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Delay (optional) */
+.delay-1 {
+  transition-delay: 0.25s;
 }
 
 /* 학원의 차별점 카드 레이아웃 + 스타일 */
@@ -949,6 +980,10 @@
         </p>
       </div>
 
+        <div class="section-illustration fade-up">
+    <img src="newimg/studentspic.png" alt="학생 이미지">
+  </div>
+
       <div class="grid-4">
         <div class="feature-card">
           <div class="feature-icon"></div>
@@ -1369,6 +1404,19 @@
 
   groups.forEach(group => io.observe(group));
 });
+
+    //section-title fade-down
+		 const fadeEls = document.querySelectorAll(".fade-down");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("show");
+      }
+    });
+  });
+
+  fadeEls.forEach((el) => observer.observe(el));
 </script>
 
 </body>
