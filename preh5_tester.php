@@ -1,0 +1,1159 @@
+<?php
+include_once('./_common.php');
+
+if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
+
+if(defined('G5_THEME_PATH')) {
+    require_once(G5_THEME_PATH.'/index.php');
+    return;
+}
+
+if (G5_IS_MOBILE) {
+    include_once(G5_MOBILE_PATH.'/preh5.php');
+    return;
+}
+
+include_once(G5_PATH.'/head.php');
+?>
+<link rel="stylesheet" href="/js/swiper/swiper.min.css">
+<script src="/js/swiper/swiper.min.js"></script>
+<style>
+	/*new style*/
+ * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", system-ui,
+        sans-serif;
+      color: #222;
+      line-height: 1.6;
+      background-color: #f4f6fb;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 컬러 톤 (학원 컬러 맞춰 변경해도 됨) */
+    :root {
+      --color-primary: #1d3c7a; /* 네이비 */
+      --color-secondary: #f1a400; /* 포인트 */
+      --color-bg: #f4f6fb;
+      --color-border: #d7dcea;
+      --color-text-muted: #666;
+      --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --radius-lg: 14px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    section:nth-of-type(even) {
+      background-color: #ffffff;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--color-text-muted);
+    }
+
+    /* =====================
+       헤더 & 네비게이션
+       ===================== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--color-primary);
+      font-size: 18px;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--color-primary);
+    }
+
+    nav ul {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+      font-size: 14px;
+    }
+
+    nav li a {
+      color: #444;
+      font-weight: 500;
+    }
+
+    nav li a:hover {
+      color: var(--color-primary);
+    }
+
+    .header-cta {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-outline {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background-color: #fff;
+    }
+
+    .btn-outline:hover {
+      background-color: #f3f6ff;
+    }
+
+    /* =====================
+       HERO
+       ===================== */
+    .hero {
+      background: linear-gradient(135deg, #001f4f, #23407f);
+      color: #fff;
+      padding: 80px 0 90px;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 50px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      position: relative;
+      display: inline-block;
+	  min-height: 120px;
+    }
+
+    .hero-title::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #fff;           /* 배경색에 맞게 조정 (다크배너면 흰색, 밝으면 네이비 등) */
+  margin-left: 4px;
+  animation: blink 0.8s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+    .hero-title.done::after {
+  display: none;
+}
+
+    .hero-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 24px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.4);
+      opacity: 0.9;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .hero-note {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    .hero-visual {
+      background-color: rgba(255,255,255,0.06);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.4);
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero-visual-header {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .hero-visual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .hero-visual-card {
+      background-color: rgba(0,0,0,0.25);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .hero-visual-label {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .hero-visual-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .hero-visual-footer {
+      margin-top: 14px;
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    /* =====================
+       카드 그리드 (차별점)
+       ===================== */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .feature-card {
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--color-border);
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  will-change: opacity, transform;
+      
+}
+
+/* grid-4에 visible 클래스가 붙으면 순차 등장 */
+.grid-4.visible .feature-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 카드별 약간씩 딜레이 줘서 슈루룩~ */
+.grid-4.visible .feature-card:nth-child(1) { transition-delay: 0.0s; }
+.grid-4.visible .feature-card:nth-child(2) { transition-delay: 0.08s; }
+.grid-4.visible .feature-card:nth-child(3) { transition-delay: 0.16s; }
+.grid-4.visible .feature-card:nth-child(4) { transition-delay: 0.24s; }
+
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      background-color: #e7ecfa;
+      margin-bottom: 12px;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #111;
+    }
+
+    .feature-text {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    /* =====================
+       타임라인 (연간 프로그램)
+       ===================== */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .timeline-item {
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+  will-change: opacity, transform;
+    }
+
+    .timeline.visible .timeline-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 순차적으로 슈르륵 */
+.timeline.visible .timeline-item:nth-child(1) { transition-delay: 0s; }
+.timeline.visible .timeline-item:nth-child(2) { transition-delay: .08s; }
+.timeline.visible .timeline-item:nth-child(3) { transition-delay: .16s; }
+.timeline.visible .timeline-item:nth-child(4) { transition-delay: .24s; }
+
+    .timeline-badge {
+      position: absolute;
+      top: -13px;
+      left: 16px;
+      background-color: var(--color-primary);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .timeline-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .timeline-period {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: 8px;
+    }
+
+    .timeline-text {
+      font-size: 13px;
+      color: #444;
+    }
+
+    /* =====================
+       리스트 블록 (하루 루틴 / 운영)
+       ===================== */
+    .pill-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .pill-item {
+      background-color: #ffffff;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 13px;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background-color: var(--color-primary);
+    }
+
+    /* =====================
+       2컬럼 레이아웃 (관리 시스템)
+       ===================== */
+    .two-column {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .panel {
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .panel-list {
+      list-style: none;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .panel-list li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 6px;
+    }
+
+    .panel-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-size: 14px;
+    }
+
+    /* =====================
+       강사 영역 / 카드
+       ===================== */
+    .teacher-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .teacher-card {
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .teacher-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 999px;
+      margin: 0 auto 10px;
+      background: #dde3f5;
+    }
+
+    .teacher-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .teacher-role {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: 6px;
+    }
+
+    .teacher-text {
+      font-size: 12px;
+    }
+
+    .stats-box {
+      margin-top: 24px;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px dashed var(--color-primary);
+      background-color: #eaf0ff;
+      font-size: 13px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .stats-item {
+      font-weight: 700;
+    }
+
+    /* =====================
+       갤러리
+       ===================== */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .gallery-item {
+      border-radius: var(--radius-lg);
+      background-color: #dde3f5;
+      height: 160px;
+    }
+
+    /* =====================
+       CTA / 문의
+       ===================== */
+    .cta {
+      text-align: center;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+
+    .cta-info {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    /* =====================
+       FAQ
+       ===================== */
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background-color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .faq-question {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .faq-answer {
+      color: var(--color-text-muted);
+    }
+
+    /* =====================
+       푸터
+       ===================== */
+    footer {
+      padding: 30px 0;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    /* =====================
+       반응형
+       ===================== */
+    @media (max-width: 992px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        margin-top: 20px;
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+
+      .timeline {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+
+      .teacher-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+
+      nav ul {
+        display: none; /* 필요 시 모바일 메뉴로 교체 */
+      }
+    }
+
+    @media (max-width: 640px) {
+      section {
+        padding: 60px 0;
+      }
+
+      .hero {
+        padding: 60px 0 70px;
+      }
+
+      .hero-title {
+        font-size: 28px;
+      }
+
+      .grid-4,
+      .timeline,
+      .pill-list,
+      .teacher-grid,
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        justify-content: space-between;
+      }
+    }
+
+</style>
+<div class="newbtitle">
+	N수 모집안내
+</div>
+<div class="newbtitle2">
+	초격차 재수종합반 | 수학집중 독학재수반 | 독학재수반
+</div>
+<div class="sv">
+   <p><img src="/newimg/newsv_3.jpg" alt="" /></p>
+</div>
+<div class="s_wrap">
+	<div class="s_loca">
+		<div class="s_loca_inner">
+			<?php
+				$on01 ='on';
+				$on002023_1 = 111;
+				$onn012023 ='on2';
+				include_once(G5_PATH.'/include/i2.php');
+			?>
+		</div>
+	</div>
+	
+	</div>
+<section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <div class="hero-eyebrow">PYEONGCHON JONGRO</div>
+        <h1 class="hero-title" id="heroTitle">
+          <!--앞선 선택,<br />
+          대학이 달라진다!-->
+        </h1>
+        <p class="hero-subtitle">
+          오직, 학생만을 생각합니다.
+        </p>
+
+        <div class="hero-badges">
+          <span class="hero-badge">강의 만족도 96% 이상</span>
+          <span class="hero-badge">완벽한 관리 시스템</span>
+          <span class="hero-badge">1:1 수학책임담임제</span>
+          <span class="hero-badge">일일테스트 & 피드백</span>
+        </div>
+
+        <!--<div class="hero-cta">
+          <a href="#contact" class="btn btn-primary">입학 상담 신청</a>
+          <a href="#program" class="btn btn-outline">연간 프로그램 보기</a>
+        </div>
+        <div class="hero-note">
+          지금 상담 신청 시, 0학기 진단 TEST & 학습 컨설팅 제공
+        </div>-->
+      </div>
+
+      <!--<div class="hero-visual">
+        <div>
+          <div class="hero-visual-header">나만의 맞춤형 시간표 예시</div>
+          <div class="hero-visual-grid">
+            <div class="hero-visual-card">
+              <div class="hero-visual-label">오전</div>
+              <div class="hero-visual-value">국어 개념 + 일일 TEST</div>
+            </div>
+            <div class="hero-visual-card">
+              <div class="hero-visual-label">오후</div>
+              <div class="hero-visual-value">수학 심화 강의 · 질의응답</div>
+            </div>
+            <div class="hero-visual-card">
+              <div class="hero-visual-label">저녁</div>
+              <div class="hero-visual-value">영어 독해 훈련 · 단어 TEST</div>
+            </div>
+            <div class="hero-visual-card">
+              <div class="hero-visual-label">야간</div>
+              <div class="hero-visual-value">지정 자습석 집중 학습</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual-footer">
+          * 실제 시간표는 학생 성적과 과목별 수준에 따라 1:1 설계됩니다.
+        </div>
+      </div>
+    </div>-->
+  </section>
+
+  <!-- =====================
+       섹션 1 : 학원의 차별점
+       ===================== -->
+  <section id="difference">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">평촌종로학원은 다릅니다.</h2>
+        <p class="section-subtitle">
+          끝까지 책임지는 평촌종로학원만의 완벽한 관리 시스템
+        </p>
+      </div>
+
+      <div class="grid-4">
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3 class="feature-title">최강 강사진</h3>
+          <p class="feature-text">
+            강의 만족도 96% 이상.<br />
+            오랜 재수 전문 노하우를 가진 강사진이 수업을 진행합니다.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3 class="feature-title">필수 + 선택 수업</h3>
+          <p class="feature-text">
+            수준별 필수 수업과 선택 수업 구성으로<br />
+            학생 개개인의 약점을 정확히 보완합니다.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3 class="feature-title">일일 TEST 시스템</h3>
+          <p class="feature-text">
+            국어·영어·탐구 일일 테스트로<br />
+            개념 누수 없이 학습 내용을 점검합니다.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"></div>
+          <h3 class="feature-title">멘토 학습 상담</h3>
+          <p class="feature-text">
+            전담 담임 선생님이 1:1 상담과 질의응답을 통해<br />
+            학습 방향과 생활 습관까지 함께 관리합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 2 : 연간 학습 프로그램
+       ===================== -->
+  <section id="program">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">한 해 전체가 계획되는 학습 로드맵</h2>
+        <p class="section-subtitle">
+          0학기부터 수능 직전 FINAL까지, 단계별 목표가 분명합니다.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-badge">0학기 (6주)</div>
+          <div class="timeline-title">기본 개념 완성</div>
+          <div class="timeline-period">국·수·영 기반 다지기</div>
+          <div class="timeline-text">
+            전 과목 기본 개념을 빠짐없이 점검하고<br />
+            재수 학습의 출발선을 맞춰 주는 기간입니다.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-badge">1학기 (18주)</div>
+          <div class="timeline-title">원리·개념 중심 / 6월 평가원 대비</div>
+          <div class="timeline-period">심화 개념 + 유형 학습</div>
+          <div class="timeline-text">
+            과목별 개념을 완성하고 주요 유형을 반복 훈련합니다.<br />
+            6월 평가원 모의고사에서의 첫 성적을 목표로 합니다.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-badge">2학기 (13주)</div>
+          <div class="timeline-title">실전 적용 / 9월 평가원 대비</div>
+          <div class="timeline-period">고난도·실전 문제 훈련</div>
+          <div class="timeline-text">
+            기출·모의고사를 중심으로 실전 감각을 키우고<br />
+            약점을 보완하는 집중 프로그램이 진행됩니다.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-badge">3학기 (7.5주)</div>
+          <div class="timeline-title">총정리 & FINAL</div>
+          <div class="timeline-period">수능 직전 마무리</div>
+          <div class="timeline-text">
+            예상 문제풀이 및 FINAL 특강을 통해<br />
+            실수 최소화, 최종 점수 극대화를 목표로 합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 3 : 하루 루틴 / 운영 시스템
+       ===================== -->
+  <section id="routine">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">공부만 하면 됩니다. 우리는 나머지를 모두 관리합니다.</h2>
+        <p class="section-subtitle">
+          출결부터 자습, 식사와 쉬는 시간까지 재수생의 하루가 설계됩니다.
+        </p>
+      </div>
+
+      <div class="pill-list">
+        <div class="pill-item">
+          <span class="pill-dot"></span>
+          월~토 전일 등원 / 카드 출결 체크 & 실시간 문자 안내
+        </div>
+        <div class="pill-item">
+          <span class="pill-dot"></span>
+          지각·결석 시 담임 확인 및 학부모 통보, 생활 리듬 관리
+        </div>
+        <div class="pill-item">
+          <span class="pill-dot"></span>
+          매일 국어·영어·탐구 일일 테스트 및 SDLP 모의고사
+        </div>
+        <div class="pill-item">
+          <span class="pill-dot"></span>
+          지정 자습석 운영으로 안정적인 학습 공간 제공
+        </div>
+        <div class="pill-item">
+          <span class="pill-dot"></span>
+          학원 내 중식·석식 운영, 식사 후 바로 학습 연계
+        </div>
+        <div class="pill-item">
+          <span class="pill-dot"></span>
+          쉬는 시간에는 휴대폰 제한, 집중 가능한 학습 분위기 유지
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 4 : 완벽한 관리 시스템 (시간표/플래너)
+       ===================== -->
+  <section id="system">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">맞춤형 시간표 & 1:1 피드백 시스템</h2>
+        <p class="section-subtitle">
+          학생마다 다른 학습 수준과 생활 패턴을 반영해 시간표부터 다르게 설계합니다.
+        </p>
+      </div>
+
+      <div class="two-column">
+        <div class="panel">
+          <h3 class="panel-title">학생별 맞춤 시간표 설계</h3>
+          <ul class="panel-list">
+            <li>진단 TEST와 상담을 통해 과목별 수준을 먼저 파악합니다.</li>
+            <li>필수 수업 + 선택 수업을 조합하여 나만의 시간표를 구성합니다.</li>
+            <li>국어·수학·영어·탐구의 균형을 맞추어 학습 루틴을 설계합니다.</li>
+            <li>모의고사 결과에 따라 시간표를 수시로 재조정합니다.</li>
+          </ul>
+          <br />
+          <h3 class="panel-title">학습 플래너 & 일일 피드백</h3>
+          <ul class="panel-list">
+            <li>매일 학습 플래너를 작성하고, 담임 선생님이 직접 확인합니다.</li>
+            <li>계획 대비 실천 여부를 체크하며 개선 포인트를 코칭합니다.</li>
+            <li>주간 단위로 학습 리포트를 제공해 학부모님께도 진행 상황을 공유합니다.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3 class="panel-title">국·영·수 일일 테스트 & 미니 모의고사</h3>
+          <ul class="panel-list">
+            <li>매일 아침 국어 독해, 영어 어휘, 수학 개념 테스트 실시</li>
+            <li>주 3회 미니 모의고사로 실전 감각을 유지</li>
+            <li>테스트 결과를 바탕으로 오답 분석과 보완 과제 제시</li>
+            <li>성적 추적 시스템으로 점수 변화를 한눈에 확인</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 5 : 1:1 수학 책임 임담임제 & 탐구 멘토링
+       ===================== -->
+  <section id="teachers">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">한 선생님이 15명만 관리하는 1:1 수학책임담임제</h2>
+        <p class="section-subtitle">
+          수학과 탐구 과목까지, 학생 한 명 한 명의 약점을 끝까지 책임집니다.
+        </p>
+      </div>
+
+      <div class="teacher-grid">
+        <div class="teacher-card">
+          <div class="teacher-photo"></div>
+          <div class="teacher-name">박상진 선생님</div>
+          <div class="teacher-role">수학 책임 담임</div>
+          <div class="teacher-text">
+            개념의 핵심을 짚어 주는 설명과 꼼꼼한 과제 점검으로<br />
+            수학 1등급 완성을 목표로 지도합니다.
+          </div>
+        </div>
+        <div class="teacher-card">
+          <div class="teacher-photo"></div>
+          <div class="teacher-name">김OO 선생님</div>
+          <div class="teacher-role">수학 / 학습 코치</div>
+          <div class="teacher-text">
+            학습 계획 수립부터 시험 직전 점검까지, 수험 생활 전반을<br />
+            함께 관리하는 멘토 역할을 담당합니다.
+          </div>
+        </div>
+        <div class="teacher-card">
+          <div class="teacher-photo"></div>
+          <div class="teacher-name">정OO 선생님</div>
+          <div class="teacher-role">탐구 멘토</div>
+          <div class="teacher-text">
+            탐구 과목 개념 정리와 기출 분석, 오답 관리까지<br />
+            주 1회 20~30분 개별 멘토링을 진행합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-box">
+        <div><strong>평촌종로 재종반 수학 성적 향상 결과</strong></div>
+        <div class="stats-row">
+          <div class="stats-item">1등급 12%</div>
+          <div class="stats-item">2등급 25%</div>
+          <div class="stats-item">3등급 38%</div>
+        </div>
+        <div style="margin-top: 6px; font-size: 12px;">
+          (최근 재수종합반 기준 / 학원 내부 통계 예시, 실제 수치는 수정 가능)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 6 : 학원 생활 갤러리
+       ===================== -->
+  <section id="gallery">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">기록되는 하루, 올라가는 성적</h2>
+        <p class="section-subtitle">
+          자습 · 수업 · 테스트 · 상담까지, 평촌종로학원의 일상을 담았습니다.
+        </p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item"></div>
+        <div class="gallery-item"></div>
+        <div class="gallery-item"></div>
+        <div class="gallery-item"></div>
+        <div class="gallery-item"></div>
+        <div class="gallery-item"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 7 : CTA / 입학 안내
+       ===================== -->
+  <section id="contact">
+    <div class="container cta">
+      <div class="section-header">
+        <h2 class="section-title">지금 시작해야 합니다.</h2>
+        <p class="section-subtitle">
+          좋은 결과는 준비된 학생에게 찾아옵니다. 지금 바로 상담을 신청하세요.
+        </p>
+      </div>
+
+      <div class="cta-buttons">
+        <a href="#!" class="btn btn-primary">입학 상담 신청</a>
+        <a href="#!" class="btn btn-outline">학부모 설명회 예약</a>
+      </div>
+
+      <div class="cta-info">
+        문의 전화 : 031-000-0000 &nbsp; | &nbsp;
+        카카오톡 채널 : 평촌종로학원 재수종합반
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================
+       섹션 8 : FAQ
+       ===================== -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">자주 묻는 질문</h2>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question">Q. 수업 시간은 어떻게 구성되어 있나요?</div>
+          <div class="faq-answer">
+            A. 월요일부터 토요일까지 전일 등원이며, 오전에는 국어·수학,
+            오후에는 영어·탐구 및 선택 수업, 저녁에는 자습과 질의응답 시간으로
+            구성되어 있습니다.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Q. 자습실은 어떻게 운영되나요?</div>
+          <div class="faq-answer">
+            A. 학생별 지정 자습석을 부여하며, 담임 선생님의 순찰과 출결 체크
+            시스템을 통해 자습 태도까지 관리합니다.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Q. 모의고사와 성적 관리는 어떻게 이루어지나요?</div>
+          <div class="faq-answer">
+            A. 정기 평가원 모의고사뿐만 아니라 학원 자체 모의고사를 병행하여
+            성적 추이를 분석하고, 결과에 따라 개인별 학습 전략을 재설계합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+	
+	 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const el = document.getElementById("heroTitle");
+    const text = "앞선 선택,\n대학이 달라진다!";
+    let index = 0;
+
+    function type() {
+      if (index < text.length) {
+        const char = text[index];
+
+        if (char === "\n") {
+          el.innerHTML += "<br />";
+        } else {
+          el.innerHTML += char;
+        }
+
+        index++;
+        setTimeout(type, 120);
+      } else {
+        // 글자 출력이 끝나면 클래스 추가
+        el.classList.add("done");
+      }
+    }
+
+    type();
+  });
+
+  // 카드 슬라이드
+  document.addEventListener("DOMContentLoaded", () => {
+  // 애니메이션 적용할 그룹들(그리드, 타임라인 등)
+  const groups = document.querySelectorAll(".grid-4, .timeline");
+  if (!groups.length) return;
+
+  const io = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible"); // grid-4 또는 timeline에 visible 추가
+          observer.unobserve(entry.target);      // 한 번만 실행되게
+        }
+      });
+    },
+    { threshold: 0.9 }
+  );
+
+  groups.forEach(group => io.observe(group));
+});
+</script>
+
+
+
+<?php
+include_once(G5_PATH.'/tail.php');
+
