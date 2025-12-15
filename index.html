@@ -309,16 +309,49 @@
   will-change: opacity, transform;
 }
 
-    .section-illustration {
- display: flex;
+	  .difference-body {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  margin: 80px auto;
+  gap: 40px;
+  margin-top: 60px;
+}
+
+    .section-illustration {
+  flex: 0 0 40%;
+  display: flex;
+  justify-content: center;
 }
 
 .section-illustration img {
- max-width: 380px;
+  max-width: 320px;
   height: auto;
   display: block;
+}
+
+/* 오른쪽 카드 2×2 */
+#difference .grid-4 {
+  flex: 0 0 50%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* 반응형 */
+@media (max-width: 992px) {
+  .difference-body {
+    flex-direction: column;
+    align-items: center;
+  }
+  #difference .grid-4 {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  #difference .grid-4 {
+    grid-template-columns: 1fr;
+  }
 }
 
 
@@ -980,6 +1013,8 @@
         </p>
       </div>
 
+		<div class="difference-body">
+
         <div class="section-illustration fade-up">
     <img src="newimg/studentspic.png" alt="학생 이미지">
   </div>
@@ -1019,6 +1054,7 @@
         </div>
       </div>
     </div>
+ </div>
   </section>
 
   <!-- =====================
