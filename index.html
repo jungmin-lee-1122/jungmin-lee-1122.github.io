@@ -366,141 +366,475 @@
 }
 
     /* =====================
-       카드 그리드 (차별점)
+       PROFILE SECTION CSS
        ===================== */
-    .feature-card {
-  opacity: 0;
-  transform: translateY(40px);
-  transition:
-    opacity 0.6s ease-out,
-    transform 0.6s ease-out;
-  will-change: opacity, transform;
+   .profile-section {
+  position: relative;
+  overflow: hidden;
+  padding: 140px 0;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(139, 92, 246, 0.14), transparent 28%),
+    radial-gradient(circle at 88% 60%, rgba(34, 211, 238, 0.08), transparent 26%),
+    linear-gradient(180deg, #0b0f14 0%, #081020 100%);
+  color: #e5e7eb;
 }
 
-	  .difference-body {
+.profile-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  pointer-events: none;
+}
+
+.profile-section::after {
+  content: "PROFILE";
+  position: absolute;
+  left: -24px;
+  top: 38px;
+  font-size: clamp(90px, 17vw, 230px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.09em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.075);
+  pointer-events: none;
+}
+
+.profile-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.profile-head {
+  margin-bottom: 72px;
+}
+
+.section-eyebrow {
+  margin-bottom: 24px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  color: #9ca3af;
+}
+
+.ppoint {
+  color: #8b5cf6;
+  font-weight: 900;
+}
+
+.profile-title-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  padding-top: 36px;
+}
+
+.profile-title-wrap h2 {
+  margin: 0;
+  font-size: clamp(56px, 8vw, 128px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+  color: #f8fafc;
+  font-weight: 900;
+}
+
+.profile-title-wrap strong {
+  flex-shrink: 0;
+  padding: 12px 18px;
+  border: 1px solid rgba(139, 92, 246, 0.55);
+  border-radius: 999px;
+  color: #22d3ee;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profile-desc {
+  max-width: 720px;
+  margin-top: 36px;
+  font-size: 18px;
+  line-height: 1.8;
+  color: #aeb7c8;
+  font-weight: 500;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 22px;
+}
+
+.profile-card {
+  position: relative;
+  padding: 28px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.profile-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.14), transparent 36%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.profile-card:hover::before {
+  opacity: 1;
+}
+
+.profile-intro {
+  grid-row: span 2;
+}
+
+.profile-photo {
+  width: 112px;
+  height: 112px;
+  margin-bottom: 34px;
+  border-radius: 28px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.profile-photo img {
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.profile-label {
+  display: inline-flex;
+  margin-bottom: 18px;
+  color: #22d3ee;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profile-intro-text h3 {
+  margin: 0;
+  font-size: clamp(34px, 4vw, 54px);
+  line-height: 1.05;
+  letter-spacing: -0.065em;
+  color: #f8fafc;
+  font-weight: 900;
+}
+
+.profile-intro-text p {
+  margin: 22px 0 34px;
+  color: #aeb7c8;
+  font-size: 16px;
+  line-height: 1.75;
+  font-weight: 500;
+}
+
+.profile-contact {
+  display: grid;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-contact li {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.profile-contact span {
+  color: #6f7b90;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-contact strong {
+  color: #d7dce7;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.card-title {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 60px;
+  gap: 14px;
+  margin-bottom: 26px;
 }
 
-    .section-illustration {
-  flex: 0 0 40%;
-  display: flex;
-  justify-content: center;
+.card-title span {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  color: #22d3ee;
+  font-size: 12px;
+  font-weight: 900;
 }
 
-.section-illustration img {
-  max-width: 320px;
-  height: auto;
-  display: block;
+.card-title h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
-/* 오른쪽 카드 2×2 */
-#difference .grid-4 {
-  flex: 0 0 50%;
+.resume-list,
+.strength-list {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.resume-list li {
+  display: grid;
+  grid-template-columns: 86px 1fr;
   gap: 18px;
 }
 
-/* 반응형 */
-@media (max-width: 992px) {
-  .difference-body {
-    flex-direction: column;
-    align-items: center;
-  }
-  #difference .grid-4 {
-    width: 100%;
-  }
-}
-
-@media (max-width: 640px) {
-  #difference .grid-4 {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-    /* === Fade Down Animation === */
-
-.fade-down {
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-
-.fade-down.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Delay (optional) */
-.delay-1 {
-  transition-delay: 0.25s;
-}
-
-/* 학원의 차별점 카드 레이아웃 + 스타일 */
-.grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
-
-/* 여기서는 모양만 잡아주고, 애니메이션(opacity/transform)은 그대로 유지 */
-.feature-card {
-  background-color: #ffffff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid #d7dcea;
-}
-
-/* 카드 안 내용 스타일 */
-.feature-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 11px;
-  background-color: #e7ecfa;
-  margin-bottom: 12px;
-}
-
-.feature-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: #111;
-}
-
-.feature-text {
+.resume-date {
+  color: #6f7b90;
   font-size: 13px;
-  color: #666;
+  font-weight: 800;
 }
 
-/* 반응형: 태블릿에서 2열, 모바일에서 1열 */
-@media (max-width: 992px) {
-  .grid-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.resume-list strong,
+.strength-list strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #e5e7eb;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 800;
 }
 
-@media (max-width: 640px) {
-  .grid-4 {
-    grid-template-columns: 1fr;
-  }
+.resume-list p,
+.strength-list p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
+.strength-list li {
+  padding-left: 18px;
+  border-left: 2px solid rgba(139, 92, 246, 0.55);
+}
 
-.grid-4.visible .feature-card {
+.skill-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 22px;
+}
+
+.skill-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+  color: #d7dce7;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.skill-top em {
+  color: #8b5cf6;
+  font-style: normal;
+}
+
+.skill-bar {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.skill-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8b5cf6, #22d3ee);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-item.is-visible .skill-bar span {
+  transform: scaleX(1);
+}
+
+.profile-wide {
+  grid-column: span 2;
+}
+
+.process-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.process-list li {
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(8, 16, 32, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.process-list span {
+  display: block;
+  margin-bottom: 22px;
+  color: #8b5cf6;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.process-list strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #f8fafc;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.process-list p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* scroll motion */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.75s ease,
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-item.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.grid-4.visible .feature-card:nth-child(1) { transition-delay: 0s; }
-.grid-4.visible .feature-card:nth-child(2) { transition-delay: 0.08s; }
-.grid-4.visible .feature-card:nth-child(3) { transition-delay: 0.16s; }
-.grid-4.visible .feature-card:nth-child(4) { transition-delay: 0.24s; }
+/* responsive */
+@media (max-width: 1100px) {
+  .profile-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile-intro {
+    grid-row: auto;
+    grid-column: span 2;
+  }
+
+  .profile-wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 860px) {
+  .profile-section {
+    padding: 110px 0;
+  }
+
+  .profile-title-wrap {
+    display: block;
+  }
+
+  .profile-title-wrap strong {
+    display: inline-flex;
+    margin-top: 24px;
+  }
+
+  .profile-desc br {
+    display: none;
+  }
+
+  .process-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .profile-inner {
+    padding: 0 20px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-intro,
+  .profile-wide {
+    grid-column: auto;
+  }
+
+  .profile-card {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .profile-contact li {
+    display: block;
+  }
+
+  .profile-contact strong {
+    display: block;
+    margin-top: 6px;
+    text-align: left;
+  }
+
+  .resume-list li {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .process-list {
+    grid-template-columns: 1fr;
+  }
+}
 
 	/* =====================
        WORK SECTION CSS
@@ -1109,63 +1443,210 @@
 </section>
 
   <!-- =====================
-       섹션 1 : 학원의 차별점
+       섹션 2 : PROFILE SECTION HTML
        ===================== -->
-  <section id="difference">
-    <div class="container">
-      <div class="section-header">
-         <h2 class="section-title fade-down">평촌종로학원은 다릅니다.</h2>
-        <p class="section-subtitle fade-down delay-1">
-         학습 습관부터 성적까지, 저희는 끝까지 책임집니다.
-        </p>
+ <section class="profile-section" id="profile">
+  <div class="profile-inner">
+
+    <div class="profile-head">
+      <p class="section-eyebrow">
+        <span class="ppoint">P</span>ROFILE
+      </p>
+
+      <div class="profile-title-wrap">
+        <h2>
+          Publisher<br>
+          Resume
+        </h2>
+        <strong>About Me</strong>
       </div>
 
-		<div class="difference-body">
-
-        <div class="section-illustration fade-up">
-    <img src="newimg/studentspic.png" alt="학생 이미지">
-  </div>
-
-      <div class="grid-4">
-        <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3 class="feature-title">최강 강사진</h3>
-          <p class="feature-text">
-            강의 만족도 96% 이상.<br />
-            오랜 재수 전문 노하우를 가진 강사진이 수업을 진행합니다.
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3 class="feature-title">필수 + 선택 수업</h3>
-          <p class="feature-text">
-            수준별 필수 수업과 선택 수업 구성으로<br />
-            학생 개개인의 약점을 정확히 보완합니다.
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3 class="feature-title">일일 TEST 시스템</h3>
-          <p class="feature-text">
-            국어·영어·탐구 일일 테스트로<br />
-            개념 누수 없이 학습 내용을 점검합니다.
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3 class="feature-title">멘토 학습 상담</h3>
-          <p class="feature-text">
-            전담 담임 선생님이 1:1 상담과 질의응답을 통해<br />
-            학습 방향과 생활 습관까지 함께 관리합니다.
-          </p>
-        </div>
-      </div>
+      <p class="profile-desc">
+        디자인의 의도를 읽고, 사용자가 편하게 읽고 사용할 수 있는 화면으로 구현합니다.<br>
+        빠른 제작 속도와 안정적인 반응형 퍼블리싱을 강점으로 작업합니다.
+      </p>
     </div>
- </div>
-  </section>
+
+    <div class="profile-grid">
+
+      <div class="profile-card profile-intro reveal-item">
+        <div class="profile-photo">
+          <img src="./img/favicon.png" alt="JM Lee profile">
+        </div>
+
+        <div class="profile-intro-text">
+          <span class="profile-label">Web Publisher</span>
+          <h3>
+            감각은 깊게,<br>
+            구조는 단단하게.
+          </h3>
+          <p>
+            읽기 쉽고 사용하기 편한 웹사이트 화면을 구현하는 웹 퍼블리셔 JM LEE입니다.
+          </p>
+        </div>
+
+        <ul class="profile-contact">
+          <li>
+            <span>Name</span>
+            <strong>JM Lee</strong>
+          </li>
+          <li>
+            <span>Email</span>
+            <strong>burningtree02@gmail.com</strong>
+          </li>
+          <li>
+            <span>Role</span>
+            <strong>Web Publisher</strong>
+          </li>
+          <li>
+            <span>Focus</span>
+            <strong>Responsive · Landing · UI</strong>
+          </li>
+        </ul>
+      </div>
+
+      <div class="profile-card reveal-item">
+        <div class="card-title">
+          <span>01</span>
+          <h3>Experience</h3>
+        </div>
+
+        <ul class="resume-list">
+          <li>
+            <span class="resume-date">2024 - Now</span>
+            <div>
+              <strong>학원/교육 서비스 웹 퍼블리싱</strong>
+              <p>프로모션 랜딩, 상품 페이지, 이벤트 페이지 반응형 퍼블리싱</p>
+            </div>
+          </li>
+          <li>
+            <span class="resume-date">Project</span>
+            <div>
+              <strong>상업용 랜딩 페이지 제작</strong>
+              <p>CTA 흐름, 섹션별 정보 위계, 모바일 화면 대응 중심 구현</p>
+            </div>
+          </li>
+          <li>
+            <span class="resume-date">UI</span>
+            <div>
+              <strong>모바일 내비게이션 UI</strong>
+              <p>사용자 접근성과 이동 흐름을 고려한 UI 구조 구현</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="profile-card reveal-item">
+        <div class="card-title">
+          <span>02</span>
+          <h3>Strength</h3>
+        </div>
+
+        <ul class="strength-list">
+          <li>
+            <strong>Responsive Publishing</strong>
+            <p>PC, tablet, mobile 환경에 맞춘 안정적인 반응형 구조 구현</p>
+          </li>
+          <li>
+            <strong>Readable Layout</strong>
+            <p>정보 위계와 가독성을 고려해 읽기 쉬운 화면 구성</p>
+          </li>
+          <li>
+            <strong>Fast Production</strong>
+            <p>프로모션 페이지를 빠르고 정확하게 제작하는 실무 대응력</p>
+          </li>
+          <li>
+            <strong>Detail Control</strong>
+            <p>간격, 정렬, hover, motion 등 작은 디테일까지 정리</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="profile-card reveal-item">
+        <div class="card-title">
+          <span>03</span>
+          <h3>Skills</h3>
+        </div>
+
+        <div class="skill-list">
+          <div class="skill-item">
+            <div class="skill-top">
+              <span>HTML / CSS</span>
+              <em>90%</em>
+            </div>
+            <div class="skill-bar">
+              <span style="width: 90%"></span>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-top">
+              <span>Responsive Web</span>
+              <em>88%</em>
+            </div>
+            <div class="skill-bar">
+              <span style="width: 88%"></span>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-top">
+              <span>JavaScript / jQuery</span>
+              <em>75%</em>
+            </div>
+            <div class="skill-bar">
+              <span style="width: 75%"></span>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-top">
+              <span>Photoshop / Design Tool</span>
+              <em>80%</em>
+            </div>
+            <div class="skill-bar">
+              <span style="width: 80%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-card profile-wide reveal-item">
+        <div class="card-title">
+          <span>04</span>
+          <h3>Publishing Process</h3>
+        </div>
+
+        <ol class="process-list">
+          <li>
+            <span>01</span>
+            <strong>Read</strong>
+            <p>디자인 시안과 콘텐츠 흐름을 먼저 파악합니다.</p>
+          </li>
+          <li>
+            <span>02</span>
+            <strong>Structure</strong>
+            <p>섹션 구조, 반응형 기준, 공통 스타일을 정리합니다.</p>
+          </li>
+          <li>
+            <span>03</span>
+            <strong>Build</strong>
+            <p>HTML, CSS, JavaScript로 화면을 정확하게 구현합니다.</p>
+          </li>
+          <li>
+            <span>04</span>
+            <strong>Refine</strong>
+            <p>디테일, 사용성, 모바일 화면을 점검하고 개선합니다.</p>
+          </li>
+        </ol>
+      </div>
+
+    </div>
+  </div>
+</section>
 
   <!-- =====================
-       섹션 2 : WORK SECTION HTML
+       섹션 3 : WORK SECTION HTML
        ===================== -->
   <section class="work-section" id="work">
   <div class="work-inner">
@@ -1376,229 +1857,7 @@
     </ul>
   </div>
 </section>
-  <!-- =====================
-       섹션 3 : 하루 루틴 / 운영 시스템
-       ===================== -->
-  <section id="routine">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">공부만 하면 됩니다. 우리는 나머지를 모두 관리합니다.</h2>
-        <p class="section-subtitle">
-          출결부터 자습, 식사와 쉬는 시간까지 재수생의 하루가 설계됩니다.
-        </p>
-      </div>
-
-      <div class="pill-list">
-        <div class="pill-item">
-          <span class="pill-dot"></span>
-          월~토 전일 등원 / 카드 출결 체크 & 실시간 문자 안내
-        </div>
-        <div class="pill-item">
-          <span class="pill-dot"></span>
-          지각·결석 시 담임 확인 및 학부모 통보, 생활 리듬 관리
-        </div>
-        <div class="pill-item">
-          <span class="pill-dot"></span>
-          매일 국어·영어·탐구 일일 테스트 및 SDLP 모의고사
-        </div>
-        <div class="pill-item">
-          <span class="pill-dot"></span>
-          지정 자습석 운영으로 안정적인 학습 공간 제공
-        </div>
-        <div class="pill-item">
-          <span class="pill-dot"></span>
-          학원 내 중식·석식 운영, 식사 후 바로 학습 연계
-        </div>
-        <div class="pill-item">
-          <span class="pill-dot"></span>
-          쉬는 시간에는 휴대폰 제한, 집중 가능한 학습 분위기 유지
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================
-       섹션 4 : 완벽한 관리 시스템 (시간표/플래너)
-       ===================== -->
-  <section id="system">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">맞춤형 시간표 & 1:1 피드백 시스템</h2>
-        <p class="section-subtitle">
-          학생마다 다른 학습 수준과 생활 패턴을 반영해 시간표부터 다르게 설계합니다.
-        </p>
-      </div>
-
-      <div class="two-column">
-        <div class="panel">
-          <h3 class="panel-title">학생별 맞춤 시간표 설계</h3>
-          <ul class="panel-list">
-            <li>진단 TEST와 상담을 통해 과목별 수준을 먼저 파악합니다.</li>
-            <li>필수 수업 + 선택 수업을 조합하여 나만의 시간표를 구성합니다.</li>
-            <li>국어·수학·영어·탐구의 균형을 맞추어 학습 루틴을 설계합니다.</li>
-            <li>모의고사 결과에 따라 시간표를 수시로 재조정합니다.</li>
-          </ul>
-          <br />
-          <h3 class="panel-title">학습 플래너 & 일일 피드백</h3>
-          <ul class="panel-list">
-            <li>매일 학습 플래너를 작성하고, 담임 선생님이 직접 확인합니다.</li>
-            <li>계획 대비 실천 여부를 체크하며 개선 포인트를 코칭합니다.</li>
-            <li>주간 단위로 학습 리포트를 제공해 학부모님께도 진행 상황을 공유합니다.</li>
-          </ul>
-        </div>
-
-        <div class="panel">
-          <h3 class="panel-title">국·영·수 일일 테스트 & 미니 모의고사</h3>
-          <ul class="panel-list">
-            <li>매일 아침 국어 독해, 영어 어휘, 수학 개념 테스트 실시</li>
-            <li>주 3회 미니 모의고사로 실전 감각을 유지</li>
-            <li>테스트 결과를 바탕으로 오답 분석과 보완 과제 제시</li>
-            <li>성적 추적 시스템으로 점수 변화를 한눈에 확인</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================
-       섹션 5 : 1:1 수학 책임 임담임제 & 탐구 멘토링
-       ===================== -->
-  <section id="teachers">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">한 선생님이 15명만 관리하는 1:1 수학책임담임제</h2>
-        <p class="section-subtitle">
-          수학과 탐구 과목까지, 학생 한 명 한 명의 약점을 끝까지 책임집니다.
-        </p>
-      </div>
-
-      <div class="teacher-grid">
-        <div class="teacher-card">
-          <div class="teacher-photo"></div>
-          <div class="teacher-name">박상진 선생님</div>
-          <div class="teacher-role">수학 책임 담임</div>
-          <div class="teacher-text">
-            개념의 핵심을 짚어 주는 설명과 꼼꼼한 과제 점검으로<br />
-            수학 1등급 완성을 목표로 지도합니다.
-          </div>
-        </div>
-        <div class="teacher-card">
-          <div class="teacher-photo"></div>
-          <div class="teacher-name">김OO 선생님</div>
-          <div class="teacher-role">수학 / 학습 코치</div>
-          <div class="teacher-text">
-            학습 계획 수립부터 시험 직전 점검까지, 수험 생활 전반을<br />
-            함께 관리하는 멘토 역할을 담당합니다.
-          </div>
-        </div>
-        <div class="teacher-card">
-          <div class="teacher-photo"></div>
-          <div class="teacher-name">정OO 선생님</div>
-          <div class="teacher-role">탐구 멘토</div>
-          <div class="teacher-text">
-            탐구 과목 개념 정리와 기출 분석, 오답 관리까지<br />
-            주 1회 20~30분 개별 멘토링을 진행합니다.
-          </div>
-        </div>
-      </div>
-
-      <div class="stats-box">
-        <div><strong>평촌종로 재종반 수학 성적 향상 결과</strong></div>
-        <div class="stats-row">
-          <div class="stats-item">1등급 12%</div>
-          <div class="stats-item">2등급 25%</div>
-          <div class="stats-item">3등급 38%</div>
-        </div>
-        <div style="margin-top: 6px; font-size: 12px;">
-          (최근 재수종합반 기준 / 학원 내부 통계 예시, 실제 수치는 수정 가능)
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================
-       섹션 6 : 학원 생활 갤러리
-       ===================== -->
-  <section id="gallery">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">기록되는 하루, 올라가는 성적</h2>
-        <p class="section-subtitle">
-          자습 · 수업 · 테스트 · 상담까지, 평촌종로학원의 일상을 담았습니다.
-        </p>
-      </div>
-
-      <div class="gallery-grid">
-        <div class="gallery-item"></div>
-        <div class="gallery-item"></div>
-        <div class="gallery-item"></div>
-        <div class="gallery-item"></div>
-        <div class="gallery-item"></div>
-        <div class="gallery-item"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================
-       섹션 7 : CTA / 입학 안내
-       ===================== -->
-  <section id="contact">
-    <div class="container cta">
-      <div class="section-header">
-        <h2 class="section-title">지금 시작해야 합니다.</h2>
-        <p class="section-subtitle">
-          좋은 결과는 준비된 학생에게 찾아옵니다. 지금 바로 상담을 신청하세요.
-        </p>
-      </div>
-
-      <div class="cta-buttons">
-        <a href="#!" class="btn btn-primary">입학 상담 신청</a>
-        <a href="#!" class="btn btn-outline">학부모 설명회 예약</a>
-      </div>
-
-      <div class="cta-info">
-        문의 전화 : 031-000-0000 &nbsp; | &nbsp;
-        카카오톡 채널 : 평촌종로학원 재수종합반
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================
-       섹션 8 : FAQ
-       ===================== -->
-  <section id="faq">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">자주 묻는 질문</h2>
-      </div>
-
-      <div class="faq-list">
-        <div class="faq-item">
-          <div class="faq-question">Q. 수업 시간은 어떻게 구성되어 있나요?</div>
-          <div class="faq-answer">
-            A. 월요일부터 토요일까지 전일 등원이며, 오전에는 국어·수학,
-            오후에는 영어·탐구 및 선택 수업, 저녁에는 자습과 질의응답 시간으로
-            구성되어 있습니다.
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-question">Q. 자습실은 어떻게 운영되나요?</div>
-          <div class="faq-answer">
-            A. 학생별 지정 자습석을 부여하며, 담임 선생님의 순찰과 출결 체크
-            시스템을 통해 자습 태도까지 관리합니다.
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-question">Q. 모의고사와 성적 관리는 어떻게 이루어지나요?</div>
-          <div class="faq-answer">
-            A. 정기 평가원 모의고사뿐만 아니라 학원 자체 모의고사를 병행하여
-            성적 추이를 분석하고, 결과에 따라 개인별 학습 전략을 재설계합니다.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  
   <!-- =====================
        FOOTER
        ===================== -->
@@ -1624,6 +1883,26 @@
 
   workCards.forEach((card) => {
     workObserver.observe(card);
+  });
+
+	  const revealItems = document.querySelectorAll('.reveal-item, .work-card a');
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('is-visible');
+        }, index * 80);
+
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.15
+  });
+
+  revealItems.forEach((item) => {
+    revealObserver.observe(item);
   });
 </script>
 	
