@@ -171,13 +171,44 @@
        HERO
        ===================== */
     /* hero 전체 */
-.hero-reel {
+		.hero-reel {
   position: relative;
-  height: 100vh;
-  min-height: 720px;
-  background: #ffffff;
+  min-height: 100vh;
+  padding: 180px 0 120px;
   overflow: hidden;
+  background:
+    radial-gradient(circle at 78% 22%, rgba(109, 93, 252, 0.14), transparent 28%),
+    radial-gradient(circle at 18% 75%, rgba(255, 151, 64, 0.10), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
+
+	  .hero-reel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 75%, transparent);
+  pointer-events: none;
+}
+
+	  .hero-reel::after {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  right: -120px;
+  top: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(109, 93, 252, 0.16), transparent 68%);
+  filter: blur(10px);
+  animation: floatGlow 7s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+	  
 
 /* 배경 레이어 */
 .reel-bg {
@@ -221,39 +252,109 @@
 /* 콘텐츠 */
 .hero-inner {
   position: relative;
-  z-index: 1;
-  height: 100%;
-  max-width: 1200px;
+  z-index: 2;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 160px 24px 0;
+  padding: 0 32px;
 }
 
 .hero-eyebrow {
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  color: #9aa3b2;
-  margin-bottom: 24px;
+  font-size: 14px;
+  letter-spacing: 0.24em;
+  color: #717791;
+  font-weight: 800;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: fadeUp 0.8s ease forwards;
 }
 
 .hero-title {
-  font-size: 80px;
-  line-height: 1.2;
-  font-weight: 800;
-  color: #0f172a;
-  margin-bottom: 28px;
+  font-size: clamp(64px, 9vw, 140px);
+  line-height: 0.95;
+  letter-spacing: -0.075em;
+  color: #081020;
+  font-weight: 900;
+  margin: 0;
 }
+
+	  .hero-title .line {
+  display: block;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(100%);
+  animation: titleReveal 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	}
+
+	  .hero-title .line:nth-child(2) {
+  		animation-delay: 0.18s;
+	}
+
 
  .hero-eyebrow .ppoint,
  .hero-title .ppoint {
-  		color: #55517b !important;
+  		color: #5f5794 !important;
   		font-weight: 900;
 		}
 
-.hero-subtitle {
-  font-size: 20px;
-  color: #475569;
-  line-height: 2;
+	  .title-gradient {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    #081020 0%,
+    #5f5794 42%,
+    #081020 78%
+  );
+  background-size: 220% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShine 4s ease-in-out infinite;
 }
+
+@keyframes textShine {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+.hero-subtitle {
+  margin-top: 52px;
+  font-size: clamp(20px, 2vw, 32px);
+  line-height: 1.75;
+  color: #48556a;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: fadeUp 0.9s ease forwards;
+  animation-delay: 0.55s;
+}
+@keyframes titleReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatGlow {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-36px, 28px, 0) scale(1.08);
+  }
+}
+	  
 @keyframes float {
   0% { transform: translateY(0); }
   50% { transform: translateY(-18px); }
@@ -928,9 +1029,13 @@
     </p>
 
    <h1 class="hero-title">
-     <span class="ppoint">D</span>eep <span class="ppoint">C</span>ode,<br>
-     <span class="ppoint">C</span>lear View.
-</h1>
+  	<span class="line">
+    	<span class="title-gradient"><span class="ppoint">D</span>eep Code,</span>
+  	</span>
+  		<span class="line">
+    	Clear View.
+  		</span>
+	</h1>
     <p class="hero-subtitle">
       감각은 깊게, 구조는 단단하게.<br>
 	  읽기 쉽고 사용하기 편한 웹사이트 화면을 구현합니다.
