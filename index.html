@@ -502,239 +502,304 @@
 .grid-4.visible .feature-card:nth-child(3) { transition-delay: 0.16s; }
 .grid-4.visible .feature-card:nth-child(4) { transition-delay: 0.24s; }
 
-/* =========================================
-   연간 학습 프로그램 섹션 스타일
-   (#program 안에 있는 디자인 전체)
-   ========================================= */
-
-.program-section {
-  background-color: #f5f7fb;
-}
-
-/* ----- 상단 비전/요약 박스 ----- */
-
-.program-vision {
-  max-width: 980px;
-  margin: 0 auto 40px;
-  text-align: center;
-}
-
-.program-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 24px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #cedaf5, #aebfe8);
-  color: #23345d;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 18px;
-}
-
-.program-vision-inner {
-  background-color: #fff;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-  border: 1px solid #e1e5f2;
-  padding: 26px 32px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap: 24px;
+	/* =====================
+       WORK SECTION 
+       ===================== */
+.work-section {
   position: relative;
+  overflow: hidden;
+  padding: 140px 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(109, 93, 252, 0.16), transparent 26%),
+    radial-gradient(circle at 82% 28%, rgba(34, 211, 238, 0.09), transparent 24%),
+    linear-gradient(180deg, #081020 0%, #0b0f14 100%);
+  color: #e5e7eb;
 }
 
-.program-vision-inner::before {
+.work-section::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 50%;
-  width: 1px;
-  height: 100%;
-  background: #edf0f8;
-  transform: translateX(-50%);
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 82%, transparent);
+  pointer-events: none;
 }
 
-.vision-item h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #222;
-}
-
-.vision-item p {
-  font-size: 13px;
-  color: #666;
-}
-
-/* 가운데 아래로 내려가는 파란 화살표 */
-.program-arrow {
-  width: 140px;
-  height: 68px;
-  margin: 20px auto 0;
-  background: linear-gradient(180deg, #3c63d4, #1d3c7a);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  box-shadow: 0 12px 30px rgba(52, 86, 184, 0.45);
-}
-
-/* ----- 하단 학기별 로드맵 카드 ----- */
-
-.program-roadmap {
-  margin-top: 40px;
-}
-
-.roadmap-track {
-  position: relative;
-  padding-bottom: 120px;
-  
-}
-
-/* 아래쪽 흐릿한 라인 */
-.roadmap-track::before {
-  content: "";
+.work-section::after {
+  content: "WORK";
   position: absolute;
-  left: 4%;
-  right: 4%;
-  bottom: 60px;
-  height: 4px;
-  background: #e1e4ef;
-  border-radius: 999px;
+  top: 40px;
+  right: -20px;
+  font-size: clamp(100px, 18vw, 260px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 
-/* 카드 4개 가로 배치 */
-.timeline {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: 18px;
-
-  /* 슬라이드 인 애니메이션 트리거용 (IntersectionObserver가 .visible 붙여줌) */
-}
-
-/* 로드맵 카드 스타일 */
-.timeline-item {
+.work-inner {
   position: relative;
-  background-color: #fff;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-  border: 1px solid #e1e5f2;
-  padding: 22px 20px 68px;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.work-head {
+  margin-bottom: 72px;
+}
+
+.section-eyebrow {
+  margin-bottom: 24px;
   font-size: 13px;
-
-  /* 슬라이드 인 초기 상태 */
-  opacity: 0;
-  transform: translateY(40px);
-  transition:
-    opacity 0.6s ease-out,
-    transform 0.6s ease-out;
-  will-change: opacity, transform;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  color: #9ca3af;
 }
 
-.term-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #222;
-  margin-bottom: 12px;
+.ppoint {
+  color: #8b5cf6;
+  font-weight: 900;
 }
 
-.term-divider {
-  width: 40px;
-  height: 2px;
-  background-color: #d3d9ec;
-  margin-bottom: 10px;
-}
-
-.term-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  color: #555;
-}
-
-.term-list li {
-  position: relative;
-  padding-left: 12px;
-  margin-bottom: 6px;
-}
-
-.term-list li::before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #3c63d4;
-  font-size: 13px;
-}
-
-/* 원형 학기 배지 */
-.term-badge-wrap {
-  position: absolute;
-  left: 50%;
-  bottom: -40px;
-  transform: translateX(-50%);
-}
-
-.term-badge {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  background: #1d3c7a;
+.work-title-wrap {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 16px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-  border: 3px solid #f5f7fb;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  padding-top: 36px;
 }
 
-/* 타임라인 슬라이드 인 애니메이션 발동 상태 */
-.timeline.visible .timeline-item {
+.work-title-wrap h2 {
+  margin: 0;
+  font-size: clamp(56px, 8vw, 128px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+  color: #f8fafc;
+  font-weight: 900;
+}
+
+.work-title-wrap strong {
+  flex-shrink: 0;
+  font-size: clamp(28px, 4vw, 72px);
+  line-height: 1;
+  color: #8b5cf6;
+  letter-spacing: -0.05em;
+}
+
+.work-desc {
+  max-width: 680px;
+  margin-top: 36px;
+  font-size: 18px;
+  line-height: 1.8;
+  color: #aeb7c8;
+  font-weight: 500;
+}
+
+.work-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.work-card {
+  min-width: 0;
+}
+
+.work-card a {
+  position: relative;
+  display: block;
+  height: 100%;
+  padding: 14px;
+  border-radius: 24px;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(14px);
+  transform: translateY(28px);
+  opacity: 0;
+  transition:
+    transform 0.35s ease,
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.work-card a.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.work-card a:hover {
+  transform: translateY(-8px);
+  border-color: rgba(139, 92, 246, 0.55);
+  background: rgba(255, 255, 255, 0.085);
+  box-shadow: 0 30px 90px rgba(109, 93, 252, 0.18);
+}
+
+.work-thumb {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  background: #111827;
+}
+
+.work-thumb::after {
+  content: "VIEW PROJECT";
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(8, 16, 32, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: 0.3s ease;
+}
+
+.work-card a:hover .work-thumb::after {
   opacity: 1;
   transform: translateY(0);
 }
 
-.timeline.visible .timeline-item:nth-child(1) { transition-delay: 0s; }
-.timeline.visible .timeline-item:nth-child(2) { transition-delay: 0.08s; }
-.timeline.visible .timeline-item:nth-child(3) { transition-delay: 0.16s; }
-.timeline.visible .timeline-item:nth-child(4) { transition-delay: 0.24s; }
+.work-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
 
-    /* 공부만 하면 됩니다… pill 카드 레이아웃 */
-.pill-list {
+.work-card a:hover .work-thumb img {
+  transform: scale(1.06);
+  filter: brightness(0.72) saturate(1.08);
+}
+
+.work-info {
+  padding: 22px 4px 6px;
+}
+
+.work-category {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: #22d3ee;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.work-info h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 22px;
+  line-height: 1.35;
+  letter-spacing: -0.04em;
+  font-weight: 900;
+}
+
+.work-info p {
+  margin: 10px 0 18px;
+  color: #aeb7c8;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.work-info dl {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 24px;
-}
-
-/* 한 줄씩 둥근 알약 카드 */
-.pill-item {
-  background-color: #ffffff;
-  border-radius: 999px;
-  padding: 12px 18px;
-  font-size: 13px;
-  border: 1px solid #d7dcea;
-  display: flex;
-  align-items: center;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-  color: #444;
+  margin: 0;
 }
 
-.pill-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background-color: #1d3c7a; /* 메인 네이비 */
+.work-info dl div {
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* 반응형: 모바일에서 한 줄로 */
-@media (max-width: 768px) {
-  .pill-list {
-    grid-template-columns: 1fr;
+.work-info dt {
+  margin-bottom: 6px;
+  color: #6f7b90;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.work-info dd {
+  margin: 0;
+  color: #d7dce7;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* responsive */
+@media (max-width: 1100px) {
+  .work-list {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
+@media (max-width: 860px) {
+  .work-section {
+    padding: 110px 0;
+  }
+
+  .work-title-wrap {
+    display: block;
+  }
+
+  .work-title-wrap strong {
+    display: block;
+    margin-top: 24px;
+  }
+
+  .work-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .work-desc br {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .work-inner {
+    padding: 0 20px;
+  }
+
+  .work-list {
+    grid-template-columns: 1fr;
+  }
+
+  .work-title-wrap h2 {
+    font-size: 56px;
+  }
+
+  .work-info h3 {
+    font-size: 20px;
+  }
+}
 
 
     /* =====================
@@ -997,9 +1062,9 @@
       <nav>
         <ul>
           <li><a href="#difference">HOME</a></li>
-          <li><a href="#program">PROFILE</a></li>
-          <li><a href="#system">DESIGN</a></li>
-          <li><a href="#teachers">WORK</a></li>
+          <li><a href="#profile">PROFILE</a></li>
+          <li><a href="#design">DESIGN</a></li>
+          <li><a href="#work">WORK</a></li>
           <li><a href="#contact">CONTACT</a></li>
         </ul>
       </nav>
@@ -1100,111 +1165,217 @@
   </section>
 
   <!-- =====================
-       섹션 2 : 연간 학습 프로그램
+       섹션 2 : WORK
        ===================== -->
-  <section id="program" class="program-section">
-  <div class="container">
+  <section class="work-section" id="work">
+  <div class="work-inner">
 
-    <div class="section-header">
-      <h2 class="section-title">연간 학습 프로그램</h2>
-      <p class="section-subtitle">
-        0학기부터 수능 직전까지, 단계별 목표가 분명한 연간 학습 로드맵입니다.
+    <div class="work-head">
+      <p class="section-eyebrow">
+        <span class="ppoint">W</span>ORK ARCHIVE
+      </p>
+
+      <div class="work-title-wrap">
+        <h2>
+          Published<br>
+          Landing Pages
+        </h2>
+        <strong>2026.ver</strong>
+      </div>
+
+      <p class="work-desc">
+        학원 프로모션, 상품 페이지, 이벤트 페이지를 중심으로<br>
+        반응형 구조와 빠른 제작 속도, 정확한 퍼블리싱 완성도를 보여주는 작업물입니다.
       </p>
     </div>
 
-    <!-- 상단 비전/로드맵 요약 박스 -->
-    <div class="program-vision">
-      <div class="program-pill">연간 학습 로드맵</div>
-
-      <div class="program-vision-inner">
-        <div class="vision-item">
-          <h3>기초부터 수능까지 이어지는 커리큘럼</h3>
-          <p>
-            0학기 기본 개념부터 실전 FINAL까지<br />
-            학기별 목표에 맞춰 체계적으로 설계된 연간 과정입니다.
-          </p>
-        </div>
-        <div class="vision-item">
-          <h3>시기별 목표와 전략을 한눈에</h3>
-          <p>
-            각 학기마다 집중해야 할 과목과 내용이 명확해<br />
-            재수 생활 전체의 흐름을 쉽게 파악할 수 있습니다.
-          </p>
-        </div>
-      </div>
-
-      <!-- 가운데 아래로 내려가는 화살표 -->
-      <div class="program-arrow"></div>
-    </div>
-
-    <!-- 하단 학기별 로드맵 -->
-    <div class="program-roadmap">
-      <div class="roadmap-track">
-        <div class="timeline">
-          <!-- 0학기 -->
-          <div class="timeline-item">
-            <h3 class="term-title">0학기 · 기본 개념 완성</h3>
-            <div class="term-divider"></div>
-            <ul class="term-list">
-              <li>국·수·영 진단 TEST로 현재 수준 파악</li>
-              <li>전 범위 기본 개념 총정리</li>
-              <li>재수 학습 습관 및 시간 관리 훈련</li>
-            </ul>
-            <div class="term-badge-wrap">
-              <div class="term-badge">0학기</div>
-            </div>
+    <ul class="work-list">
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/promotion/interview/" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_interview.jpg" alt="면접반 홍보 페이지">
           </div>
-
-          <!-- 1학기 -->
-          <div class="timeline-item">
-            <h3 class="term-title">1학기 · 원리·개념 심화 / 6월 평가원 대비</h3>
-            <div class="term-divider"></div>
-            <ul class="term-list">
-              <li>과목별 심화 개념 & 핵심 유형 학습</li>
-              <li>6월 평가원 모의고사 목표 점수 설정</li>
-              <li>주간 모의고사로 실전 감각 키우기</li>
-            </ul>
-            <div class="term-badge-wrap">
-              <div class="term-badge">1학기</div>
-            </div>
+          <div class="work-info">
+            <span class="work-category">Academy Promotion</span>
+            <h3>학원 | 면접반 홍보 페이지</h3>
+            <p>반응형 랜딩 페이지 퍼블리싱</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>2일</dd>
+              </div>
+            </dl>
           </div>
+        </a>
+      </li>
 
-          <!-- 2학기 -->
-          <div class="timeline-item">
-            <h3 class="term-title">2학기 · 실전 적용 / 9월 평가원 대비</h3>
-            <div class="term-divider"></div>
-            <ul class="term-list">
-              <li>기출·모의고사 집중 분석</li>
-              <li>취약 단원 보완을 위한 맞춤 수업</li>
-              <li>9월 평가원 성적 기준 재설계</li>
-            </ul>
-            <div class="term-badge-wrap">
-              <div class="term-badge">2학기</div>
-            </div>
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/classes/online/pass/superEvent/" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_superevent.jpg" alt="상품 할인 페이지">
           </div>
-
-          <!-- 3학기 -->
-          <div class="timeline-item">
-            <h3 class="term-title">3학기 · FINAL / 수능 직전 대비</h3>
-            <div class="term-divider"></div>
-            <ul class="term-list">
-              <li>과목별 FINAL 특강 & 예상 문제풀이</li>
-              <li>실수 줄이기를 위한 마무리 점검</li>
-              <li>개인별 컨디션 관리 & 시험 전략 수립</li>
-            </ul>
-            <div class="term-badge-wrap">
-              <div class="term-badge">3학기</div>
-            </div>
+          <div class="work-info">
+            <span class="work-category">Product Event</span>
+            <h3>학원 | 상품 할인 페이지</h3>
+            <p>프로모션 상품 페이지 반응형 구현</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>1.5일</dd>
+              </div>
+            </dl>
           </div>
+        </a>
+      </li>
 
-        </div>
-      </div>
-    </div>
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/classes/online/pass/" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_superpass.jpg" alt="상품 페이지">
+          </div>
+          <div class="work-info">
+            <span class="work-category">Product Page</span>
+            <h3>학원 | 상품 페이지</h3>
+            <p>상품 정보 구조와 구매 흐름 중심 구현</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>1.5일</dd>
+              </div>
+            </dl>
+          </div>
+        </a>
+      </li>
 
+      <li class="work-card">
+        <a href="https://www.miraeij.com/policerankup/classes/online/pass/passUp/" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_passup.jpg" alt="상품 페이지">
+          </div>
+          <div class="work-info">
+            <span class="work-category">Product Page</span>
+            <h3>학원 | 상품 페이지</h3>
+            <p>프로모션 구조에 맞춘 반응형 퍼블리싱</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>1.5일</dd>
+              </div>
+            </dl>
+          </div>
+        </a>
+      </li>
+
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/classes/online/pass/highschool/" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_highschool.jpg" alt="상품 페이지">
+          </div>
+          <div class="work-info">
+            <span class="work-category">Product Page</span>
+            <h3>학원 | 상품 페이지</h3>
+            <p>섹션별 정보 전달력을 고려한 화면 구현</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>1.5일</dd>
+              </div>
+            </dl>
+          </div>
+        </a>
+      </li>
+
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_snb.PNG" alt="모바일 SNB">
+          </div>
+          <div class="work-info">
+            <span class="work-category">Mobile UI</span>
+            <h3>UI/UX | 모바일 SNB</h3>
+            <p>모바일 사용성을 고려한 내비게이션 UI 구현</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>1일</dd>
+              </div>
+            </dl>
+          </div>
+        </a>
+      </li>
+
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/passcut/202603" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_passcut.jpg" alt="사전예약 페이지">
+          </div>
+          <div class="work-info">
+            <span class="work-category">Reservation Page</span>
+            <h3>온라인 | 사전예약 페이지</h3>
+            <p>신청 유도 흐름을 고려한 랜딩 구현</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>1일</dd>
+              </div>
+            </dl>
+          </div>
+        </a>
+      </li>
+
+      <li class="work-card">
+        <a href="https://www.miraeij.com/police/passcut" target="_blank">
+          <div class="work-thumb">
+            <img src="images/img_fullservice.jpg" alt="합격예측 풀서비스">
+          </div>
+          <div class="work-info">
+            <span class="work-category">Service UI</span>
+            <h3>UI/UX | 합격예측 풀서비스</h3>
+            <p>서비스 정보와 사용자 흐름 중심 UI 구현</p>
+            <dl>
+              <div>
+                <dt>Role</dt>
+                <dd>Publishing 100%</dd>
+              </div>
+              <div>
+                <dt>Period</dt>
+                <dd>2.5일</dd>
+              </div>
+            </dl>
+          </div>
+        </a>
+      </li>
+    </ul>
   </div>
 </section>
-
-
   <!-- =====================
        섹션 3 : 하루 루틴 / 운영 시스템
        ===================== -->
@@ -1436,66 +1607,25 @@
   </footer>
 
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const el = document.getElementById("heroTitle");
-    const text = "앞선 선택,\n대학이 달라진다!";
-    let index = 0;
+  <script>
+  const workCards = document.querySelectorAll('.work-card a');
 
-    function type() {
-      if (index < text.length) {
-        const char = text[index];
-
-        if (char === "\n") {
-          el.innerHTML += "<br />";
-        } else {
-          el.innerHTML += char;
-        }
-
-        index++;
-        setTimeout(type, 120);
-      } else {
-        // 글자 출력이 끝나면 클래스 추가
-        el.classList.add("done");
-      }
-    }
-
-    type();
-  });
-
-  // 카드 슬라이드
-    document.addEventListener("DOMContentLoaded", () => {
-  // 스르륵 애니메이션 적용할 그룹들: 차별점 카드(.grid-4), 로드맵(.timeline)
-  const groups = document.querySelectorAll(".grid-4, .timeline");
-  if (!groups.length) return;
-
-  const io = new IntersectionObserver(
-    (entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target); // 한 번만 실행
-        }
-      });
-    },
-    { threshold: 0.2 }
-  );
-
-  groups.forEach(group => io.observe(group));
-});
-
-    //section-title fade-down
-		 const fadeEls = document.querySelectorAll(".fade-down");
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
+  const workObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
       if (entry.isIntersecting) {
-        entry.target.classList.add("show");
+        setTimeout(() => {
+          entry.target.classList.add('is-visible');
+        }, index * 80);
       }
     });
+  }, {
+    threshold: 0.15
   });
 
-  fadeEls.forEach((el) => observer.observe(el));
+  workCards.forEach((card) => {
+    workObserver.observe(card);
+  });
 </script>
-
+	
 </body>
 </html>
