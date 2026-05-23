@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>우리 학원 썸머스쿨</title>
+
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Pretendard', sans-serif;
+    background: #e9fbff;
+    color: #fff;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.summer-intro {
+    position: relative;
+    min-height: 920px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 58% 47%, rgba(255,255,255,.24) 0 8%, transparent 38%),
+        linear-gradient(180deg, #38c7f4 0%, #55d9ee 46%, #a5fff5 100%);
+}
+
+/* 물결 배경 */
+.summer-intro::before {
+    content: "";
+    position: absolute;
+    left: -8%;
+    right: -8%;
+    bottom: -125px;
+    height: 330px;
+    background:
+        radial-gradient(ellipse at 18% 22%, rgba(23, 151, 204, .22) 0 38%, transparent 39%),
+        radial-gradient(ellipse at 50% 18%, rgba(255,255,255,.24) 0 28%, transparent 29%),
+        radial-gradient(ellipse at 78% 24%, rgba(16, 148, 202, .18) 0 36%, transparent 37%);
+    filter: blur(1px);
+    opacity: .9;
+}
+
+.summer-intro::after {
+    content: "";
+    position: absolute;
+    right: -120px;
+    bottom: 30px;
+    width: 470px;
+    height: 230px;
+    background: #fff;
+    border-radius: 54% 46% 0 0 / 70% 66% 0 0;
+    box-shadow:
+        -105px 25px 0 25px #fff,
+        -210px 42px 0 -8px rgba(255,255,255,.95),
+        -65px -35px 0 -18px rgba(255,255,255,.96);
+    opacity: .98;
+}
+
+.confetti-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: .55;
+}
+
+.intro-inner {
+    position: relative;
+    z-index: 2;
+    width: min(1180px, calc(100% - 40px));
+    min-height: 920px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.sun-mark {
+    position: absolute;
+    top: 118px;
+    left: 50%;
+    width: 96px;
+    height: 50px;
+    transform: translateX(-50%);
+}
+
+.sun-mark::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 34px;
+    height: 18px;
+    border: 5px solid #fff;
+    border-bottom: 0;
+    border-radius: 40px 40px 0 0;
+    transform: translateX(-50%);
+}
+
+.sun-mark i {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    width: 4px;
+    height: 22px;
+    background: #fff;
+    border-radius: 999px;
+    transform-origin: 2px 42px;
+    opacity: .9;
+}
+
+.sun-mark i:nth-child(1) { transform: rotate(-55deg); }
+.sun-mark i:nth-child(2) { transform: rotate(-32deg); }
+.sun-mark i:nth-child(3) { transform: rotate(-12deg); }
+.sun-mark i:nth-child(4) { transform: rotate(12deg); }
+.sun-mark i:nth-child(5) { transform: rotate(32deg); }
+.sun-mark i:nth-child(6) { transform: rotate(55deg); }
+
+.hero-copy {
+    position: relative;
+    width: 100%;
+    padding-top: 20px;
+}
+
+.hero-copy::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 76px;
+    width: min(720px, 65vw);
+    aspect-ratio: 1 / 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(19, 170, 232, .38);
+    z-index: -1;
+}
+
+.hero-kicker {
+    font-size: 30px;
+    line-height: 1.55;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    text-shadow: 0 4px 14px rgba(0, 99, 147, .22);
+}
+
+.hero-kicker span {
+    color: #0b7cff;
+}
+
+.hero-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 72px;
+    min-width: 410px;
+    height: 60px;
+    padding: 0 36px;
+    border: 2px solid rgba(255,255,255,.95);
+    border-radius: 999px;
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -1.4px;
+    background: rgba(255,255,255,.08);
+    box-shadow: 0 12px 28px rgba(0, 118, 184, .13);
+}
+
+.hero-pill strong {
+    color: #fff;
+}
+
+.hero-title {
+    margin-top: 28px;
+    font-size: clamp(92px, 9.8vw, 178px);
+    line-height: .93;
+    font-weight: 950;
+    letter-spacing: -9px;
+}
+
+.hero-title .blue {
+    color: #0877ff;
+}
+
+.hero-title .white {
+    color: #fff;
+}
+
+.script-text {
+    position: absolute;
+    left: 50%;
+    top: 435px;
+    transform: translateX(-50%) rotate(-6deg);
+    font-size: clamp(48px, 6vw, 92px);
+    font-family: Georgia, serif;
+    font-style: italic;
+    color: rgba(11, 133, 210, .25);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.hero-desc {
+    margin-top: 40px;
+    font-size: 29px;
+    line-height: 1.55;
+    font-weight: 850;
+    letter-spacing: -1.4px;
+    text-shadow: 0 4px 15px rgba(0, 94, 143, .18);
+}
+
+.hero-desc strong {
+    display: block;
+    margin-top: 8px;
+    color: #0877ff;
+    font-size: 48px;
+}
+
+.cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 34px;
+}
+
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    height: 58px;
+    padding: 0 28px;
+    border-radius: 999px;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.cta-btn.primary {
+    background: #006fff;
+    color: #fff;
+    box-shadow: 0 16px 32px rgba(0, 90, 180, .28);
+}
+
+.cta-btn.secondary {
+    background: rgba(255,255,255,.9);
+    color: #0072e8;
+}
+
+.cta-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(0, 90, 180, .24);
+}
+
+/* 좌측 플로팅 원형 배너 */
+.float-badges {
+    position: fixed;
+    left: max(18px, calc(50% - 760px));
+    top: 80px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.float-badge {
+    position: relative;
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    padding: 22px 14px;
+    text-align: center;
+    box-shadow: 0 14px 30px rgba(0, 63, 118, .18);
+    animation: badgeFloat 3.8s ease-in-out infinite;
+}
+
+.float-badge:nth-child(2) { animation-delay: .4s; }
+.float-badge:nth-child(3) { animation-delay: .8s; }
+
+.float-badge.pink {
+    background: linear-gradient(180deg, #ffd4ff, #f0b8ff);
+    color: #7e35f5;
+}
+
+.float-badge.navy {
+    background: linear-gradient(180deg, #253657, #111a31);
+    color: #fff;
+}
+
+.float-badge.orange {
+    background: linear-gradient(180deg, #ff8b4c, #ff6947);
+    color: #fff;
+}
+
+.float-badge b {
+    display: block;
+    font-size: 24px;
+    line-height: 1.15;
+    letter-spacing: -1.2px;
+}
+
+.float-badge span {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.9);
+    color: #111;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.badge-close {
+    position: absolute;
+    right: -8px;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.badge-close::before,
+.badge-close::after {
+    content: "";
+    position: absolute;
+    left: 13px;
+    top: 4px;
+    width: 1px;
+    height: 22px;
+    background: #105069;
+}
+
+.badge-close::before { transform: rotate(45deg); }
+.badge-close::after { transform: rotate(-45deg); }
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,.36);
+    animation: bubbleUp 7s linear infinite;
+}
+
+.bubble.b1 { width: 10px; height: 10px; left: 23%; bottom: 160px; }
+.bubble.b2 { width: 16px; height: 16px; left: 72%; bottom: 230px; animation-delay: 1s; }
+.bubble.b3 { width: 8px; height: 8px; left: 83%; bottom: 120px; animation-delay: 2.4s; }
+
+@keyframes badgeFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+}
+
+@keyframes bubbleUp {
+    0% {
+        transform: translateY(0) scale(.8);
+        opacity: 0;
+    }
+    15% { opacity: .9; }
+    100% {
+        transform: translateY(-360px) scale(1.25);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 1280px) {
+    .float-badges {
+        display: none;
+    }
+
+    .summer-intro,
+    .intro-inner {
+        min-height: 820px;
+    }
+
+    .hero-pill {
+        margin-top: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .summer-intro,
+    .intro-inner {
+        min-height: 760px;
+    }
+
+    .intro-inner {
+        width: calc(100% - 28px);
+    }
+
+    .sun-mark {
+        top: 86px;
+        transform: translateX(-50%) scale(.72);
+    }
+
+    .hero-copy::before {
+        top: 110px;
+        width: 88vw;
+    }
+
+    .hero-kicker {
+        font-size: 22px;
+    }
+
+    .hero-pill {
+        min-width: auto;
+        width: 86%;
+        height: 48px;
+        margin-top: 56px;
+        font-size: 21px;
+    }
+
+    .hero-title {
+        margin-top: 24px;
+        font-size: 88px;
+        letter-spacing: -5px;
+    }
+
+    .script-text {
+        top: 360px;
+        font-size: 48px;
+    }
+
+    .hero-desc {
+        margin-top: 32px;
+        font-size: 21px;
+    }
+
+    .hero-desc strong {
+        font-size: 34px;
+    }
+
+    .cta-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cta-btn {
+        width: 82%;
+        height: 54px;
+        font-size: 17px;
+    }
+
+    .summer-intro::after {
+        width: 330px;
+        height: 150px;
+        right: -120px;
+        bottom: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<section class="summer-intro">
+    <canvas class="confetti-canvas" id="summerConfetti"></canvas>
+
+    <div class="float-badges">
+        <div class="float-badge pink">
+            <button class="badge-close" aria-label="닫기"></button>
+            <b>여름방학<br>집중반</b>
+            <span>모집중</span>
+        </div>
+
+        <div class="float-badge navy">
+            <button class="badge-close" aria-label="닫기"></button>
+            <b>기초부터<br>포트폴리오</b>
+            <span>무료상담</span>
+        </div>
+
+        <div class="float-badge orange">
+            <button class="badge-close" aria-label="닫기"></button>
+            <b>포토샵<br>일러스트 특강</b>
+            <span>바로가기</span>
+        </div>
+    </div>
+
+    <span class="bubble b1"></span>
+    <span class="bubble b2"></span>
+    <span class="bubble b3"></span>
+
+    <div class="intro-inner">
+        <div class="sun-mark">
+            <i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="hero-copy">
+            <p class="hero-kicker">
+                방학 4주, 먼저 시작한 학생이<br>
+                <span>작품으로 증명</span>한다.
+            </p>
+
+            <div class="hero-pill">
+                <strong>2026 여름방학 디자인 집중 대비</strong>
+            </div>
+
+            <div class="script-text">Summer School</div>
+
+            <h1 class="hero-title">
+                <span class="blue">썸머</span><br>
+                <span class="blue">스</span><span class="white">쿨</span>
+            </h1>
+
+            <p class="hero-desc">
+                빠른 기초 완성과 실전 포트폴리오 제작까지,<br>
+                이번 여름 가장 시원한 성장 루트
+                <strong>여름방학 특강 OPEN!</strong>
+            </p>
+
+            <div class="cta-row">
+                <a href="#apply" class="cta-btn primary">수강 상담 신청</a>
+                <a href="#curriculum" class="cta-btn secondary">커리큘럼 보기</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+/* 좌측 플로팅 배너 닫기 */
+document.querySelectorAll('.badge-close').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        this.closest('.float-badge').style.display = 'none';
+    });
+});
+
+/* 살짝 움직이는 패럴랙스 */
+const hero = document.querySelector('.summer-intro');
+const copy = document.querySelector('.hero-copy');
+const scriptText = document.querySelector('.script-text');
+
+hero.addEventListener('mousemove', function(e) {
+    const x = (e.clientX / window.innerWidth - 0.5) * 18;
+    const y = (e.clientY / window.innerHeight - 0.5) * 14;
+
+    copy.style.transform = `translate(${x * 0.35}px, ${y * 0.35}px)`;
+    scriptText.style.transform = `translateX(-50%) rotate(-6deg) translate(${x * -0.6}px, ${y * -0.4}px)`;
+});
+
+hero.addEventListener('mouseleave', function() {
+    copy.style.transform = '';
+    scriptText.style.transform = 'translateX(-50%) rotate(-6deg)';
+});
+
+/* 가벼운 캔버스 색종이 */
+const canvas = document.getElementById('summerConfetti');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = hero.offsetHeight;
+}
+
+function makeParticles() {
+    particles = Array.from({ length: 80 }, function() {
+        return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 4 + 2,
+            speed: Math.random() * 1.1 + 0.4,
+            swing: Math.random() * 2 + 0.5,
+            angle: Math.random() * Math.PI * 2,
+            opacity: Math.random() * 0.45 + 0.25
+        };
+    });
+}
+
+function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(function(p) {
+        p.y += p.speed;
+        p.angle += 0.02;
+        p.x += Math.sin(p.angle) * p.swing * 0.25;
+
+        if (p.y > canvas.height + 20) {
+            p.y = -20;
+            p.x = Math.random() * canvas.width;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+
+    requestAnimationFrame(drawParticles);
+}
+
+window.addEventListener('resize', function() {
+    resizeCanvas();
+    makeParticles();
+});
+
+resizeCanvas();
+makeParticles();
+drawParticles();
+</script>
+
+</body>
+</html>
