@@ -27,14 +27,14 @@ a {
 
 .summer-intro {
     position: relative;
-    min-height: 920px;
+    min-height: 891px;
     overflow: hidden;
 
+    background-color: #078bed;
     background-image: url("./summer-bg.png");
     background-repeat: no-repeat;
     background-position: center top;
-    background-size: 1920px auto;
-    background-color: #38c7f4;
+    background-size: contain;
 }
 
 /* 물결 배경 */
@@ -384,7 +384,14 @@ a {
 
     .summer-intro,
     .intro-inner {
-        min-height: 820px;
+        min-height: min(891px, 100vh);
+    }
+
+    .summer-intro {
+        background-size: contain;
+        background-position: center top;
+        background-repeat: no-repeat;
+        background-color: #078bed;
     }
 
     .hero-pill {
