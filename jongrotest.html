@@ -30,11 +30,11 @@ a {
     min-height: 891px;
     overflow: hidden;
 
-    background-color: #078bed;
     background-image: url("./summer-bg.png");
     background-repeat: no-repeat;
     background-position: center top;
-    background-size: contain;
+    background-size: cover;
+    background-color: #078bed;
 }
 
 /* 물결 배경 */
@@ -382,16 +382,14 @@ a {
         display: none;
     }
 
-    .summer-intro,
+   .summer-intro,
     .intro-inner {
-        min-height: min(891px, 100vh);
+        min-height: 891px;
     }
 
     .summer-intro {
-        background-size: contain;
+        background-size: cover;
         background-position: center top;
-        background-repeat: no-repeat;
-        background-color: #078bed;
     }
 
     .hero-pill {
@@ -400,13 +398,14 @@ a {
 }
 
 @media (max-width: 768px) {
-    .summer-intro {
-        min-height: 760px;
-        background-size: cover;
-        background-position: center top;
-    }
+  .summer-intro,
     .intro-inner {
         min-height: 760px;
+    }
+
+    .summer-intro {
+        background-size: cover;
+        background-position: center top;
     }
 
     .intro-inner {
