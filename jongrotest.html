@@ -33,7 +33,8 @@ a {
     background-image: url("./summer-bg.png");
     background-repeat: no-repeat;
     background-position: center top;
-    background-size: cover;
+    background-size: 1920px auto;
+    background-color: #38c7f4;
 }
 
 /* 물결 배경 */
@@ -392,7 +393,11 @@ a {
 }
 
 @media (max-width: 768px) {
-    .summer-intro,
+    .summer-intro {
+        min-height: 760px;
+        background-size: cover;
+        background-position: center top;
+    }
     .intro-inner {
         min-height: 760px;
     }
