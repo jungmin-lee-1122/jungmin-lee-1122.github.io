@@ -202,12 +202,15 @@ a {
 .script-text {
     position: absolute;
     left: 50%;
-    top: 435px;
-    transform: translateX(-50%) rotate(-6deg);
-    font-size: clamp(48px, 6vw, 92px);
-    font-family: Georgia, serif;
+    top: 48%;
+    z-index: 1;
+    transform: translate(-50%, -50%) rotate(-6deg);
+    font-size: clamp(46px, 7vw, 112px);
+    font-family: Georgia, 'Times New Roman', serif;
     font-style: italic;
-    color: rgba(11, 133, 210, .25);
+    font-weight: 400;
+    letter-spacing: -4px;
+    color: rgba(0, 73, 170, .18);
     white-space: nowrap;
     pointer-events: none;
 }
@@ -460,8 +463,9 @@ a {
     }
 
     .script-text {
-        top: 360px;
+        top: 50%;
         font-size: 48px;
+        letter-spacing: -2px;
     }
 
     .hero-desc {
@@ -538,10 +542,9 @@ a {
                 <strong>2026 여름방학 수학집중 대비반</strong>
             </div>
 
-            <div class="script-text">Summer School</div>
-
             <h1 class="hero-title">
-                2026<br>
+                <span class="year">2026</span>
+                <span class="script-text">Summer School</span>
                 <span class="blue">썸머스</span><span class="white">쿨</span>
             </h1>
 
