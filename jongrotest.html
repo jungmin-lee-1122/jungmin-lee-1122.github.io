@@ -27,8 +27,8 @@ a {
 
 .summer-intro {
     position: relative;
+    min-height: 891px;
     overflow: hidden;
-
     background-color: #078bed;
     background-image: url("./summer-bg.png");
     background-repeat: no-repeat;
@@ -79,7 +79,7 @@ a {
 }
 
 .intro-inner {
-   position: relative;
+ position: relative;
     z-index: 4;
     width: min(1180px, calc(100% - 40px));
     min-height: 891px;
@@ -382,15 +382,14 @@ a {
         display: none;
     }
 
-   .summer-intro,
+    .summer-intro,
     .intro-inner {
         min-height: 891px;
     }
 
     .summer-intro {
-        background-size: contain;
+        background-size: cover;
         background-position: center top;
-        background-repeat: no-repeat;
     }
 
     .hero-pill {
@@ -408,13 +407,12 @@ a {
 @media (max-width: 768px) {
   .summer-intro,
     .intro-inner {
-        min-height: calc(100vw * 891 / 1920);
+        min-height: 760px;
     }
 
     .summer-intro {
-        background-size: 100% auto;
+        background-size: cover;
         background-position: center top;
-        /*background-repeat: no-repeat;*/
     }
 
     .intro-inner {
