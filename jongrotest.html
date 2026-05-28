@@ -29,13 +29,15 @@ a {
     position: relative;
     min-height: 920px;
     overflow: hidden;
-    background:
-        radial-gradient(circle at 58% 47%, rgba(255,255,255,.24) 0 8%, transparent 38%),
-        linear-gradient(180deg, #38c7f4 0%, #55d9ee 46%, #a5fff5 100%);
+
+    background-image: url("./summer-bg.png");
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: cover;
 }
 
 /* 물결 배경 */
-.summer-intro::before {
+/*.summer-intro::before {
     content: "";
     position: absolute;
     left: -8%;
@@ -64,7 +66,7 @@ a {
         -210px 42px 0 -8px rgba(255,255,255,.95),
         -65px -35px 0 -18px rgba(255,255,255,.96);
     opacity: .98;
-}
+}*/
 
 .confetti-canvas {
    position: absolute;
@@ -78,7 +80,7 @@ a {
 
 .intro-inner {
     position: relative;
-    z-index: 2;
+    z-index: 4;
     width: min(1180px, calc(100% - 40px));
     min-height: 920px;
     margin: 0 auto;
@@ -135,7 +137,7 @@ a {
     padding-top: 20px;
 }
 
-.hero-copy::before {
+/*.hero-copy::before {
     content: "";
     position: absolute;
     left: 50%;
@@ -146,7 +148,7 @@ a {
     border-radius: 50%;
     background: rgba(19, 170, 232, .38);
     z-index: -1;
-}
+}*/
 
 .hero-kicker {
     font-size: 30px;
