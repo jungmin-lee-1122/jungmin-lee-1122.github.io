@@ -27,14 +27,13 @@ a {
 
 .summer-intro {
     position: relative;
-    min-height: 891px;
     overflow: hidden;
 
+    background-color: #078bed;
     background-image: url("./summer-bg.png");
     background-repeat: no-repeat;
     background-position: center top;
-    background-size: cover;
-    background-color: #078bed;
+    background-size: 100% auto;
 }
 
 /* 물결 배경 */
@@ -80,10 +79,10 @@ a {
 }
 
 .intro-inner {
-    position: relative;
+   position: relative;
     z-index: 4;
     width: min(1180px, calc(100% - 40px));
-    min-height: 920px;
+    min-height: 891px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -388,8 +387,9 @@ a {
     }
 
     .summer-intro {
-        background-size: cover;
+        background-size: contain;
         background-position: center top;
+        background-repeat: no-repeat;
     }
 
     .hero-pill {
@@ -397,15 +397,23 @@ a {
     }
 }
 
+@media (min-width: 769px) {
+    .summer-intro,
+    .intro-inner {
+        min-height: calc(100vw * 891 / 1920);
+    }
+}
+
 @media (max-width: 768px) {
   .summer-intro,
     .intro-inner {
-        min-height: 760px;
+        min-height: calc(100vw * 891 / 1920);
     }
 
     .summer-intro {
-        background-size: cover;
+        background-size: 100% auto;
         background-position: center top;
+        /*background-repeat: no-repeat;*/
     }
 
     .intro-inner {
