@@ -210,6 +210,17 @@ a {
     100% { transform: translateY(-360px) scale(1.25); opacity: 0; }
 }
 
+@keyframes sdPanelFade {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (min-width: 1281px) and (max-width: 1919px) {
     .summer-intro,
     .intro-inner {
@@ -769,13 +780,14 @@ a {
 }
 
 .sd-panel {
-    display: none;
+     display: none;
     margin-top: 28px;
     padding: 42px;
     border: 1px solid var(--sd-line);
     border-radius: 30px;
     background: #fff;
     box-shadow: 0 22px 60px rgba(10, 69, 150, .08);
+    animation: sdPanelFade .45s ease both;
 }
 
 .sd-panel.active {
@@ -1840,19 +1852,59 @@ if (hero && copy) {
 
 const sdTabButtons = document.querySelectorAll('.sd-tab-btn');
 const sdPanels = document.querySelectorAll('.sd-panel');
+let sdCurrentTab = 0;
+let sdTabTimer = null;
 
-sdTabButtons.forEach(function(button) {
+function activateSummerTab(index) {
+    const button = sdTabButtons[index];
+    if (!button) return;
+
+    const target = button.dataset.tab;
+
+    sdTabButtons.forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+
+    sdPanels.forEach(function(panel) {
+        panel.classList.remove('active');
+    });
+
+    button.classList.add('active');
+
+    const targetPanel = document.getElementById(target);
+    if (targetPanel) {
+        targetPanel.classList.add('active');
+    }
+
+    sdCurrentTab = index;
+}
+
+function startSummerTabAuto() {
+    stopSummerTabAuto();
+
+    sdTabTimer = setInterval(function() {
+        const nextIndex = (sdCurrentTab + 1) % sdTabButtons.length;
+        activateSummerTab(nextIndex);
+    }, 3000);
+}
+
+function stopSummerTabAuto() {
+    if (sdTabTimer) {
+        clearInterval(sdTabTimer);
+        sdTabTimer = null;
+    }
+}
+
+sdTabButtons.forEach(function(button, index) {
     button.addEventListener('click', function() {
-        const target = button.dataset.tab;
-
-        sdTabButtons.forEach(function(btn) { btn.classList.remove('active'); });
-        sdPanels.forEach(function(panel) { panel.classList.remove('active'); });
-
-        button.classList.add('active');
-        document.getElementById(target).classList.add('active');
+        activateSummerTab(index);
+        startSummerTabAuto();
     });
 });
 
+activateSummerTab(0);
+startSummerTabAuto();
+    
 const sdAccItems = document.querySelectorAll('.sd-acc-item');
 
 sdAccItems.forEach(function(item) {
