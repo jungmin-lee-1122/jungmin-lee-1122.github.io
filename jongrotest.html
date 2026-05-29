@@ -163,6 +163,14 @@ a {
     margin-top: 34px;
 }
 
+.cta-row.single {
+    justify-content: center;
+}
+
+.cta-row.single .cta-btn {
+    min-width: 260px;
+}
+
 .cta-btn {
     display: inline-flex;
     align-items: center;
@@ -203,6 +211,39 @@ a {
 .bubble.b1 { width: 10px; height: 10px; left: 23%; bottom: 160px; }
 .bubble.b2 { width: 16px; height: 16px; left: 72%; bottom: 230px; animation-delay: 1s; }
 .bubble.b3 { width: 8px; height: 8px; left: 83%; bottom: 120px; animation-delay: 2.4s; }
+
+.double-down {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0;
+    margin-left: 12px;
+    transform: translateY(-2px);
+}
+
+.double-down i {
+    width: 11px;
+    height: 11px;
+    border-right: 3px solid currentColor;
+    border-bottom: 3px solid currentColor;
+    transform: rotate(45deg);
+}
+
+.double-down i + i {
+    margin-top: -5px;
+}
+
+.cta-btn:hover .double-down {
+    animation: doubleDownMove .8s ease-in-out infinite;
+}
+
+@keyframes doubleDownMove {
+    0%, 100% {
+        transform: translateY(-2px);
+    }
+    50% {
+        transform: translateY(3px);
+    }
+}
 
 @keyframes bubbleUp {
     0% { transform: translateY(0) scale(.8); opacity: 0; }
@@ -406,6 +447,11 @@ a {
         flex-direction: column;
         align-items: center;
         gap: 10px;
+    }
+
+    .cta-row.single .cta-btn {
+        width: 82%;
+        max-width: 320px;
     }
 
     .cta-btn {
@@ -1705,9 +1751,13 @@ a {
                 <strong id="text">여름방학 특강 OPEN!</strong>
             </p>
 
-            <div class="cta-row">
-                <a href="#apply" class="cta-btn primary">수강 상담 신청</a>
-                <a href="#curriculum" class="cta-btn secondary">커리큘럼 보기</a>
+            <div class="cta-row single">
+              <a href="#curriculum" class="cta-btn secondary">
+               커리큘럼 보기
+                   <span class="double-down" aria-hidden="true">
+                    <i></i><i></i>
+                   </span>
+                </a>
             </div>
         </div>
     </div>
