@@ -470,6 +470,42 @@ a {
     box-shadow: 0 18px 44px rgba(10, 69, 150, .07);
 }
 
+.choice-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.choice-card {
+    min-height: 260px;
+    padding: 54px 24px 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: none;
+}
+
+.choice-card h3 {
+    margin-top: 0;
+    font-size: 32px;
+    line-height: 1.25;
+    color: #2e2e2e;
+    font-weight: 900;
+}
+
+.choice-card p {
+    margin-top: 28px;
+    font-size: 24px;
+    line-height: 1.55;
+    color: #666;
+    font-weight: 700;
+}
+
 .sd-summary-card .sd-num {
     width: 42px;
     height: 42px;
@@ -1066,6 +1102,44 @@ a {
     .sd-timeline::before {
         display: none;
     }
+
+    @media (max-width: 980px) {
+    .choice-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .choice-card {
+        min-height: 230px;
+    }
+
+    .choice-card h3 {
+        font-size: 28px;
+    }
+
+    .choice-card p {
+        font-size: 21px;
+    }
+}
+
+@media (max-width: 640px) {
+    .choice-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .choice-card {
+        min-height: 210px;
+        padding: 42px 22px;
+    }
+
+    .choice-card h3 {
+        font-size: 26px;
+    }
+
+    .choice-card p {
+        margin-top: 20px;
+        font-size: 19px;
+    }
+}
 }
 
 @media (max-width: 640px) {
@@ -1160,12 +1234,43 @@ a {
                 <div class="sd-quick-item"><span>03</span><div><b>운영목표</b><strong>3주 완성 집중 학습</strong></div></div>
             </div>
 
-            <div class="sd-summary-grid">
-                <article class="sd-summary-card"><span class="sd-num">M</span><h3>중등부<br>고등수학 선행</h3><p>고등수학을 미리 경험하고, 방학 동안 수학 자신감을 만드는 집중 특강입니다.</p></article>
-                <article class="sd-summary-card"><span class="sd-num">1</span><h3>고1<br>수학 집중</h3><p>공통수학2와 대수의 핵심 개념 및 내신 주요 유형을 체계적으로 정리합니다.</p></article>
-                <article class="sd-summary-card"><span class="sd-num">2</span><h3>고2<br>수능 기초</h3><p>미적분 중심의 수능 수학 기초 체력을 만들고 선택 과목 학습까지 연결합니다.</p></article>
-                <article class="sd-summary-card"><span class="sd-num">3</span><h3>고3<br>수능 실전</h3><p>국어, 수학, 영어와 테스트, 질의응답 시스템으로 실전 점수 상승을 목표로 합니다.</p></article>
-            </div>
+    <div class="sd-summary-grid choice-grid">
+    <article class="sd-summary-card choice-card">
+        <h3>중등부</h3>
+        <p>
+            고등수학을 미리 경험하고<br>
+            방학 동안 수학 자신감을<br>
+            만들고 싶다면
+        </p>
+    </article>
+
+    <article class="sd-summary-card choice-card">
+        <h3>고1</h3>
+        <p>
+            공통수학2와 대수의<br>
+            핵심 개념과 내신 유형을<br>
+            정리하고 싶다면
+        </p>
+    </article>
+
+    <article class="sd-summary-card choice-card">
+        <h3>고2</h3>
+        <p>
+            미적분 중심으로<br>
+            수능 수학의 기초 체력을<br>
+            만들고 싶다면
+        </p>
+    </article>
+
+    <article class="sd-summary-card choice-card">
+        <h3>고3</h3>
+        <p>
+            국어·수학·영어를<br>
+            실전 중심으로 정리하고<br>
+            약점을 줄이고 싶다면
+        </p>
+    </article>
+</div>
         </div>
     </section>
 
