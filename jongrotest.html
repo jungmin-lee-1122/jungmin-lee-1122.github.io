@@ -780,18 +780,33 @@ a {
 }
 
 .sd-panel {
-     display: none;
-    margin-top: 28px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(18px);
+    pointer-events: none;
+
     padding: 42px;
     border: 1px solid var(--sd-line);
     border-radius: 30px;
     background: #fff;
     box-shadow: 0 22px 60px rgba(10, 69, 150, .08);
-    animation: sdPanelFade .45s ease both;
+
+    transition:
+        opacity .65s ease,
+        transform .65s ease,
+        visibility .65s ease;
 }
 
 .sd-panel.active {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .sd-program-top {
@@ -1886,7 +1901,7 @@ function startSummerTabAuto() {
     sdTabTimer = setInterval(function() {
         const nextIndex = (sdCurrentTab + 1) % sdTabButtons.length;
         activateSummerTab(nextIndex);
-    }, 3000);
+    }, 4000);
 }
 
 function stopSummerTabAuto() {
