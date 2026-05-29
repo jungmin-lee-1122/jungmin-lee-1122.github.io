@@ -1313,6 +1313,48 @@ a {
     color: #fff;
 }
 
+.sd-system-card {
+    transition:
+        transform .45s ease,
+        background .45s ease,
+        border-color .45s ease,
+        box-shadow .45s ease,
+        color .45s ease;
+}
+
+.sd-system-card .sd-icon,
+.sd-system-card h3,
+.sd-system-card p {
+    transition:
+        background .45s ease,
+        color .45s ease,
+        transform .45s ease;
+}
+
+/* 순서대로 활성화될 때 */
+.sd-system-card.is-active {
+    transform: translateY(-16px) scale(1.035);
+    background: linear-gradient(180deg, #075ed8 0%, #0047b8 100%);
+    border-color: #075ed8;
+    box-shadow: 0 26px 54px rgba(0, 75, 183, .28);
+    color: #fff;
+}
+
+.sd-system-card.is-active .sd-icon {
+    background: rgba(255,255,255,.18);
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.sd-system-card.is-active h3,
+.sd-system-card.is-active p {
+    color: #fff;
+}
+
+.sd-system-card.is-active p {
+    opacity: .88;
+}
+
 @media (max-width: 980px) {
     .summer-detail section {
         padding: 78px 18px;
@@ -1958,6 +2000,46 @@ window.addEventListener('load', function() {
     if (typeText) {
         typeWriter(typeText);
     }
+});
+
+const sdSystemCards = document.querySelectorAll('.sd-system-card');
+let sdSystemIndex = 0;
+let sdSystemTimer = null;
+
+function activateSystemCard(index) {
+    if (!sdSystemCards.length) return;
+
+    sdSystemCards.forEach(function(card) {
+        card.classList.remove('is-active');
+    });
+
+    sdSystemCards[index].classList.add('is-active');
+    sdSystemIndex = index;
+}
+
+function startSystemCardLoop() {
+    if (!sdSystemCards.length) return;
+
+    clearInterval(sdSystemTimer);
+
+    sdSystemTimer = setInterval(function() {
+        const nextIndex = (sdSystemIndex + 1) % sdSystemCards.length;
+        activateSystemCard(nextIndex);
+    }, 1600);
+}
+
+activateSystemCard(0);
+startSystemCardLoop();
+
+sdSystemCards.forEach(function(card, index) {
+    card.addEventListener('mouseenter', function() {
+        clearInterval(sdSystemTimer);
+        activateSystemCard(index);
+    });
+
+    card.addEventListener('mouseleave', function() {
+        startSystemCardLoop();
+    });
 });
 </script>
 </body>
