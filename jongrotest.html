@@ -782,11 +782,14 @@ a {
     color: #fff;
     box-shadow: 0 12px 26px rgba(0, 75, 183, .2);
 }
+    
+.sd-panel-wrap {
+    display: grid;
+    margin-top: 28px;
+}
 
 .sd-panel {
-    position: absolute;
-    left: 0;
-    top: 0;
+    grid-area: 1 / 1;
     width: 100%;
 
     opacity: 0;
