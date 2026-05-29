@@ -1031,44 +1031,22 @@ a {
 .sd-compare {
     position: relative;
     background:
-        radial-gradient(circle at 12% 18%, rgba(0, 111, 255, .08) 0 11%, transparent 12%),
-        radial-gradient(circle at 88% 78%, rgba(185, 211, 255, .35) 0 12%, transparent 13%),
-        linear-gradient(180deg, #ffffff 0%, #f5f9ff 42%, #eef6ff 100%);
+        radial-gradient(circle at 18% 18%, rgba(110, 169, 255, .14) 0%, transparent 28%),
+        radial-gradient(circle at 86% 76%, rgba(190, 212, 255, .24) 0%, transparent 30%),
+        linear-gradient(180deg, #ffffff 0%, #f7faff 42%, #eef6ff 100%);
     overflow: hidden;
 }
 
-/* 뒤쪽 큰 워터마크 */
-.sd-compare::before {
-    content: "MAP";
-    position: absolute;
-    right: -30px;
-    top: 60px;
-    font-size: clamp(120px, 19vw, 280px);
-    font-weight: 950;
-    letter-spacing: -0.08em;
-    color: rgba(0, 75, 183, .035);
-    pointer-events: none;
-}
-
-/* 점 패턴 */
+.sd-compare::before,
 .sd-compare::after {
-    content: "";
-    position: absolute;
-    left: 8%;
-    bottom: 110px;
-    width: 120px;
-    height: 120px;
-    background-image: radial-gradient(rgba(0, 75, 183, .13) 2px, transparent 2px);
-    background-size: 18px 18px;
-    opacity: .5;
-    pointer-events: none;
+    display: none;
 }
 
 .sd-compare .sd-inner {
     position: relative;
     z-index: 2;
 }
-
+    
 .sd-compare-table {
     position: relative;
     margin-top: 42px;
