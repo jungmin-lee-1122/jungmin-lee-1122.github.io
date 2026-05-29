@@ -304,6 +304,11 @@ a {
         height: 54px;
         font-size: 17px;
     }
+
+    .sd-final-cta {
+        min-height: 460px;
+        background-position: center bottom;
+    }
 }
 
 /* =============================
@@ -960,10 +965,31 @@ a {
 }
 
 .sd-final-cta {
-    padding: 86px 20px;
-    background: var(--sd-blue);
+    position: relative;
+    min-height: 430px;
+    padding: 110px 20px;
+    background-color: #078bed;
+    background-image: url("./summer-cloud-bg.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
     color: #fff;
     text-align: center;
+    overflow: hidden;
+}
+
+.sd-final-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 75, 183, 0.18);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sd-final-cta .sd-inner {
+    position: relative;
+    z-index: 2;
 }
 
 .sd-final-cta h2 {
