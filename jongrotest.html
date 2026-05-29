@@ -503,6 +503,30 @@ a {
      .mo-br {
         display: block;
     }
+
+    .sd-compare::before {
+        right: -20px;
+        top: 80px;
+        font-size: 110px;
+    }
+
+    .sd-compare::after {
+        left: auto;
+        right: -20px;
+        bottom: 70px;
+        width: 90px;
+        height: 90px;
+        background-size: 14px 14px;
+    }
+
+    .sd-compare-table {
+        border-radius: 20px;
+    }
+
+    .sd-compare-row > div {
+        padding: 18px 14px;
+        font-size: 14px;
+    }
 }
 
 /* =============================
@@ -1004,13 +1028,71 @@ a {
     background: #f7fbff;
 }
 
+.sd-compare {
+    position: relative;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(0, 111, 255, .08) 0 11%, transparent 12%),
+        radial-gradient(circle at 88% 78%, rgba(185, 211, 255, .35) 0 12%, transparent 13%),
+        linear-gradient(180deg, #ffffff 0%, #f5f9ff 42%, #eef6ff 100%);
+    overflow: hidden;
+}
+
+/* 뒤쪽 큰 워터마크 */
+.sd-compare::before {
+    content: "MAP";
+    position: absolute;
+    right: -30px;
+    top: 60px;
+    font-size: clamp(120px, 19vw, 280px);
+    font-weight: 950;
+    letter-spacing: -0.08em;
+    color: rgba(0, 75, 183, .035);
+    pointer-events: none;
+}
+
+/* 점 패턴 */
+.sd-compare::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    bottom: 110px;
+    width: 120px;
+    height: 120px;
+    background-image: radial-gradient(rgba(0, 75, 183, .13) 2px, transparent 2px);
+    background-size: 18px 18px;
+    opacity: .5;
+    pointer-events: none;
+}
+
+.sd-compare .sd-inner {
+    position: relative;
+    z-index: 2;
+}
+
 .sd-compare-table {
+    position: relative;
     margin-top: 42px;
     overflow: hidden;
-    border: 1px solid var(--sd-line);
-    border-radius: 26px;
-    background: #fff;
-    box-shadow: 0 20px 46px rgba(10, 69, 150, .06);
+    border: 1px solid rgba(6, 75, 183, .16);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, .92);
+    box-shadow:
+        0 26px 70px rgba(10, 69, 150, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .8);
+    backdrop-filter: blur(8px);
+}
+
+/* 표 상단 포인트 라인 */
+.sd-compare-table::before {
+    content: "";
+    position: absolute;
+    left: 34px;
+    top: 0;
+    width: 120px;
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #064bb7, #9cc7ff);
+    z-index: 3;
 }
 
 .sd-compare-row {
@@ -1019,32 +1101,44 @@ a {
 }
 
 .sd-compare-row + .sd-compare-row {
-    border-top: 1px solid var(--sd-line);
+    border-top: 1px solid #e4ecfa;
 }
 
 .sd-compare-row > div {
-    padding: 22px 18px;
-    border-left: 1px solid var(--sd-line);
+    padding: 24px 20px;
+    border-left: 1px solid #e4ecfa;
     font-size: 16px;
     line-height: 1.45;
-    font-weight: 700;
+    font-weight: 750;
+    color: #172b4d;
+    transition:
+        background .25s ease,
+        color .25s ease;
 }
 
 .sd-compare-row > div:first-child {
     border-left: 0;
-    background: #edf5ff;
+    background: #eaf3ff;
     color: var(--sd-blue);
     font-weight: 950;
 }
 
 .sd-compare-row.sd-head > div {
-    background: var(--sd-blue);
+    background: linear-gradient(180deg, #075ed8 0%, #064bb7 100%);
     color: #fff;
     font-size: 18px;
     font-weight: 950;
     text-align: center;
 }
 
+.sd-compare-row:not(.sd-head):hover > div {
+    background: #f8fbff;
+}
+
+.sd-compare-row:not(.sd-head):hover > div:first-child {
+    background: #dfeeff;
+}
+    
 .sd-system {
     background: #fff;
 }
