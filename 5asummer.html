@@ -503,6 +503,30 @@ a {
      .mo-br {
         display: block;
     }
+
+    .sd-compare::before {
+        right: -20px;
+        top: 80px;
+        font-size: 110px;
+    }
+
+    .sd-compare::after {
+        left: auto;
+        right: -20px;
+        bottom: 70px;
+        width: 90px;
+        height: 90px;
+        background-size: 14px 14px;
+    }
+
+    .sd-compare-table {
+        border-radius: 20px;
+    }
+
+    .sd-compare-row > div {
+        padding: 18px 14px;
+        font-size: 14px;
+    }
 }
 
 /* =============================
@@ -538,14 +562,7 @@ a {
 }
 
 .sd-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--sd-blue);
-    font-weight: 900;
-    font-size: 15px;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+    display: none;
 }
 
 .sd-eyebrow::before {
@@ -556,11 +573,12 @@ a {
 }
 
 .sd-title {
-    margin-top: 20px;
+    margin-top: 0;
     font-size: clamp(38px, 5vw, 72px);
     /*line-height: 1.02;*/
     color: var(--sd-blue);
     font-weight: 950;
+    text-align: center;
 }
 
 .sd-title em {
@@ -574,6 +592,7 @@ a {
     line-height: 1.65;
     color: #394760;
     font-weight: 650;
+    text-align: center;
 }
 
 .sd-badge {
@@ -797,7 +816,42 @@ a {
 }
 
 .sd-program {
-    background: #fff;
+    position: relative;
+    background:
+        radial-gradient(circle at 18% 20%, rgba(0, 111, 255, .06) 0 11%, transparent 12%),
+        radial-gradient(circle at 84% 18%, rgba(180, 205, 255, .28) 0 9%, transparent 10%),
+        linear-gradient(180deg, #ffffff 0%, #f6f9ff 52%, #ffffff 100%);
+    overflow: hidden;
+}
+
+.sd-program::before {
+    content: "SUMMER";
+    position: absolute;
+    left: -40px;
+    top: 70px;
+    font-size: clamp(100px, 16vw, 220px);
+    font-weight: 950;
+    letter-spacing: -0.08em;
+    color: rgba(0, 75, 183, .03);
+    pointer-events: none;
+}
+
+.sd-program::after {
+    content: "";
+    position: absolute;
+    right: 8%;
+    top: 170px;
+    width: 120px;
+    height: 120px;
+    background-image: radial-gradient(rgba(0, 75, 183, .12) 2px, transparent 2px);
+    background-size: 18px 18px;
+    opacity: .45;
+    pointer-events: none;
+}
+
+.sd-program .sd-inner {
+    position: relative;
+    z-index: 2;
 }
 
 .sd-tab-head {
@@ -969,13 +1023,49 @@ a {
     background: #f7fbff;
 }
 
+.sd-compare {
+    position: relative;
+    background:
+        radial-gradient(circle at 18% 18%, rgba(110, 169, 255, .14) 0%, transparent 28%),
+        radial-gradient(circle at 86% 76%, rgba(190, 212, 255, .24) 0%, transparent 30%),
+        linear-gradient(180deg, #ffffff 0%, #f7faff 42%, #eef6ff 100%);
+    overflow: hidden;
+}
+
+.sd-compare::before,
+.sd-compare::after {
+    display: none;
+}
+
+.sd-compare .sd-inner {
+    position: relative;
+    z-index: 2;
+}
+    
 .sd-compare-table {
+    position: relative;
     margin-top: 42px;
     overflow: hidden;
-    border: 1px solid var(--sd-line);
-    border-radius: 26px;
-    background: #fff;
-    box-shadow: 0 20px 46px rgba(10, 69, 150, .06);
+    border: 1px solid rgba(6, 75, 183, .16);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, .92);
+    box-shadow:
+        0 26px 70px rgba(10, 69, 150, .12),
+        inset 0 1px 0 rgba(255, 255, 255, .8);
+    backdrop-filter: blur(8px);
+}
+
+/* 표 상단 포인트 라인 */
+.sd-compare-table::before {
+    content: "";
+    position: absolute;
+    left: 34px;
+    top: 0;
+    width: 120px;
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #064bb7, #9cc7ff);
+    z-index: 3;
 }
 
 .sd-compare-row {
@@ -984,32 +1074,44 @@ a {
 }
 
 .sd-compare-row + .sd-compare-row {
-    border-top: 1px solid var(--sd-line);
+    border-top: 1px solid #e4ecfa;
 }
 
 .sd-compare-row > div {
-    padding: 22px 18px;
-    border-left: 1px solid var(--sd-line);
+    padding: 24px 20px;
+    border-left: 1px solid #e4ecfa;
     font-size: 16px;
     line-height: 1.45;
-    font-weight: 700;
+    font-weight: 750;
+    color: #172b4d;
+    transition:
+        background .25s ease,
+        color .25s ease;
 }
 
 .sd-compare-row > div:first-child {
     border-left: 0;
-    background: #edf5ff;
+    background: #eaf3ff;
     color: var(--sd-blue);
     font-weight: 950;
 }
 
 .sd-compare-row.sd-head > div {
-    background: var(--sd-blue);
+    background: linear-gradient(180deg, #075ed8 0%, #064bb7 100%);
     color: #fff;
     font-size: 18px;
     font-weight: 950;
     text-align: center;
 }
 
+.sd-compare-row:not(.sd-head):hover > div {
+    background: #f8fbff;
+}
+
+.sd-compare-row:not(.sd-head):hover > div:first-child {
+    background: #dfeeff;
+}
+    
 .sd-system {
     background: #fff;
 }
@@ -1940,7 +2042,7 @@ a {
     <section class="sd-detail" id="detail">
         <div class="sd-inner">
             <span class="sd-eyebrow">Detail Guide</span>
-            <h2 class="sd-title">상세 모집요강</h2>
+            <h2 class="sd-title"><em>상세</em> 모집요강</h2>
             <p class="sd-desc">학년별 과정이 다르므로 학생의 학년에 맞는 요강을 확인해 주세요.</p>
             <div class="sd-accordion">
                 <div class="sd-acc-item active"><button class="sd-acc-title">고1 · 고2 썸머스쿨 모집요강</button><div class="sd-acc-content"><table class="sd-info-table"><tr><th>운영기간</th><td>2026.07.23 ~ 2026.08.12</td></tr><tr><th>모집대상</th><td>고1, 고2</td></tr><tr><th>교육과정</th><td>고1: 공통수학2, 대수 / 고2: 미적분, 기하(유료 선택 특강) / 국어・영어(유료 선택 특강)</td></tr><tr><th>반 편성</th><td>수학진단평가 응시 후 상담을 통해 최종 반 편성</td></tr></table></div></div>
@@ -1950,7 +2052,7 @@ a {
         </div>
     </section>
 
-    <section class="sd-routine">
+    <!--<section class="sd-routine">
         <div class="sd-inner">
             <span class="sd-eyebrow">Daily Routine</span>
             <h2 class="sd-title"><em>하루를 학습 루틴으로</em><br>바꾸는 시간표</h2>
@@ -1962,7 +2064,7 @@ a {
                 <article class="sd-time-card" data-step="5"><b>자습관리</b><p>복습, 과제, 질의응답으로 하루 학습을 마무리합니다.</p></article>
             </div>
         </div>
-    </section>
+    </section>-->
 
     <!--<section class="sd-apply-flow" id="apply">
         <div class="sd-inner">
@@ -1992,9 +2094,12 @@ a {
 
     <section class="sd-final-cta">
         <div class="sd-inner">
-            <h2>집중의 3주, 달라지는 성적!</h2>
+            <h2>집중의 3주, <span class="blue">달라지는 성적!</span></h2>
             <p>중등부부터 고3까지, 목표에 맞춘 3주 집중관리 프로그램</p>
-            <div class="sd-cta-buttons"><a href="#apply" class="sd-cta-btn white">상담 신청하기</a><a href="#detail" class="sd-cta-btn ghost">모집요강 보기</a></div>
+            <div class="sd-cta-buttons">
+                <a href="tel:031-386-1881" class="sd-cta-btn white">상담 신청하기</a>
+                <a href="#detail" class="sd-cta-btn ghost">모집요강 보기</a>
+            </div>
         </div>
     </section>
 </main>
