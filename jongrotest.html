@@ -1590,6 +1590,86 @@ a {
     color: rgba(255, 255, 255, 0.82);
     white-space: nowrap;
 }
+/* 공통 등장 전 상태 */
+.reveal-up,
+.reveal-pop {
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+/* 제목/서브문구 fade-up */
+.reveal-up {
+    transform: translateY(34px);
+    transition:
+        opacity .75s ease,
+        transform .75s cubic-bezier(.22, 1, .36, 1);
+}
+
+.reveal-up.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* choice 카드 pop-up */
+.reveal-pop {
+    transform: translateY(34px) scale(.94);
+    transition:
+        opacity .7s ease,
+        transform .8s cubic-bezier(.18, 1.35, .32, 1);
+}
+
+.reveal-pop.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* 카드별 순차 등장 */
+.choice-card.reveal-pop:nth-child(1) {
+    transition-delay: .05s;
+}
+
+.choice-card.reveal-pop:nth-child(2) {
+    transition-delay: .14s;
+}
+
+.choice-card.reveal-pop:nth-child(3) {
+    transition-delay: .23s;
+}
+
+.choice-card.reveal-pop:nth-child(4) {
+    transition-delay: .32s;
+}
+
+/* 등장 후 hover 느낌 */
+.choice-card.is-visible {
+    transition:
+        opacity .7s ease,
+        transform .8s cubic-bezier(.18, 1.35, .32, 1),
+        box-shadow .3s ease,
+        border-color .3s ease,
+        background .3s ease;
+}
+
+.choice-card.is-visible:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #b8cfff;
+    box-shadow: 0 22px 46px rgba(58, 100, 190, .16);
+    background: #fff;
+}
+
+/* 모션 줄이기 설정 사용자 배려 */
+@media (prefers-reduced-motion: reduce) {
+    .reveal-up,
+    .reveal-pop {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .choice-card.is-visible:hover {
+        transform: none;
+    }
+}
 
 </style>
 </head>
@@ -1637,12 +1717,12 @@ a {
     <section class="sd-overview" id="summary">
         <div class="sd-inner">
             <span class="sd-eyebrow">2026 Summer School</span>
-            <h2 class="sd-title"><em>학년이 다르면,</em><br>여름방학 전략도 달라야 합니다!</h2>
-            <p class="sd-desc">중등부부터 고3까지, 학년별 전략으로 완성하는 3주 집중 프로그램</p>
+            <h2 class="sd-title reveal-up"><em>학년이 다르면,</em><br>여름방학 전략도 달라야 합니다!</h2>
+            <p class="sd-desc reveal-up">중등부부터 고3까지, 학년별 전략으로 완성하는 3주 집중 프로그램</p>
 
     <div class="sd-overview-layout">
     <div class="sd-summary-grid choice-grid">
-        <article class="sd-summary-card choice-card">
+        <article class="sd-summary-card choice-card reveal-pop">
             <h3>중등부</h3>
             <p>
                 고등수학을<br>
@@ -1651,7 +1731,7 @@ a {
             </p>
         </article>
 
-        <article class="sd-summary-card choice-card">
+        <article class="sd-summary-card choice-card reveal-pop">
             <h3>고1</h3>
             <p>
                 내신 핵심<br>
@@ -1660,7 +1740,7 @@ a {
             </p>
         </article>
 
-        <article class="sd-summary-card choice-card">
+        <article class="sd-summary-card choice-card reveal-pop">
             <h3>고2</h3>
             <p>
                 수능 수학<br>
@@ -1669,7 +1749,7 @@ a {
             </p>
         </article>
 
-        <article class="sd-summary-card choice-card">
+        <article class="sd-summary-card choice-card reveal-pop">
             <h3>고3</h3>
             <p>
                 실전 중심<br>
@@ -2042,6 +2122,24 @@ sdSystemCards.forEach(function(card, index) {
         startSystemCardLoop();
     });
 });
+
+const revealItems = document.querySelectorAll('.reveal-up, .reveal-pop');
+
+const revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, {
+    threshold: 0.18
+});
+
+revealItems.forEach(function(item) {
+    revealObserver.observe(item);
+});
+    
 </script>
 </body>
 </html>
