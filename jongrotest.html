@@ -1464,6 +1464,14 @@ a {
     .sd-program-title h3 {
         font-size: 30px;
     }
+
+     .period-line {
+        gap: 6px;
+    }
+
+    .period-line small {
+        font-size: 10px;
+    }
 }
 
 .mo-br {
@@ -1478,6 +1486,19 @@ a {
     font-weight: 600;
     color: rgba(255, 255, 255, 0.82);
     vertical-align: middle;
+}
+    
+.period-line em {
+    font-style: normal;
+    white-space: nowrap;
+}
+
+.period-line small {
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.82);
+    white-space: nowrap;
 }
 
 </style>
@@ -1581,8 +1602,10 @@ a {
             <span>02</span>
             <div>
                 <b>운영기간</b>
-                <strong>7/23 ~ 8/12</strong>
-                <small class="period-note">* 중등부는 6주 특강으로 진행</small>
+                 <strong class="period-line">
+                 <em>7/23 ~ 8/12</em>
+                 <small>* 중등부는 6주 특강</small>
+                 </strong>
             </div>
         </div>
 
