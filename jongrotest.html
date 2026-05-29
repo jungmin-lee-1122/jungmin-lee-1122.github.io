@@ -799,9 +799,9 @@ a {
 .sd-program {
     position: relative;
     background:
-        radial-gradient(circle at 18% 22%, rgba(0, 111, 255, .08) 0 12%, transparent 13%),
-        radial-gradient(circle at 82% 18%, rgba(185, 211, 255, .35) 0 10%, transparent 11%),
-        linear-gradient(180deg, #ffffff 0%, #f5f9ff 52%, #ffffff 100%);
+        radial-gradient(circle at 18% 20%, rgba(0, 111, 255, .06) 0 11%, transparent 12%),
+        radial-gradient(circle at 84% 18%, rgba(180, 205, 255, .28) 0 9%, transparent 10%),
+        linear-gradient(180deg, #ffffff 0%, #f6f9ff 52%, #ffffff 100%);
     overflow: hidden;
 }
 
@@ -809,11 +809,11 @@ a {
     content: "SUMMER";
     position: absolute;
     left: -40px;
-    top: 80px;
-    font-size: clamp(120px, 18vw, 260px);
+    top: 70px;
+    font-size: clamp(100px, 16vw, 220px);
     font-weight: 950;
     letter-spacing: -0.08em;
-    color: rgba(0, 75, 183, .035);
+    color: rgba(0, 75, 183, .03);
     pointer-events: none;
 }
 
@@ -822,23 +822,18 @@ a {
     position: absolute;
     right: 8%;
     top: 170px;
-    width: 130px;
-    height: 130px;
-    background-image: radial-gradient(rgba(0, 75, 183, .14) 2px, transparent 2px);
+    width: 120px;
+    height: 120px;
+    background-image: radial-gradient(rgba(0, 75, 183, .12) 2px, transparent 2px);
     background-size: 18px 18px;
-    opacity: .55;
+    opacity: .45;
     pointer-events: none;
 }
 
-.sd-program .sd-inner::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -36px;
-    width: 86px;
-    height: 6px;
-    border-radius: 999px;
-    background: 
+.sd-program .sd-inner {
+    position: relative;
+    z-index: 2;
+}
 
 .sd-tab-head {
     margin-top: 44px;
