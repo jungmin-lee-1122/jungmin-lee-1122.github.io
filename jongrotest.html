@@ -221,6 +221,59 @@ a {
         background-position: center top;
     }
 }
+@media (max-width: 980px) {
+    .sd-overview-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sd-overview-layout .choice-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sd-overview-layout .sd-quick-info {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .sd-overview-layout {
+        gap: 20px;
+    }
+
+    .sd-overview-layout .choice-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .sd-overview-layout .choice-card {
+        min-height: 130px;
+        padding: 20px 10px;
+    }
+
+    .sd-overview-layout .choice-card h3 {
+        font-size: 22px;
+    }
+
+    .sd-overview-layout .choice-card p {
+        margin-top: 10px;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .sd-overview-layout .sd-quick-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .sd-overview-layout .sd-quick-item {
+        min-height: 76px;
+        padding: 16px 18px;
+    }
+
+    .sd-overview-layout .sd-quick-item strong {
+        font-size: 18px;
+    }
+}
 
 @media (max-width: 1280px) {
     .summer-intro,
@@ -556,6 +609,69 @@ a {
     line-height: 1.55;
     color: #53627a;
     font-weight: 600;
+}
+    .sd-overview-layout {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: 1.35fr .85fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+/* 왼쪽 2x2 선택 카드 */
+.sd-overview-layout .choice-grid {
+    margin-top: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+/* 오른쪽 모집 정보 세로 배치 */
+.sd-overview-layout .sd-quick-info {
+    margin-top: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+/* 왼쪽 카드 */
+.sd-overview-layout .choice-card {
+    min-height: 180px;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: none;
+}
+
+.sd-overview-layout .choice-card h3 {
+    margin-top: 0;
+    font-size: 30px;
+    line-height: 1.25;
+    color: #2e2e2e;
+    font-weight: 900;
+}
+
+.sd-overview-layout .choice-card p {
+    margin-top: 22px;
+    font-size: 22px;
+    line-height: 1.5;
+    color: #666;
+    font-weight: 700;
+}
+
+/* 오른쪽 정보 카드 */
+.sd-overview-layout .sd-quick-item {
+    min-height: 0;
+    height: 100%;
+    padding: 28px 26px;
+    align-items: center;
 }
 
 .sd-program {
@@ -1253,49 +1369,71 @@ a {
             <h2 class="sd-title"><em>학년이 다르면,</em><br>여름방학 전략도 달라야 합니다!</h2>
             <p class="sd-desc">중등부부터 고3까지, 학년별 전략으로 완성하는 3주 집중 프로그램</p>
 
+    <div class="sd-overview-layout">
     <div class="sd-summary-grid choice-grid">
-    <article class="sd-summary-card choice-card">
-        <h3>중등부</h3>
-        <p>
-            고등수학을 미리 경험하고<br>
-            방학 동안 수학 자신감을<br>
-            만들고 싶다면
-        </p>
-    </article>
+        <article class="sd-summary-card choice-card">
+            <h3>중등부</h3>
+            <p>
+                고등수학을<br>
+                미리 준비하고<br>
+                싶다면
+            </p>
+        </article>
 
-    <article class="sd-summary-card choice-card">
-        <h3>고1</h3>
-        <p>
-            공통수학2와 대수의<br>
-            핵심 개념과 내신 유형을<br>
-            정리하고 싶다면
-        </p>
-    </article>
+        <article class="sd-summary-card choice-card">
+            <h3>고1</h3>
+            <p>
+                내신 핵심<br>
+                개념과 유형을<br>
+                잡고 싶다면
+            </p>
+        </article>
 
-    <article class="sd-summary-card choice-card">
-        <h3>고2</h3>
-        <p>
-            미적분 중심으로<br>
-            수능 수학의 기초 체력을<br>
-            만들고 싶다면
-        </p>
-    </article>
+        <article class="sd-summary-card choice-card">
+            <h3>고2</h3>
+            <p>
+                수능 수학<br>
+                기초 체력을<br>
+                만들고 싶다면
+            </p>
+        </article>
 
-    <article class="sd-summary-card choice-card">
-        <h3>고3</h3>
-        <p>
-            국어·수학·영어를<br>
-            실전 중심으로 정리하고<br>
-            약점을 줄이고 싶다면
-        </p>
-    </article>
-</div>
+        <article class="sd-summary-card choice-card">
+            <h3>고3</h3>
+            <p>
+                실전 중심<br>
+                약점 보완이<br>
+                필요하다면
+            </p>
+        </article>
+    </div>
 
-             <div class="sd-quick-info">
-                <div class="sd-quick-item"><span>01</span><div><b>모집대상</b><strong>중등부 · 고등부 전학년</strong></div></div>
-                <div class="sd-quick-item"><span>02</span><div><b>운영기간</b><strong>7/23 ~ 8/12</strong></div></div>
-                <div class="sd-quick-item"><span>03</span><div><b>운영목표</b><strong>3주 완성 집중 학습</strong></div></div>
+    <div class="sd-quick-info">
+        <div class="sd-quick-item">
+            <span>01</span>
+            <div>
+                <b>모집대상</b>
+                <strong>중등부 · 고등부 전학년</strong>
             </div>
+        </div>
+
+        <div class="sd-quick-item">
+            <span>02</span>
+            <div>
+                <b>운영기간</b>
+                <strong>7/23 ~ 8/12</strong>
+            </div>
+        </div>
+
+        <div class="sd-quick-item">
+            <span>03</span>
+            <div>
+                <b>운영목표</b>
+                <strong>3주 완성 집중 학습</strong>
+            </div>
+        </div>
+    </div>
+</div>
 
         </div>
     </section>
