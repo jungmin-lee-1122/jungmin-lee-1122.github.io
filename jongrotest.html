@@ -286,10 +286,6 @@ a {
         grid-template-columns: repeat(3, 1fr);
     }
 
-    .sd-detail {
-        background-size: cover;
-        background-position: center top;
-    }
 }
 
 @media (max-width: 640px) {
@@ -336,11 +332,6 @@ a {
         margin-left: 0;
         margin-top: 6px;
         font-size: 12px;
-    }
-
-     .sd-detail {
-        background-size: 1200px auto;
-        background-position: 65% top;
     }
 
     .sd-system-grid {
@@ -570,10 +561,6 @@ a {
         font-size: 14px;
     }
 
-     .sd-detail {
-        background-size: cover;
-        background-position: center top;
-    }
 }
 
 /* =============================
@@ -1892,6 +1879,23 @@ a {
 
     .sd-system-card p {
         font-size: 12px;
+    }
+}
+
+@media (max-width: 980px) {
+    .sd-detail {
+        background-image: url("./detail-bg.png");
+        background-size: cover;
+        background-position: center top;
+    }
+}
+
+/* 모바일 전용 이미지 */
+@media (max-width: 640px) {
+    .sd-detail {
+        background-image: url("./detail-bg-mo.png");
+        background-size: cover;
+        background-position: center top;
     }
 }
 </style>
