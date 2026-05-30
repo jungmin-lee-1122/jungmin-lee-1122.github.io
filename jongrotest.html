@@ -500,6 +500,8 @@ a {
         white-space: nowrap;
     }
 
+    
+
      .mo-br {
         display: block;
     }
@@ -526,6 +528,11 @@ a {
     .sd-compare-row > div {
         padding: 18px 14px;
         font-size: 14px;
+    }
+
+     .sd-detail {
+        background-size: cover;
+        background-position: center top;
     }
 }
 
@@ -1018,9 +1025,18 @@ a {
     font-weight: 600;
 }
 
-.sd-compare,
-.sd-detail {
+.sd-compare {
     background: #f7fbff;
+}
+
+.sd-detail {
+    position: relative;
+    background-color: #eaf7ff;
+    background-image: url("./detail-bg.png");
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: 100% auto;
+    overflow: hidden;
 }
 
 .sd-compare {
