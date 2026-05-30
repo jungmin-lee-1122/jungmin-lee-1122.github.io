@@ -342,6 +342,36 @@ a {
         background-size: 1200px auto;
         background-position: 65% top;
     }
+
+    .sd-system-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .sd-system-card {
+        min-height: 180px;
+        padding: 22px 12px;
+        border-radius: 18px;
+    }
+
+    .sd-system-card .sd-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        font-size: 18px;
+    }
+
+    .sd-system-card h3 {
+        margin-top: 14px;
+        font-size: 21px;
+    }
+
+    .sd-system-card p {
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.45;
+        word-break: keep-all;
+    }
 }
 
 @media (max-width: 1280px) {
@@ -1616,7 +1646,6 @@ a {
     .sd-summary-grid,
     .sd-quick-info,
     .sd-course-grid,
-    .sd-system-grid,
     .sd-flow-grid {
         grid-template-columns: 1fr;
     }
@@ -1847,6 +1876,24 @@ a {
     }
 }
 
+    @media (max-width: 430px) {
+    .sd-system-grid {
+        gap: 10px;
+    }
+
+    .sd-system-card {
+        min-height: 165px;
+        padding: 18px 8px;
+    }
+
+    .sd-system-card h3 {
+        font-size: 19px;
+    }
+
+    .sd-system-card p {
+        font-size: 12px;
+    }
+}
 </style>
 </head>
 
