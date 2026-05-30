@@ -1126,7 +1126,15 @@ a {
     overflow: hidden;
 }
 
-.sd-compare::before,
+.sd-compare::before {
+   content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(220, 242, 255, 0.32);
+    z-index: 1;
+    pointer-events: none;
+}
+
 .sd-compare::after {
     display: none;
 }
@@ -1161,9 +1169,9 @@ a {
     right: 0;
     bottom: 8px;
     height: 24px;
-    border-radius: 999px;
+    /*border-radius: 999px;*/
     z-index: -1;
-    transform: skewX(-8deg);
+    /*transform: skewX(-8deg);*/
     background: rgba(0, 79, 190, .56);
 }
 
