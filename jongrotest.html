@@ -561,6 +561,43 @@ a {
         font-size: 14px;
     }
 
+       .hero-date-box {
+        margin-top: 18px;
+        padding: 10px 14px;
+        gap: 10px;
+        max-width: 92%;
+    }
+
+    .hero-date-box .date-label {
+        height: 28px;
+        padding: 0 10px;
+        font-size: 13px;
+    }
+
+    .hero-date-box .date-item {
+        gap: 5px;
+    }
+
+    .hero-date-box .date-item b {
+        font-size: 14px;
+    }
+
+    .hero-date-box .date-item strong {
+        font-size: 18px;
+    }
+
+    .hero-date-box .date-item strong span {
+        font-size: 13px;
+    }
+
+    .date-line {
+        height: 18px;
+    }
+
+    .hero-date-box + .cta-row {
+        margin-top: 16px;
+    }
+
 }
 
 /* =============================
@@ -1880,6 +1917,20 @@ a {
     .sd-system-card p {
         font-size: 12px;
     }
+        
+     .hero-date-box {
+        border-radius: 22px;
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .hero-date-box .date-label {
+        flex: 0 0 auto;
+    }
+
+    .date-line {
+        display: none;
+    }
 }
 
 @media (max-width: 980px) {
@@ -1897,6 +1948,77 @@ a {
         background-size: cover;
         background-position: center top;
     }
+}
+
+.hero-date-box {
+    width: fit-content;
+    margin: 22px auto 0;
+    padding: 12px 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+
+    border: 1px solid rgba(255, 255, 255, .45);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .16);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 34px rgba(0, 86, 170, .16);
+
+    color: #fff;
+}
+
+.hero-date-box .date-label {
+    height: 32px;
+    padding: 0 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .92);
+    color: #0072e8;
+
+    font-size: 15px;
+    font-weight: 950;
+    letter-spacing: -0.04em;
+}
+
+.hero-date-box .date-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.hero-date-box .date-item b {
+    font-size: 17px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, .88);
+}
+
+.hero-date-box .date-item strong {
+    font-size: 24px;
+    font-weight: 950;
+    letter-spacing: -0.04em;
+    color: #fff;
+}
+
+.hero-date-box .date-item strong span {
+    margin-left: 2px;
+    font-size: 16px;
+    font-weight: 800;
+    opacity: .9;
+}
+
+.date-line {
+    width: 1px;
+    height: 22px;
+    background: rgba(255, 255, 255, .35);
+}
+
+.hero-date-box + .cta-row {
+    margin-top: 18px;
 }
 </style>
 </head>
@@ -1931,6 +2053,23 @@ a {
                 기초부터 심화, 학습 습관까지!
                 <strong id="text">여름방학 특강 OPEN!</strong>
             </p>
+
+            <div class="hero-date-box">
+                <span class="date-label">개강</span>
+
+                    <div class="date-item">
+                    <b>중등부</b>
+                        <strong>7/20<span>(월)</span></strong>
+                    </div>
+
+                    <div class="date-line"></div>
+
+                    <div class="date-item">
+                     <b>고등부</b>
+                        <strong>7/23<span>(목)</span></strong>
+                    </div>
+            </div>
+
 
             <div class="cta-row single">
               <a href="#curriculum" class="cta-btn secondary">
