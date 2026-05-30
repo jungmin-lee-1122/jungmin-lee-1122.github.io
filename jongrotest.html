@@ -2635,7 +2635,6 @@ if (hero && copy) {
 const sdTabButtons = document.querySelectorAll('.sd-tab-btn');
 const sdPanels = document.querySelectorAll('.sd-panel');
 let sdCurrentTab = 0;
-let sdTabTimer = null;
 
 function activateSummerTab(index) {
     const button = sdTabButtons[index];
@@ -2661,31 +2660,13 @@ function activateSummerTab(index) {
     sdCurrentTab = index;
 }
 
-function startSummerTabAuto() {
-    stopSummerTabAuto();
-
-    sdTabTimer = setInterval(function() {
-        const nextIndex = (sdCurrentTab + 1) % sdTabButtons.length;
-        activateSummerTab(nextIndex);
-    }, 4000);
-}
-
-function stopSummerTabAuto() {
-    if (sdTabTimer) {
-        clearInterval(sdTabTimer);
-        sdTabTimer = null;
-    }
-}
-
 sdTabButtons.forEach(function(button, index) {
     button.addEventListener('click', function() {
         activateSummerTab(index);
-        startSummerTabAuto();
     });
 });
 
 activateSummerTab(0);
-startSummerTabAuto();
     
 const sdAccItems = document.querySelectorAll('.sd-acc-item');
 
