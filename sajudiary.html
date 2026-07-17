@@ -1850,15 +1850,20 @@ function natalObj() {
 // ---------- 동기화 표시 ----------
 function syncHTML() {
   const map = {
-    off:     ['', ''],
+    off:     ['!', '저장하려면 로그인해주세요.'],
     idle:    ['·', '동기화됨'],
     saving:  ['◌', '저장 중'],
     saved:   ['✓', '저장됨'],
     error:   ['!', '저장 실패'],
     offline: ['', ''],
   };
-  const [ic, tx] = map[state.sync] || ['',''];
-  if (!tx) return `<span id="sync"></span>`;
+
+  const [ic, tx] = map[state.sync] || ['', ''];
+
+  if (!tx) {
+    return `<span id="sync"></span>`;
+  }
+
   return `<span id="sync" class="sync ${state.sync}">${ic} ${tx}</span>`;
 }
 
