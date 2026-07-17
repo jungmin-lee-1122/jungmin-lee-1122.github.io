@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>만세력 일기</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1114; --ink2:#161B21; --ink3:#1F262E;
+  --line:#2C353F; --line2:#3A4552;
+  --paper:#E8E2D4; --paper-dim:#A9A294; --mute:#6B7683;
+  --mok:#4B9E7A; --hwa:#C4514B; --to:#B98A3E; --geum:#C9C6BE; --su:#4A6FA5;
+  --alert:#C4514B; --ok:#4B9E7A;
+  --r:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--ink);color:var(--paper);
+  font-family:'Gowun Batang',serif;
+  min-height:100vh;overflow-x:hidden;
+}
+#app{display:flex;min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+#scrim.on{opacity:1;pointer-events:auto}
+aside{
+  position:fixed;top:0;left:0;bottom:0;width:270px;background:var(--ink2);
+  border-right:1px solid var(--line);z-index:50;
+  transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;padding:22px 0;
+}
+aside.on{transform:none}
+.brand{padding:0 22px 20px;border-bottom:1px solid var(--line)}
+.brand h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:19px;letter-spacing:.14em}
+.brand p{font-size:11px;color:var(--mute);margin-top:5px;letter-spacing:.08em}
+nav{padding:14px 0;flex:1}
+.nav-i{
+  display:flex;align-items:center;gap:12px;padding:13px 22px;cursor:pointer;
+  border-left:2px solid transparent;color:var(--paper-dim);font-size:14px;transition:.15s;
+}
+.nav-i:hover{background:var(--ink3);color:var(--paper)}
+.nav-i.on{border-left-color:var(--to);color:var(--paper);background:var(--ink3)}
+.nav-i .gz{font-family:'Noto Serif KR',serif;font-size:15px;color:var(--to);width:18px;text-align:center}
+.nav-i.on .gz{color:var(--to)}
+.nav-note{padding:14px 22px;border-top:1px solid var(--line);font-size:10.5px;color:var(--mute);line-height:1.7}
+
+/* ---------- Main ---------- */
+main{flex:1;min-width:0;padding:0 0 60px}
+header{
+  position:sticky;top:0;z-index:30;background:rgba(14,17,20,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:14px 20px;
+}
+.burger{width:24px;height:16px;position:relative;cursor:pointer;flex:none}
+.burger i{position:absolute;left:0;right:0;height:1.5px;background:var(--paper);transition:.25s}
+.burger i:nth-child(1){top:0}.burger i:nth-child(2){top:7px}.burger i:nth-child(3){top:14px}
+header h2{font-family:'Noto Serif KR',serif;font-weight:500;font-size:15px;letter-spacing:.1em}
+.view{padding:26px 20px;max-width:940px;margin:0 auto;animation:fade .35s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
+/* ---------- 명식판 (signature) ---------- */
+.myeongsik{display:flex;gap:8px;justify-content:center;margin:0 auto}
+.pillar{flex:1;max-width:112px;min-width:0}
+.pillar-cap{
+  text-align:center;font-size:10.5px;color:var(--mute);letter-spacing:.22em;
+  padding-bottom:9px;border-bottom:1px solid var(--line);margin-bottom:10px;
+}
+.gzbox{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);
+  padding:14px 6px;text-align:center;position:relative;overflow:hidden;
+}
+.gzbox+.gzbox{margin-top:6px}
+.gzbox .ch{
+  font-family:'Noto Serif KR',serif;font-weight:700;
+  font-size:clamp(30px,8.4vw,42px);line-height:1.05;display:block;
+}
+.gzbox .ko{font-size:10.5px;color:var(--paper-dim);margin-top:5px;letter-spacing:.1em}
+.gzbox .tg{font-size:9.5px;color:var(--mute);margin-top:2px}
+.e-목{color:var(--mok)}.e-화{color:var(--hwa)}.e-토{color:var(--to)}
+.e-금{color:var(--geum)}.e-수{color:var(--su)}
+.b-목{border-color:rgba(75,158,122,.4)}.b-화{border-color:rgba(196,81,75,.4)}
+.b-토{border-color:rgba(185,138,62,.4)}.b-금{border-color:rgba(201,198,190,.32)}
+.b-수{border-color:rgba(74,111,165,.4)}
+.hidden-row{
+  margin-top:6px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--ink2);padding:9px 5px;text-align:center;
+}
+.hidden-row .lbl{font-size:9px;color:var(--mute);letter-spacing:.14em;margin-bottom:5px}
+.hidden-row .hg{font-family:'Noto Serif KR',serif;font-size:13px;line-height:1.6}
+.hidden-row .hg small{font-size:8.5px;color:var(--mute);margin-left:1px}
+
+/* ---------- 오늘 ---------- */
+.today-date{text-align:center;margin-bottom:22px}
+.today-date .d{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mute);letter-spacing:.16em}
+.today-date .big{font-family:'Noto Serif KR',serif;font-size:26px;font-weight:500;margin-top:7px;letter-spacing:.05em}
+.term-strip{
+  display:flex;justify-content:center;gap:8px;margin-top:12px;font-size:10.5px;color:var(--mute);
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;flex-wrap:wrap;
+}
+.term-strip b{color:var(--to);font-weight:500}
+
+/* ---------- 캘린더 ---------- */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav button{
+  background:var(--ink2);border:1px solid var(--line);color:var(--paper);
+  width:34px;height:34px;border-radius:var(--r);cursor:pointer;font-size:15px;
+}
+.cal-nav button:hover{border-color:var(--line2)}
+.cal-nav .t{font-family:'Noto Serif KR',serif;font-size:16px;letter-spacing:.08em;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
+.cal-nav .t small{color:var(--to);font-size:11.5px;letter-spacing:.14em}
+.picks{display:flex;align-items:center;gap:6px}
+.pick{position:relative}
+.pick select{
+  appearance:none;-webkit-appearance:none;
+  background:transparent;border:1px solid transparent;border-radius:var(--r);
+  color:var(--paper);font-family:'Noto Serif KR',serif;font-size:16px;
+  letter-spacing:.06em;padding:3px 19px 3px 7px;cursor:pointer;
+  transition:.14s;text-align:center;
+}
+.pick select:hover{border-color:var(--line2);background:var(--ink2)}
+.pick select:focus{outline:none;border-color:var(--to);background:var(--ink2)}
+.pick::after{
+  content:'';position:absolute;right:7px;top:50%;margin-top:-1.5px;
+  width:5px;height:5px;border-right:1.5px solid var(--mute);border-bottom:1.5px solid var(--mute);
+  transform:rotate(45deg) translateY(-2px);pointer-events:none;
+}
+.pick select option{background:var(--ink2);color:var(--paper);font-size:14px}
+.gzline{display:flex;align-items:center;gap:6px;justify-content:center}
+.info{
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--line2);
+  background:none;color:var(--mute);font-family:'IBM Plex Mono',monospace;
+  font-size:9px;line-height:1;cursor:pointer;padding:0;transition:.14s;
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+}
+.info:hover,.info.on{border-color:var(--to);color:var(--to)}
+.info:focus-visible{outline:2px solid var(--to);outline-offset:2px}
+.pop{
+  max-width:400px;margin:10px auto 16px;background:var(--ink2);
+  border:1px solid var(--line2);border-radius:var(--r);padding:14px;
+  animation:pop .18s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+.pop-hd{font-size:10px;color:var(--mute);letter-spacing:.16em;margin-bottom:11px}
+.seg{padding:9px 0;border-bottom:1px solid var(--line)}
+.seg:last-of-type{border:none}
+.seg-gz{font-family:'Noto Serif KR',serif;font-size:17px;letter-spacing:.04em;display:flex;align-items:baseline;gap:8px}
+.seg-ko{font-size:11px;color:var(--paper-dim);letter-spacing:.06em}
+.seg-range{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--paper);margin-top:5px;letter-spacing:.02em}
+.seg-term{font-size:10.5px;color:var(--to);margin-top:3px;letter-spacing:.03em}
+.pop-note{font-size:10px;color:var(--mute);line-height:1.75;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.jump{display:flex;justify-content:center;margin:-6px 0 14px}
+.jump button{
+  background:none;border:1px solid var(--line);color:var(--mute);
+  border-radius:var(--r);padding:5px 13px;font-family:'Gowun Batang',serif;
+  font-size:11px;letter-spacing:.1em;cursor:pointer;transition:.14s;
+}
+.jump button:hover{border-color:var(--to);color:var(--to)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px}
+.dow div{text-align:center;font-size:10px;color:var(--mute);letter-spacing:.1em;padding:5px 0}
+.dow div:first-child{color:var(--hwa)}.dow div:last-child{color:var(--su)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cell{
+  aspect-ratio:1/1.16;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--ink2);padding:5px 3px 3px;cursor:pointer;position:relative;
+  display:flex;flex-direction:column;align-items:center;transition:.12s;
+}
+.cell:hover{border-color:var(--line2);background:var(--ink3)}
+.cell.pad{opacity:.22;pointer-events:none}
+.cell.today{border-color:var(--to);box-shadow:0 0 0 1px rgba(185,138,62,.28)}
+.cell.sel{background:var(--ink3);border-color:var(--paper-dim)}
+.cell .n{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--paper-dim);line-height:1}
+.cell .gz{font-family:'Noto Serif KR',serif;font-size:13px;margin-top:3px;font-weight:500;line-height:1.15}
+.cell .dots{position:absolute;bottom:4px;display:flex;gap:2.5px}
+.cell .dot{width:4px;height:4px;border-radius:50%}
+.cell .term{
+  position:absolute;top:3px;right:3px;font-size:7.5px;color:var(--to);
+  letter-spacing:.02em;
+}
+.cell.warn::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--alert);
+  border-radius:var(--r) var(--r) 0 0;
+}
+
+/* ---------- 기록 패널 ---------- */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:60;opacity:0;pointer-events:none;transition:.25s}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--ink2);
+  border-top:1px solid var(--line2);border-radius:12px 12px 0 0;
+  max-height:88vh;overflow-y:auto;transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 0 30px;
+}
+.sheet.on{transform:none}
+.sheet-hd{
+  position:sticky;top:0;background:var(--ink2);padding:16px 20px 13px;
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;
+}
+.sheet-hd .dt{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mute);letter-spacing:.1em}
+.sheet-hd .gz{font-family:'Noto Serif KR',serif;font-size:17px;margin-top:4px;letter-spacing:.08em}
+.sheet-hd button{background:none;border:none;color:var(--mute);font-size:22px;cursor:pointer;line-height:1}
+.sheet-body{padding:20px}
+.grab{width:34px;height:3px;background:var(--line2);border-radius:2px;margin:8px auto 0}
+.f-lbl{font-size:11px;color:var(--mute);letter-spacing:.16em;margin:22px 0 11px}
+.f-lbl:first-child{margin-top:0}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.mood{
+  border:1px solid var(--line);background:var(--ink3);border-radius:var(--r);
+  padding:12px 4px;text-align:center;cursor:pointer;transition:.14s;position:relative;
+}
+.mood:hover{border-color:var(--line2)}
+.mood.on{border-color:var(--to);background:rgba(185,138,62,.11)}
+.mood:focus-visible{outline:2px solid var(--to);outline-offset:2px}
+.mood::after{
+  content:'';position:absolute;top:5px;right:5px;width:11px;height:11px;
+  border:1px solid var(--line2);border-radius:2px;opacity:0;transition:.14s;
+}
+.mood.on::after{
+  opacity:1;border-color:var(--to);background:var(--to);
+  background-image:linear-gradient(45deg,transparent 46%,var(--ink) 46%,var(--ink) 54%,transparent 54%),
+    linear-gradient(-45deg,transparent 46%,var(--ink) 46%,var(--ink) 54%,transparent 54%);
+}
+.mood:hover::after{opacity:1}
+.hint{color:var(--mute);font-size:10px;letter-spacing:.02em;margin-left:6px}
+.mood .em{font-size:23px;display:block;line-height:1}
+.mood .nm{font-size:10px;color:var(--paper-dim);margin-top:6px;display:block}
+.mood.on .nm{color:var(--paper)}
+.bodies{display:flex;gap:7px}
+.bd{
+  flex:1;border:1px solid var(--line);background:var(--ink3);border-radius:var(--r);
+  padding:13px 0;text-align:center;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+  font-size:16px;color:var(--paper-dim);transition:.14s;
+}
+.bd:hover{border-color:var(--line2)}
+.bd.on{border-color:var(--to);background:rgba(185,138,62,.11);color:var(--paper)}
+.bd small{display:block;font-size:8.5px;color:var(--mute);margin-top:4px;font-family:'Gowun Batang',serif}
+textarea{
+  width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--paper);padding:12px;font-family:'Gowun Batang',serif;font-size:14px;
+  resize:vertical;min-height:92px;line-height:1.65;
+}
+textarea:focus{outline:none;border-color:var(--line2)}
+.btn{
+  width:100%;background:var(--paper);color:var(--ink);border:none;border-radius:var(--r);
+  padding:14px;font-family:'Noto Serif KR',serif;font-weight:500;font-size:14px;
+  cursor:pointer;margin-top:22px;letter-spacing:.1em;
+}
+.btn:hover{opacity:.9}
+.btn.ghost{background:none;border:1px solid var(--line2);color:var(--paper-dim);margin-top:8px}
+.day-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.tag{
+  font-size:10px;padding:4px 8px;border-radius:2px;background:var(--ink3);
+  border:1px solid var(--line);color:var(--paper-dim);letter-spacing:.04em;
+}
+.tag.bad{border-color:rgba(196,81,75,.5);color:#E0938E}
+.tag.good{border-color:rgba(75,158,122,.5);color:#7FC4A4}
+
+/* ---------- 입력 폼 ---------- */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+input,select{
+  width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--paper);padding:11px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+}
+input:focus,select:focus{outline:none;border-color:var(--line2)}
+label.fl{display:block;font-size:10.5px;color:var(--mute);margin-bottom:5px;letter-spacing:.1em}
+
+/* ---------- 카드/표 ---------- */
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);padding:16px;margin-top:14px}
+.card h3{font-family:'Noto Serif KR',serif;font-size:13px;font-weight:500;letter-spacing:.14em;margin-bottom:12px;color:var(--paper-dim)}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv:last-child{border:none}
+.kv .k{color:var(--mute);font-size:12px}
+.luck{display:flex;gap:5px;overflow-x:auto;padding-bottom:6px}
+.luck-i{
+  flex:none;width:56px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--ink3);padding:9px 3px;text-align:center;
+}
+.luck-i.now{border-color:var(--to);background:rgba(185,138,62,.1)}
+.luck-i .age{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--mute)}
+.luck-i .g{font-family:'Noto Serif KR',serif;font-size:15px;margin-top:4px;line-height:1.2}
+.empty{text-align:center;padding:56px 20px;color:var(--mute)}
+.empty .ic{font-size:34px;opacity:.3;margin-bottom:14px;font-family:'Noto Serif KR',serif}
+.empty p{font-size:13px;line-height:1.9}
+.warn-i{
+  border:1px solid var(--line);border-left:2px solid var(--alert);border-radius:var(--r);
+  background:var(--ink2);padding:14px;margin-bottom:9px;
+}
+.warn-i .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.warn-i .dt{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+.warn-i .gz{font-family:'Noto Serif KR',serif;font-size:15px;margin-left:8px}
+.warn-i .cf{font-size:10px;color:var(--mute);letter-spacing:.06em}
+.bar{height:2px;background:var(--ink3);border-radius:1px;overflow:hidden;margin:9px 0 8px}
+.bar i{display:block;height:100%;background:var(--alert)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.stat-row:last-child{border:none}
+.stat-row .n{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mute)}
+.delta{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.delta.neg{color:#E0938E}.delta.pos{color:#7FC4A4}
+.note{font-size:11px;color:var(--mute);line-height:1.85;margin-top:14px;padding:12px;background:var(--ink2);border-radius:var(--r);border:1px solid var(--line)}
+.lead{font-size:12.5px;color:var(--paper-dim);line-height:1.8}
+.err{font-size:11.5px;color:#E0938E;margin-top:10px;min-height:1px;line-height:1.6}
+.err.ok{color:#7FC4A4}
+.bk{display:flex;gap:8px;margin-top:14px}
+.bk .btn{margin-top:0}
+.card.danger{border-color:rgba(196,81,75,.3)}
+.card.danger h3{color:#E0938E}
+.danger-btn{border-color:rgba(196,81,75,.45);color:#E0938E}
+.danger-btn:hover{background:rgba(196,81,75,.1)}
+.sync{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+  color:var(--mute);margin-left:10px;font-weight:400;
+}
+.sync.saving{color:var(--to)}
+.sync.saved{color:var(--ok)}
+.sync.error{color:var(--alert)}
+button:disabled{opacity:.5;cursor:default}
+@media(min-width:900px){
+  aside{transform:none;position:sticky;height:100vh}
+  #scrim{display:none} .burger{display:none}
+  main{margin-left:0}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="scrim"></div>
+<div id="app">
+<aside id="side">
+  <div class="brand"><h1>萬歲曆 日記</h1><p>만세력 일기</p></div>
+  <nav id="nav"></nav>
+  <div class="nav-note">기록은 이 브라우저 세션에만 유지됩니다.</div>
+</aside>
+<main>
+  <header>
+    <div class="burger" id="bg"><i></i><i></i><i></i></div>
+    <h2 id="ttl">오늘의 만세력</h2>
+  </header>
+  <div class="view" id="view"></div>
+</main>
+</div>
+<div class="sheet-bg" id="sbg"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="sheet-hd">
+    <div><div class="dt" id="shDt"></div><div class="gz" id="shGz"></div></div>
+    <button id="shX">&times;</button>
+  </div>
+  <div class="sheet-body" id="shBody"></div>
+</div>
+<script>
+// ===== src/engine/core.js =====
+// ============================================================
+// 만세력 코어 엔진
+// ============================================================
+
+const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+
+const STEM_ELEM = ['목','목','화','화','토','토','금','금','수','수'];
+const STEM_YIN  = [false,true,false,true,false,true,false,true,false,true];
+
+const BRANCH_ELEM = ['수','토','목','목','토','화','화','토','금','금','토','수'];
+const BRANCH_YIN  = [false,true,false,true,false,true,false,true,false,true,false,true];
+
+// 지장간: [여기, 중기, 정기] — 일수 배분 포함
+const HIDDEN = {
+  '자': [['임',10],['계',20]],
+  '축': [['계',9],['신',3],['기',18]],
+  '인': [['무',7],['병',7],['갑',16]],
+  '묘': [['갑',10],['을',20]],
+  '진': [['을',9],['계',3],['무',18]],
+  '사': [['무',7],['경',7],['병',16]],
+  '오': [['병',10],['기',9],['정',11]],
+  '미': [['정',9],['을',3],['기',18]],
+  '신': [['무',7],['임',7],['경',16]],
+  '유': [['경',10],['신',20]],
+  '술': [['신',9],['정',3],['무',18]],
+  '해': [['무',7],['갑',7],['임',16]],
+};
+
+// ---------- 오행 생극 ----------
+const GEN = { '목':'화','화':'토','토':'금','금':'수','수':'목' };  // 생
+const OVR = { '목':'토','토':'수','수':'화','화':'금','금':'목' };  // 극
+
+const generates = (a,b) => GEN[a] === b;
+const overcomes = (a,b) => OVR[a] === b;
+
+// ---------- 십성 ----------
+function tenGod(dayStem, targetStem) {
+  const di = STEMS.indexOf(dayStem), ti = STEMS.indexOf(targetStem);
+  if (di < 0 || ti < 0) return null;
+  const de = STEM_ELEM[di], te = STEM_ELEM[ti];
+  const same = STEM_YIN[di] === STEM_YIN[ti];
+
+  if (de === te)            return same ? '비견' : '겁재';
+  if (generates(de, te))    return same ? '식신' : '상관';
+  if (overcomes(de, te))    return same ? '편재' : '정재';
+  if (overcomes(te, de))    return same ? '편관' : '정관';
+  if (generates(te, de))    return same ? '편인' : '정인';
+  return null;
+}
+
+// 지지의 십성은 정기(마지막 지장간) 기준
+function tenGodBranch(dayStem, branch) {
+  const h = HIDDEN[branch];
+  return tenGod(dayStem, h[h.length - 1][0]);
+}
+
+// ---------- 지지 관계 ----------
+const bi = b => BRANCHES.indexOf(b);
+
+const isChung   = (a,b) => (bi(a) - bi(b) + 12) % 12 === 6;           // 충
+const isYukhap  = (a,b) => (bi(a) + bi(b)) % 12 === 1 && a !== b;      // 육합
+const isWonjin  = (a,b) => WONJIN[a] === b;                            // 원진
+const isHae     = (a,b) => HAE[a] === b;                               // 해
+const isPa      = (a,b) => PA[a] === b;                                // 파
+
+const pairMap = pairs => {
+  const m = {};
+  for (const [x,y] of pairs) { m[x]=y; m[y]=x; }
+  return m;
+};
+
+const WONJIN = pairMap([['자','미'],['축','오'],['인','유'],['묘','신'],['진','해'],['사','술']]);
+const HAE    = pairMap([['자','미'],['축','오'],['인','사'],['묘','진'],['신','해'],['유','술']]);
+const PA     = pairMap([['자','유'],['축','진'],['인','해'],['묘','오'],['사','신'],['미','술']]);
+
+// 형 (삼형 / 상형 / 자형)
+const SAMHYUNG = [['인','사','신'], ['축','술','미']];
+const SANGHYUNG = [['자','묘']];
+const JAHYUNG = ['진','오','유','해'];
+
+function isHyung(a, b) {
+  if (a === b) return JAHYUNG.includes(a);
+  for (const g of SAMHYUNG) if (g.includes(a) && g.includes(b)) return true;
+  for (const g of SANGHYUNG) if (g.includes(a) && g.includes(b)) return true;
+  return false;
+}
+
+// 삼합 / 방합
+const SAMHAP = [
+  { members:['신','자','진'], elem:'수' },
+  { members:['해','묘','미'], elem:'목' },
+  { members:['인','오','술'], elem:'화' },
+  { members:['사','유','축'], elem:'금' },
+];
+const BANGHAP = [
+  { members:['인','묘','진'], elem:'목' },
+  { members:['사','오','미'], elem:'화' },
+  { members:['신','유','술'], elem:'금' },
+  { members:['해','자','축'], elem:'수' },
+];
+
+// ---------- 신살 ----------
+// 천을귀인 (일간 기준)
+const CHEONEUL = {
+  '갑':['축','미'], '무':['축','미'], '경':['축','미'],
+  '을':['자','신'], '기':['자','신'],
+  '병':['해','유'], '정':['해','유'],
+  '신':['인','오'],
+  '임':['묘','사'], '계':['묘','사'],
+};
+
+// 도화(연살) / 역마 / 화개 — 삼합국 기준
+const SAMHAP_GROUP = {
+  '신':'수','자':'수','진':'수',
+  '해':'목','묘':'목','미':'목',
+  '인':'화','오':'화','술':'화',
+  '사':'금','유':'금','축':'금',
+};
+const DOHWA = { '수':'유', '목':'자', '화':'묘', '금':'오' };
+const YEOKMA = { '수':'인', '목':'사', '화':'신', '금':'해' };
+const HWAGAE = { '수':'진', '목':'미', '화':'술', '금':'축' };
+
+// 양인 (일간 기준)
+const YANGIN = { '갑':'묘','병':'오','무':'오','경':'유','임':'자' };
+
+// 백호대살
+const BAEKHO = ['갑진','을미','병술','정축','무진','임술','계축'];
+// 괴강
+const GWEGANG = ['경진','경술','임진','임술','무술'];
+
+function shinsal(dayStem, dayBranch, targetBranch, targetPillar) {
+  const tags = [];
+  if ((CHEONEUL[dayStem]||[]).includes(targetBranch)) tags.push('천을귀인');
+  const g = SAMHAP_GROUP[dayBranch];
+  if (DOHWA[g]  === targetBranch) tags.push('도화');
+  if (YEOKMA[g] === targetBranch) tags.push('역마');
+  if (HWAGAE[g] === targetBranch) tags.push('화개');
+  if (YANGIN[dayStem] === targetBranch) tags.push('양인');
+  if (targetPillar && BAEKHO.includes(targetPillar))  tags.push('백호');
+  if (targetPillar && GWEGANG.includes(targetPillar)) tags.push('괴강');
+  return tags;
+}
+
+// ---------- 60갑자 ----------
+function ganjiFromIndex(i) {
+  i = ((i % 60) + 60) % 60;
+  return STEMS[i % 10] + BRANCHES[i % 12];
+}
+
+function ganjiIndex(gz) {
+  const s = STEMS.indexOf(gz[0]), b = BRANCHES.indexOf(gz[1]);
+  for (let i = 0; i < 60; i++) if (i % 10 === s && i % 12 === b) return i;
+  return -1;
+}
+
+// ---------- 일주 계산 ----------
+// 기준: 1900-01-01 = 갑술일 (index 10)
+// 검증: 2026-07-16 → 신묘 (KASI/만세력 대조 확인)
+const EPOCH = Date.UTC(1900, 0, 1);
+const EPOCH_IDX = 10;
+
+// 일주는 KST 기준 날짜로 판정한다. 기기 시간대에 따라 일진이 달라지면 안 된다.
+const KST_MS = 9 * 3600000;
+function dayGanji(date) {
+  const k = new Date(date.getTime() + KST_MS);
+  const utc = Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate());
+  const days = Math.round((utc - EPOCH) / 86400000);
+  return ganjiFromIndex(EPOCH_IDX + days);
+}
+
+// ---------- 시주 계산 ----------
+// 조자시/야자시 정책: 'jo' = 야자시를 다음날로, 'ya' = 당일 유지
+function hourGanji(dayStemChar, hour, minute = 0, policy = 'ja') {
+  const t = hour * 60 + minute;
+  let bIdx;
+  if (t >= 23 * 60 || t < 60) bIdx = 0;
+  else bIdx = Math.floor((t + 60) / 120) % 12;
+
+  const dIdx = STEMS.indexOf(dayStemChar);
+  const startStem = (dIdx % 5) * 2;
+  return STEMS[(startStem + bIdx) % 10] + BRANCHES[bIdx];
+}
+
+// ---------- 연주 (입춘 기준) ----------
+// 사주의 연주는 1월 1일이 아니라 입춘에 바뀐다.
+// 예: 2000-01-01은 아직 기묘년, 2000-02-04(입춘) 이후부터 경진년.
+// 1984 = 갑자년 (index 0)
+function yearGanjiRaw(solarYear) {
+  return ganjiFromIndex(solarYear - 1984);
+}
+
+// date 기준으로 입춘 경계를 반영한 연주.
+// getIpchun(year) -> Date (해당 연도 입춘 시각). 절기 테이블 주입 필요.
+function yearGanji(date, getIpchun) {
+  if (typeof date === 'number') {
+    // 레거시 호출(연도만) — 입춘 무시. 경고성 raw 반환.
+    return yearGanjiRaw(date);
+  }
+  const y = new Date(date.getTime() + KST_MS).getUTCFullYear();
+  const ipchun = getIpchun ? getIpchun(y) : new Date(y, 1, 4);
+  return yearGanjiRaw(date < ipchun ? y - 1 : y);
+}
+
+// ---------- 월주 (절입 기준) ----------
+// termIndex: 0=입춘(인월) … 11=소한(축월)
+function monthGanji(yearStemChar, termIndex) {
+  const bIdx = (termIndex + 2) % 12;  // 인 = 2
+  const yi = STEMS.indexOf(yearStemChar);
+  const startStem = ((yi % 5) * 2 + 2) % 10;  // 갑/기년 → 병인월
+  return STEMS[(startStem + termIndex) % 10] + BRANCHES[bIdx];
+}
+
+// ===== src/engine/solarterm.js =====
+// ============================================================
+// 24절기 계산 (태양황경 기준)
+// 사주 월주는 절입 시각에 바뀌므로 정밀 계산 필요.
+// 정확도: 실제 절입 시각 대비 대략 ±2분 이내 (1900~2100)
+// ============================================================
+
+const RAD = Math.PI / 180;
+
+// 12절(節) — 월주 경계. 중기(中氣)는 월주와 무관.
+// termIndex 0=입춘(인월) … 11=소한(축월)
+const MONTH_TERMS = [
+  { name:'입춘', lon: 315, branch:'인' },
+  { name:'경칩', lon: 345, branch:'묘' },
+  { name:'청명', lon:  15, branch:'진' },
+  { name:'입하', lon:  45, branch:'사' },
+  { name:'망종', lon:  75, branch:'오' },
+  { name:'소서', lon: 105, branch:'미' },
+  { name:'입추', lon: 135, branch:'신' },
+  { name:'백로', lon: 165, branch:'유' },
+  { name:'한로', lon: 195, branch:'술' },
+  { name:'입동', lon: 225, branch:'해' },
+  { name:'대설', lon: 255, branch:'자' },
+  { name:'소한', lon: 285, branch:'축' },
+];
+
+// ---------- 율리우스일 ----------
+function toJD(date) { return date.getTime() / 86400000 + 2440587.5; }
+function fromJD(jd) { return new Date((jd - 2440587.5) * 86400000); }
+
+// ---------- 태양 겉보기황경 (도) ----------
+// VSOP87D 지구 황경 주요항 → 태양 황경 = 지구황경 + 180
+// 약식 Meeus 공식은 절입 시각에서 최대 -23분 오차가 나므로
+// (검증: 2026 소서 계산 10:48 vs KASI 11:12) 주기항을 보강함.
+// 정확도: 1900~2100 구간 실측 대비 약 ±1분.
+
+// [진폭, 위상, 각속도] — VSOP87D Earth L0/L1/L2 상위항
+const L0_TERMS = [
+  [175347046, 0, 0], [3341656, 4.6692568, 6283.0758500], [34894, 4.62610, 12566.15170],
+  [3497, 2.7441, 5753.3849], [3418, 2.8289, 3.5231], [3136, 3.6277, 77713.7715],
+  [2676, 4.4181, 7860.4194], [2343, 6.1352, 3930.2097], [1324, 0.7425, 11506.7698],
+  [1273, 2.0371, 529.6910], [1199, 1.1096, 1577.3435], [990, 5.233, 5884.927],
+  [902, 2.045, 26.298], [857, 3.508, 398.149], [780, 1.179, 5223.694],
+  [753, 2.533, 5507.553], [505, 4.583, 18849.228], [492, 4.205, 775.523],
+  [357, 2.920, 0.067], [317, 5.849, 11790.629], [284, 1.899, 796.298],
+  [271, 0.315, 10977.079], [243, 0.345, 5486.778], [206, 4.806, 2544.314],
+  [205, 1.869, 5573.143], [202, 2.458, 6069.777], [156, 0.833, 213.299],
+  [132, 3.411, 2942.463], [126, 1.083, 20.775], [115, 0.645, 0.980],
+  [103, 0.636, 4694.003], [102, 0.976, 15720.839], [102, 4.267, 7.114],
+  [99, 6.21, 2146.17], [98, 0.68, 155.42], [86, 5.98, 161000.69],
+  [85, 1.30, 6275.96], [85, 3.67, 71430.70], [80, 1.81, 17260.15],
+  [79, 3.04, 12036.46], [75, 1.76, 5088.63], [74, 3.50, 3154.69],
+  [74, 4.68, 801.82], [70, 0.83, 9437.76], [62, 3.98, 8827.39],
+  [61, 1.82, 7084.90], [57, 2.78, 6286.60], [56, 4.39, 14143.50],
+  [56, 3.47, 6279.55], [52, 0.19, 12139.55], [52, 1.33, 1748.02],
+  [51, 0.28, 5856.48], [49, 0.49, 1194.45], [41, 5.37, 8429.24],
+  [41, 2.40, 19651.05], [39, 6.17, 10447.39], [37, 6.04, 10213.29],
+  [37, 2.57, 1059.38], [36, 1.71, 2352.87], [36, 1.78, 6812.77],
+  [33, 0.59, 17789.85], [30, 0.44, 83996.85], [30, 2.74, 1349.87],
+  [25, 3.16, 4690.48],
+];
+const L1_TERMS = [
+  [628331966747, 0, 0], [206059, 2.678235, 6283.075850], [4303, 2.6351, 12566.1517],
+  [425, 1.590, 3.523], [119, 5.796, 26.298], [109, 2.966, 1577.344],
+  [93, 2.59, 18849.23], [72, 1.14, 529.69], [68, 1.87, 398.15],
+  [67, 4.41, 5507.55], [59, 2.89, 5223.69], [56, 2.17, 155.42],
+  [45, 0.40, 796.30], [36, 0.47, 775.52], [29, 2.65, 7.11],
+  [21, 5.34, 0.98], [19, 1.85, 5486.78], [19, 4.97, 213.30],
+  [17, 2.99, 6275.96], [16, 0.03, 2544.31],
+];
+const L2_TERMS = [
+  [52919, 0, 0], [8720, 1.0721, 6283.0758], [309, 0.867, 12566.152],
+  [27, 0.05, 3.52], [16, 5.19, 26.30], [16, 3.68, 155.42],
+  [10, 0.76, 18849.23], [9, 2.06, 77713.77], [7, 0.83, 775.52],
+  [5, 4.66, 1577.34],
+];
+const L3_TERMS = [[289, 5.844, 6283.076], [35, 0, 0], [17, 5.49, 12566.15]];
+const L4_TERMS = [[114, 3.142, 0]];
+
+// 지구 궤도반경 벡터 R (AU) — VSOP87 R0/R1/R2 상위항
+const R0_TERMS = [
+  [100013989, 0, 0], [1670700, 3.0984635, 6283.0758500], [13956, 3.05525, 12566.15170],
+  [3084, 5.1985, 77713.7715], [1628, 1.1739, 5753.3849], [1576, 2.8469, 7860.4194],
+  [925, 5.453, 11506.770], [542, 4.564, 3930.210], [472, 3.661, 5884.927],
+  [346, 0.964, 5507.553], [329, 5.900, 5223.694], [307, 0.299, 5573.143],
+  [243, 4.273, 11790.629], [212, 5.847, 1577.344], [186, 5.022, 10977.079],
+  [175, 3.012, 18849.228], [110, 5.055, 5486.778], [98, 0.89, 6069.78],
+  [86, 5.69, 15720.84], [86, 1.27, 161000.69], [65, 0.27, 17260.15],
+  [63, 0.92, 529.69], [57, 2.01, 83996.85], [56, 5.24, 71430.70],
+  [49, 3.25, 2544.31], [47, 2.58, 775.52], [45, 5.54, 9437.76],
+  [43, 6.01, 6275.96], [39, 5.36, 4694.00], [38, 2.39, 8827.39],
+  [37, 0.83, 19651.05], [37, 4.90, 12139.55], [36, 1.67, 12036.46],
+  [35, 1.84, 2942.46], [33, 0.24, 7084.90], [32, 0.18, 5088.63],
+  [32, 1.78, 398.15], [28, 1.21, 6286.60], [28, 1.90, 6279.55],
+  [26, 4.59, 10447.39],
+];
+const R1_TERMS = [
+  [103019, 1.107490, 6283.075850], [1721, 1.0644, 12566.1517], [702, 3.142, 0],
+  [32, 1.02, 18849.23], [31, 2.84, 5507.55], [25, 1.32, 5223.69],
+  [18, 1.42, 1577.34], [10, 5.91, 10977.08], [9, 1.42, 6275.96],
+  [9, 0.27, 5486.78],
+];
+const R2_TERMS = [
+  [4359, 5.7846, 6283.0758], [124, 5.579, 12566.152], [12, 3.14, 0],
+  [9, 3.63, 77713.77], [6, 1.87, 5573.14], [3, 5.47, 18849.23],
+];
+
+const sumSeries = (terms, t) =>
+  terms.reduce((s, [a, b, c]) => s + a * Math.cos(b + c * t), 0);
+
+function earthRadiusVector(t) {
+  return (sumSeries(R0_TERMS, t)
+    + sumSeries(R1_TERMS, t) * t
+    + sumSeries(R2_TERMS, t) * t * t) / 1e8;
+}
+
+function solarLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  const t = T / 10;  // VSOP87은 천년 단위
+
+  // 지구 황경 (라디안)
+  const L = (sumSeries(L0_TERMS, t)
+    + sumSeries(L1_TERMS, t) * t
+    + sumSeries(L2_TERMS, t) * t * t
+    + sumSeries(L3_TERMS, t) * t ** 3
+    + sumSeries(L4_TERMS, t) * t ** 4) / 1e8;
+
+  // 태양 황경 = 지구 황경 + 180°
+  let lon = (L / RAD) + 180;
+
+  // VSOP87 동역학 황도 → FK5 보정 (황경 상수항만; 위도항은 무시 가능)
+  lon += -0.09033 / 3600;
+
+  // 장동 (황경)
+  const omega = 125.04452 - 1934.136261 * T;
+  const Lsun = 280.4665 + 36000.7698 * T;
+  const Lmoon = 218.3165 + 481267.8813 * T;
+  const dPsi = (-17.20 * Math.sin(omega * RAD)
+    - 1.32 * Math.sin(2 * Lsun * RAD)
+    - 0.23 * Math.sin(2 * Lmoon * RAD)
+    + 0.21 * Math.sin(2 * omega * RAD)) / 3600;
+  lon += dPsi;
+
+  // 광행차: 지구-태양 실제 거리(R)에 반비례. 상수로 두면 원일점/근일점에서
+  // 최대 ±0.3" 오차 → 절입 시각 오차의 주원인이었음.
+  const R = earthRadiusVector(t);
+  lon -= (20.4898 / 3600) / R;
+
+  return ((lon % 360) + 360) % 360;
+}
+
+// ---------- 지구 자전 지연(ΔT) 근사 ----------
+// 태양황경은 TT 기준, 우리는 UT 필요 → ΔT 보정
+function deltaT(year) {
+  // Espenak & Meeus 다항식 (1900~2150 구간)
+  let t;
+  if (year >= 2005 && year < 2050) { t = year - 2000; return 62.92 + 0.32217*t + 0.005589*t*t; }
+  if (year >= 1900 && year < 1920) { t = year - 1900; return -2.79 + 1.494119*t - 0.0598939*t*t + 0.0061966*t*t*t - 0.000197*t*t*t*t; }
+  if (year >= 1920 && year < 1941) { t = year - 1920; return 21.20 + 0.84493*t - 0.076100*t*t + 0.0020936*t*t*t; }
+  if (year >= 1941 && year < 1961) { t = year - 1950; return 29.07 + 0.407*t - t*t/233 + t*t*t/2547; }
+  if (year >= 1961 && year < 1986) { t = year - 1975; return 45.45 + 1.067*t - t*t/260 - t*t*t/718; }
+  if (year >= 1986 && year < 2005) { t = year - 2000; return 63.86 + 0.3345*t - 0.060374*t*t + 0.0017275*t*t*t + 0.000651814*t*t*t*t + 0.00002373599*t*t*t*t*t; }
+  if (year >= 2050 && year <= 2150) { return -20 + 32*Math.pow((year-1820)/100, 2) - 0.5628*(2150-year); }
+  return 64;
+}
+
+// ---------- 특정 황경에 도달하는 시각 (이분법+뉴턴) ----------
+function solveTerm(year, targetLon) {
+  // 근사 시작일: 황경 315(입춘)≈2/4 … 각 절기 대략 위치
+  let guess = 315 <= targetLon || targetLon < 15
+    ? new Date(Date.UTC(targetLon >= 315 ? year : year, targetLon >= 315 ? 1 : 3, 4))
+    : new Date(Date.UTC(year, Math.floor(((targetLon + 45) % 360) / 30), 6));
+
+  let jd = toJD(guess);
+
+  // 뉴턴법: dλ/dt ≈ 0.9856 도/일
+  for (let i = 0; i < 30; i++) {
+    const lon = solarLongitude(jd);
+    let diff = targetLon - lon;
+    // 각도 wrap 처리
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    if (Math.abs(diff) < 1e-7) break;
+    jd += diff / 0.98564736;
+  }
+
+  // TT → UT 보정
+  jd -= deltaT(year) / 86400;
+  return fromJD(jd);
+}
+
+// ---------- 캐시 ----------
+const cache = new Map();
+
+/** 해당 연도의 12절 절입 시각 (KST Date 배열, termIndex 순) */
+function monthTerms(year) {
+  if (cache.has(year)) return cache.get(year);
+  const out = MONTH_TERMS.map((t, i) => {
+    // 소한(285)은 해당 연도 1월, 입춘(315)은 2월 → 같은 해
+    const d = solveTerm(year, t.lon);
+    return { ...t, index: i, date: d };
+  });
+  cache.set(year, out);
+  return out;
+}
+
+/** 입춘 시각 */
+function getIpchun(year) {
+  return monthTerms(year).find(t => t.name === '입춘').date;
+}
+
+/**
+ * 날짜가 속한 월지 termIndex와 사주 연도 반환.
+ * 입춘 전이면 전년도로 귀속.
+ */
+function termIndexOf(date) {
+  const y = new Date(date.getTime() + 9 * 3600000).getUTCFullYear();
+  const terms = monthTerms(y);
+  const ipchun = terms[0].date;
+
+  if (date < ipchun) {
+    // 입춘 전 → 전년도 소한(축월) 또는 그 이전
+    const prev = monthTerms(y - 1);
+    for (let i = prev.length - 1; i >= 0; i--) {
+      if (date >= prev[i].date) return { termIndex: i, sajuYear: y - 1 };
+    }
+    return { termIndex: 11, sajuYear: y - 2 };
+  }
+
+  for (let i = terms.length - 1; i >= 0; i--) {
+    if (date >= terms[i].date) {
+      // 소한(i=11)은 다음해 입춘까지 → sajuYear는 y
+      return { termIndex: i, sajuYear: y };
+    }
+  }
+  return { termIndex: 0, sajuYear: y };
+}
+
+// ===== src/engine/analysis.js =====
+// ============================================================
+// 주의 날짜 분석 엔진
+// ============================================================
+
+// ---------- 기분 → 점수 ----------
+const MOOD = {
+  good:      { label:'기분 좋음',   icon:'😊', score:  2 },
+  neutral:   { label:'그냥 그럼',   icon:'😐', score:  0 },
+  down:      { label:'우울함',      icon:'😞', score: -2 },
+  irritated: { label:'짜증남',      icon:'😤', score: -2 },
+  angry:     { label:'히스테릭/화남',icon:'😡', score: -3 },
+  sensitive: { label:'예민함',      icon:'😖', score: -1 },
+};
+
+// 기록의 기분을 배열로 정규화 (구버전 단일 문자열도 허용)
+function moodList(entry) {
+  const m = entry?.mood;
+  if (!m) return [];
+  const arr = Array.isArray(m) ? m : [m];
+  return arr.filter(x => MOOD[x]);
+}
+
+/**
+ * 여러 기분이 동시에 선택된 날의 점수.
+ * 평균을 쓰면 안 된다: "짜증남(-2) + 예민함(-1)"의 평균은 -1.5로,
+ * 짜증남 단독(-2)보다 좋아져 버린다. 실제로는 더 나쁜 날이다.
+ * → 가장 나쁜 기분을 기준으로 잡고, 추가 부정 감정은 체감 가산한다.
+ */
+function moodScore(entry) {
+  const list = moodList(entry);
+  if (!list.length) return null;
+  const scores = list.map(k => MOOD[k].score);
+
+  // 긍정만 선택된 경우: 최고값 사용
+  const negs = scores.filter(s => s < 0).sort((a, b) => a - b);
+  if (!negs.length) return Math.max(...scores);
+
+  // 부정이 하나라도 있으면 긍정은 상쇄 효과만 (완전히 지우지 않음)
+  let s = negs[0];                       // 최악값이 기준
+  for (let i = 1; i < negs.length; i++) {
+    s += negs[i] * 0.35 * Math.pow(0.7, i - 1);   // 추가 부정 감정 체감 가산
+  }
+  const posMax = Math.max(0, ...scores.filter(x => x > 0));
+  s += posMax * 0.3;                     // 양가감정 소폭 완화
+
+  return Math.max(-4, s);
+}
+
+// 종합 점수: 기분 + 몸상태(1~5 → -2~+2)
+function composite(entry) {
+  const m = moodScore(entry) ?? 0;
+  const b = (entry.body ?? 3) - 3;
+  return m * 0.6 + b * 0.4 * 1.5;
+}
+
+// ============================================================
+// 태그 추출: 하루의 일진 × 내 명식 → 관계 태그 배열
+// ============================================================
+function extractTags(natal, dayGz, ctx = {}) {
+  const tags = [];
+  const dStem = dayGz[0], dBranch = dayGz[1];
+  const me = natal.day[0];  // 일간
+
+  const pillars = [
+    ['년', natal.year], ['월', natal.month],
+    ['일', natal.day],  ['시', natal.hour],
+  ].filter(([, v]) => v);
+
+  // --- 지지 관계 ---
+  for (const [name, gz] of pillars) {
+    const b = gz[1];
+    if (isChung(dBranch, b))  tags.push(`충:${name}지`);
+    if (isWonjin(dBranch, b)) tags.push(`원진:${name}지`);
+    if (isHyung(dBranch, b))  tags.push(`형:${name}지`);
+    if (isHae(dBranch, b))    tags.push(`해:${name}지`);
+    if (isPa(dBranch, b))     tags.push(`파:${name}지`);
+    if (isYukhap(dBranch, b)) tags.push(`육합:${name}지`);
+  }
+
+  // --- 십성 (일간 대비 일진 천간) ---
+  const tg = tenGod(me, dStem);
+  if (tg) tags.push(`일진십성:${tg}`);
+
+  const tgb = tenGodBranch(me, dBranch);
+  if (tgb) tags.push(`일진지지십성:${tgb}`);
+
+  // --- 흉신 투출 ---
+  if (tg === '편관') tags.push('편관투출');
+  if (tg === '상관') tags.push('상관투출');
+  if (tg === '겁재') tags.push('겁재투출');
+
+  // --- 오행 ---
+  tags.push(`오행:${STEM_ELEM[STEMS.indexOf(dStem)]}`);
+  tags.push(`지지오행:${BRANCH_ELEM[BRANCHES.indexOf(dBranch)]}`);
+
+  // --- 신살 ---
+  for (const s of shinsal(me, natal.day[1], dBranch, dayGz)) {
+    tags.push(`신살:${s}`);
+  }
+
+  // --- 삼합/방합 성립 (원국 지지 + 일진) ---
+  const natalBranches = pillars.map(([, gz]) => gz[1]);
+  for (const { members, elem } of SAMHAP) {
+    if (!members.includes(dBranch)) continue;
+    const hit = members.filter(m => m !== dBranch && natalBranches.includes(m));
+    if (hit.length >= 2) tags.push(`삼합:${elem}`);
+    else if (hit.length === 1) tags.push(`반합:${elem}`);
+  }
+  for (const { members, elem } of BANGHAP) {
+    if (!members.includes(dBranch)) continue;
+    const hit = members.filter(m => m !== dBranch && natalBranches.includes(m));
+    if (hit.length >= 2) tags.push(`방합:${elem}`);
+  }
+
+  // --- 세운/대운 동조 ---
+  if (ctx.daeun && isChung(dBranch, ctx.daeun[1])) tags.push('충:대운지');
+  if (ctx.seun  && isChung(dBranch, ctx.seun[1]))  tags.push('충:세운지');
+
+  // --- 용신/기신 운 ---
+  if (natal.yongsin) {
+    const de = STEM_ELEM[STEMS.indexOf(dStem)];
+    if (natal.yongsin.includes(de)) tags.push('용희신운');
+    if (natal.gisin?.includes(de))  tags.push('구기신운');
+  }
+
+  // --- 일주 자체 ---
+  tags.push(`일주:${dayGz}`);
+
+  return [...new Set(tags)];
+}
+
+// ============================================================
+// 통계 집계
+// ============================================================
+function buildStats(natal, entries, opts = {}) {
+  const MIN_N = opts.minSamples ?? 3;
+  const scored = entries.map(e => ({
+    ...e,
+    score: composite(e),
+    tags: extractTags(natal, e.ganji ?? dayGanji(new Date(e.date)), e.ctx),
+  }));
+
+  // 개인 베이스라인
+  const all = scored.map(s => s.score);
+  const baseline = mean(all);
+  const sd = stddev(all, baseline);
+
+  // 태그별 집계
+  const byTag = new Map();
+  for (const s of scored) {
+    for (const t of s.tags) {
+      if (!byTag.has(t)) byTag.set(t, []);
+      byTag.get(t).push(s.score);
+    }
+  }
+
+  const stats = [];
+  for (const [tag, scores] of byTag) {
+    const n = scores.length;
+    if (n < MIN_N) continue;
+
+    const m = mean(scores);
+
+    // 대조군 = 이 태그가 없는 날들. 전체 평균과 비교하면 해당 태그의
+    // 나쁜 날이 베이스라인 자체를 끌어내려 Δ가 과소평가됨.
+    const without = scored.filter(s => !s.tags.includes(tag)).map(s => s.score);
+    const ctrl = without.length >= 2 ? mean(without) : baseline;
+    const delta = m - ctrl;
+
+    // 효과크기: 대조군 표준편차 기준
+    const ctrlSd = without.length >= 2 ? stddev(without, ctrl) : sd;
+    const useSd = ctrlSd > 0.001 ? ctrlSd : sd;
+    const d = useSd > 0.001 ? delta / useSd : 0;
+
+    // 표본 보정: n이 작을수록 강하게 감쇠 (n=3 → 0.27, n=10 → 0.56, n=30 → 0.79)
+    const shrink = n / (n + 8);
+
+    // 신뢰도 상한 0.9 — 어떤 표본으로도 확실성을 주장하지 않음
+    const confidence = Math.min(0.9, Math.abs(d) * shrink);
+
+    // 일주 태그(60종)는 너무 특수해 표본이 절대 모이지 않음.
+    // 통계에는 남기되 위험 승격 대상에서 제외 → 계열 태그로 일반화.
+    const tooSpecific = tag.startsWith('일주:');
+
+    stats.push({
+      tag, n, mean: m, delta, effect: d, confidence,
+      level: confidence >= 0.5 ? '높음' : confidence >= 0.25 ? '중간' : '낮음',
+      risk: delta < -0.4 && confidence >= 0.25 && n >= MIN_N && !tooSpecific,
+    });
+  }
+
+  stats.sort((a, b) => a.delta - b.delta);
+  return { baseline, sd, total: scored.length, stats, scored };
+}
+
+const mean = a => a.length ? a.reduce((x,y)=>x+y,0) / a.length : 0;
+const stddev = (a, m) => a.length < 2 ? 0 :
+  Math.sqrt(a.reduce((s,x)=>s+(x-m)**2, 0) / (a.length - 1));
+
+// ============================================================
+// 태그 상관 처리
+// 하나의 일진이 여러 태그를 동시에 발화시킴 (예: 유일 → 충:일지 + 원진:월지
+// + 파:년지 …). 이들은 독립 증거가 아니라 같은 사건의 다른 이름이므로
+// 신뢰도를 곱셈 결합하면 과대평가됨. 계열(family)로 묶어 대표 1개만 사용.
+// ============================================================
+function tagFamily(tag) {
+  const [kind] = tag.split(':');
+  if (['충','원진','형','해','파','육합'].includes(kind)) return 'branch-rel';
+  if (kind === '일진십성' || kind === '일진지지십성') return 'tengod';
+  if (kind === '오행' || kind === '지지오행') return 'element';
+  if (kind === '삼합' || kind === '반합' || kind === '방합') return 'hap';
+  if (kind === '신살') return 'shinsal';
+  return kind;
+}
+
+// 계열별 최강 태그만 남김 (|delta| 기준)
+function collapseByFamily(hits) {
+  const best = new Map();
+  for (const h of hits) {
+    const f = tagFamily(h.tag);
+    const cur = best.get(f);
+    if (!cur || Math.abs(h.delta) > Math.abs(cur.delta)) best.set(f, h);
+  }
+  return [...best.values()];
+}
+
+// 통계적으로 동률일 때 어떤 이름으로 부를지 결정하는 명리 우선순위.
+// (충/형은 1차 관계, 원진/파/해는 파생적 표현으로 본다)
+const KIND_PRIORITY = {
+  '충':0, '형':1, '원진':2, '해':3, '파':4, '육합':5,
+  '일진십성':6, '일진지지십성':7, '신살':8, '삼합':9, '반합':10, '방합':11,
+  '오행':12, '지지오행':13,
+};
+const kindRank = tag => {
+  const k = tag.split(':')[0];
+  return KIND_PRIORITY[k] ?? 20;
+};
+
+/**
+ * 계열이 달라도 같은 날에 늘 함께 발화하는 태그들이 있다.
+ * 예: 일지 진(辰) 명식에서 술(戌)일은 반드시 충:일지 + 원진:월지 + 파:시지 동시 발생.
+ * 이들은 독립 증거가 아니라 한 사건의 다른 이름이므로 대표 하나만 남긴다.
+ */
+function dropSubsumed(riskStats, scored) {
+  const dayCount = new Map();
+  for (const s of scored) for (const t of new Set(s.tags))
+    dayCount.set(t, (dayCount.get(t) || 0) + 1);
+
+  const coCount = new Map();
+  for (const s of scored) {
+    const ts = [...new Set(s.tags)];
+    for (const a of ts) for (const b of ts) {
+      if (a === b) continue;
+      const k = a + '\u0000' + b;
+      coCount.set(k, (coCount.get(k) || 0) + 1);
+    }
+  }
+
+  // 효과 큰 순 → 표본 많은 순 → 명리 우선순위 → 이름순
+  const rank = (a, b) =>
+    Math.abs(b.delta) - Math.abs(a.delta)
+    || b.n - a.n
+    || kindRank(a.tag) - kindRank(b.tag)
+    || a.tag.localeCompare(b.tag);
+  const ordered = [...riskStats].sort(rank);
+
+  const keep = [];
+  for (const h of ordered) {
+    let host = null;
+    for (const other of keep) {
+      const co = coCount.get(h.tag + '\u0000' + other.tag) || 0;
+      const nh = dayCount.get(h.tag) || 1;
+      if (co / nh >= 0.9) { host = other; break; }
+    }
+    if (host) (host.aliases ||= []).push(h.tag);
+    else keep.push({ ...h, aliases: [] });
+  }
+  return keep;
+}
+
+// ============================================================
+// 미래 예측
+// ============================================================
+function forecast(natal, entries, { days = 365, from = new Date(), minSamples = 3 } = {}) {
+  const { stats, baseline, scored } = buildStats(natal, entries, { minSamples });
+
+  // 위험 태그 중 다른 태그에 종속된 것(항상 함께 뜨고 더 약한 것)을 제거
+  const independent = dropSubsumed(stats.filter(s => s.risk), scored);
+  const riskTags = new Map(independent.map(s => [s.tag, s]));
+  if (!riskTags.size) return { days: [], riskTags: [], baseline };
+
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(from);
+    d.setDate(d.getDate() + i);
+    const gz = dayGanji(d);
+    const tags = extractTags(natal, gz);
+    const raw = tags.map(t => riskTags.get(t)).filter(Boolean);
+    if (!raw.length) continue;
+
+    // 같은 계열의 태그는 같은 사건의 중복 표현 → 대표 1개로 축약
+    const hits = collapseByFamily(raw);
+
+    // 예상 편차 = 신뢰도 가중 평균
+    const wSum = hits.reduce((s,h) => s + h.confidence, 0);
+    const predicted = hits.reduce((s,h) => s + h.delta * h.confidence, 0) / wSum;
+
+    // 축약 후에도 계열 간에는 상관이 남을 수 있으므로 보수적 결합:
+    // 최강 신뢰도를 기준으로, 추가 계열은 체감 가산
+    const sorted = [...hits].sort((a,b) => b.confidence - a.confidence);
+    let conf = sorted[0].confidence;
+    for (let k = 1; k < sorted.length; k++) {
+      conf += sorted[k].confidence * (1 - conf) * 0.5;  // 감쇠 가산
+    }
+    conf = Math.min(0.9, conf);   // 확실성 상한 (태그 단위 상한과 동일)
+
+    out.push({
+      date: d.toISOString().slice(0,10),
+      ganji: gz,
+      predicted,
+      confidence: conf,
+      level: conf >= 0.6 ? '높음' : conf >= 0.35 ? '중간' : '낮음',
+      reasons: hits.map(h => ({ tag: h.tag, n: h.n, delta: h.delta })),
+      allTags: raw.map(h => h.tag),
+    });
+  }
+
+  out.sort((a,b) => a.predicted - b.predicted);
+  return { days: out, riskTags: independent, baseline };
+}
+
+// ============================================================
+// 블라인드 기간: 확증편향 방지
+// 예측일 중 일부를 무작위로 숨겨 대조군 확보
+// ============================================================
+function applyBlinding(forecastDays, { holdout = 0.3, seed = 42 } = {}) {
+  let s = seed;
+  const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  return forecastDays.map(d => ({ ...d, blinded: rnd() < holdout }));
+}
+
+
+// ===== app =====
+// ============================================================
+// 앱 로직
+// ============================================================
+// ============================================================
+// 시간대 — 만세력은 한국 표준시(KST, UTC+9) 기준으로 정의된다.
+// 사용자가 어느 나라에 있든 절입 시각과 날짜 경계는 KST로 판정해야
+// 같은 날의 일진이 기기마다 달라지지 않는다.
+// (Date 객체 내부는 항상 UTC 절대시각이고, 아래 헬퍼로만 KST를 읽는다.)
+// ============================================================
+const KST_OFFSET = 9 * 60 * 60 * 1000;
+
+/** UTC 절대시각 → KST 벽시계 값을 읽기 위한 shifted Date */
+const toKST = d => new Date(d.getTime() + KST_OFFSET);
+
+/** KST 벽시계 기준 년/월/일/시/분 */
+const kstParts = d => {
+  const k = toKST(d);
+  return {
+    y: k.getUTCFullYear(), m: k.getUTCMonth(), d: k.getUTCDate(),
+    h: k.getUTCHours(), mi: k.getUTCMinutes(), dow: k.getUTCDay(),
+  };
+};
+
+/** KST 벽시계 년/월/일/시/분 → UTC 절대시각 Date */
+const fromKST = (y, m, d, h = 0, mi = 0) =>
+  new Date(Date.UTC(y, m, d, h, mi) - KST_OFFSET);
+
+/** 지금 이 순간의 KST 날짜 */
+const nowKST = () => kstParts(new Date());
+
+/** KST 기준 YYYY-MM-DD */
+const isoKST = d => {
+  const p = kstParts(d);
+  return `${p.y}-${String(p.m+1).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`;
+};
+
+const fmtKST = d => {
+  const p = kstParts(d);
+  return `${p.m+1}월 ${p.d}일 ${String(p.h).padStart(2,'0')}:${String(p.mi).padStart(2,'0')}`;
+};
+
+const HANJA_S = {'갑':'甲','을':'乙','병':'丙','정':'丁','무':'戊','기':'己','경':'庚','신':'辛','임':'壬','계':'癸'};
+const HANJA_B = {'자':'子','축':'丑','인':'寅','묘':'卯','진':'辰','사':'巳','오':'午','미':'未','신':'申','유':'酉','술':'戌','해':'亥'};
+const H = c => HANJA_S[c] || HANJA_B[c] || c;
+const elemOfStem  = c => STEM_ELEM[STEMS.indexOf(c)];
+const elemOfBranch= c => BRANCH_ELEM[BRANCHES.indexOf(c)];
+const $ = s => document.querySelector(s);
+
+// 서버 위에서 돌고 있는지 확인. 파일로 직접 열었으면 로컬 전용 모드로 동작한다.
+let SERVER_MODE = location.protocol === 'http:' || location.protocol === 'https:';
+
+const state = {
+  tab: 'today',
+  entries: {},          // { 'YYYY-MM-DD': {mood, body, memo} }
+  natal: null,          // {y,m,d,h, gender, pillars}
+  cal: new Date(),
+  sel: null,
+  user: null,           // 로그인한 아이디
+  rev: 0,               // 서버 데이터 버전
+  sync: 'off',          // off | idle | saving | saved | error | offline
+};
+
+// ============================================================
+// 서버 연동
+// 서버가 없으면(파일로 직접 열었을 때) 자동으로 로컬 전용 모드로 동작한다.
+// ============================================================
+const API = {
+  async call(method, path, body) {
+    const r = await fetch(path, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    let j = null;
+    try { j = await r.json(); } catch {}
+    if (!r.ok) throw Object.assign(new Error(j?.error || '요청 실패'), { status: r.status, body: j });
+    return j;
+  },
+  me:     ()      => API.call('GET', '/api/me'),
+  login:  (u,p)   => API.call('POST','/api/login',  { username:u, password:p }),
+  signup: (u,p)   => API.call('POST','/api/signup', { username:u, password:p }),
+  logout: ()      => API.call('POST','/api/logout'),
+  put:    (d,rev) => API.call('PUT', '/api/data',   { data:d, rev }),
+  passwd: (c,n)   => API.call('POST','/api/password',{ current:c, next:n }),
+  imp:    (d,m)   => API.call('POST','/api/import', { dump:d, mode:m }),
+  del:    (p)     => API.call('DELETE','/api/account',{ password:p }),
+};
+
+let saveTimer = null;
+function setSync(s) { state.sync = s; const el = $('#sync'); if (el) el.outerHTML = syncHTML(); }
+
+/** 변경 후 디바운스 저장 — 타이핑마다 요청을 보내지 않는다 */
+function queueSave() {
+  if (!state.user) return;
+  clearTimeout(saveTimer);
+  setSync('saving');
+  saveTimer = setTimeout(pushNow, 800);
+}
+
+async function pushNow() {
+  if (!state.user) return;
+  try {
+    const r = await API.put({ natal: state.natal, entries: state.entries }, state.rev);
+    state.rev = r.rev;
+    setSync('saved');
+    setTimeout(()=>{ if(state.sync==='saved') setSync('idle'); }, 2000);
+  } catch (e) {
+    if (e.status === 409) {
+      // 다른 기기가 먼저 저장함 → 병합 후 재시도
+      const sd = e.body.serverData || { entries:{}, natal:null };
+      state.entries = { ...sd.entries, ...state.entries };
+      state.natal = state.natal || sd.natal;
+      state.rev = e.body.serverRev;
+      return pushNow();
+    }
+    setSync(e.status === 401 ? 'off' : 'error');
+    if (e.status === 401) { state.user = null; render(); }
+  }
+}
+
+// ---------- 사주 산출 ----------
+function computeSaju(date, hour, minute) {
+  const { termIndex, sajuYear } = termIndexOf(date);
+  const yGz = yearGanjiRaw(sajuYear);
+  const mGz = monthGanji(yGz[0], termIndex);
+  const dGz = dayGanji(date);
+  const hGz = (hour === null || hour === undefined) ? null : hourGanji(dGz[0], hour, minute || 0);
+  return { year: yGz, month: mGz, day: dGz, hour: hGz, termIndex, sajuYear };
+}
+
+// ---------- 용희신 (간이 판정) ----------
+// 일간 기준 신강/신약 → 억부용신. 실제 명리는 조후/통관/병약 등 복합 판단이 필요하므로
+// 여기서는 오행 세력 균형만 본 근사치임을 UI에 명시한다.
+function analyzeYongsin(p) {
+  const count = {목:0,화:0,토:0,금:0,수:0};
+  const add = (e,w)=>{count[e]+=w;};
+  for (const [gz,w] of [[p.year,1],[p.month,1.5],[p.day,1],[p.hour,1]]) {
+    if (!gz) continue;
+    add(elemOfStem(gz[0]), w);
+    add(elemOfBranch(gz[1]), w);
+    for (const [hs, days] of HIDDEN[gz[1]]) add(elemOfStem(hs), w * days/30 * 0.5);
+  }
+  const me = elemOfStem(p.day[0]);
+  const GENOF = {목:'수',화:'목',토:'화',금:'토',수:'금'};
+  const OVROF = {목:'금',화:'수',토:'목',금:'화',수:'토'};
+  const DRAIN = {목:'화',화:'토',토:'금',금:'수',수:'목'};
+  const CTRL  = {목:'토',화:'금',토:'수',금:'목',수:'화'};
+
+  const support = count[me] + count[GENOF[me]];
+  const drain = count[DRAIN[me]] + count[OVROF[me]] + count[CTRL[me]];
+  const strong = support > drain;
+  const total = Object.values(count).reduce((a,b)=>a+b,0);
+  const ratio = support / total;
+
+  const yong = strong ? [DRAIN[me], OVROF[me]] : [GENOF[me], me];
+  const gi   = strong ? [GENOF[me], me] : [DRAIN[me], OVROF[me]];
+  return { count, me, strong, ratio, yongsin:yong, gisin:gi };
+}
+
+// ---------- 대운 ----------
+function computeDaeun(p, birth, gender) {
+  const yinYear = STEM_YIN[STEMS.indexOf(p.year[0])];
+  const forward = (gender === 'M') !== yinYear;   // 양남음녀 순행
+  const terms = monthTerms(birth.getFullYear());
+  let prev = null, next = null;
+  const all = [...monthTerms(birth.getFullYear()-1), ...terms, ...monthTerms(birth.getFullYear()+1)]
+    .map(t=>t.date).sort((a,b)=>a-b);
+  for (const t of all) { if (t <= birth) prev = t; else if (!next) next = t; }
+  const days = forward ? (next - birth)/86400000 : (birth - prev)/86400000;
+  const startAge = Math.max(1, Math.round(days / 3 * 10) / 10);
+
+  const mi = ganjiIndex(p.month);
+  const out = [];
+  for (let i = 1; i <= 9; i++) {
+    out.push({ age: Math.floor(startAge + (i-1)*10), gz: ganjiFromIndex(mi + (forward ? i : -i)) });
+  }
+  return { startAge, forward, list: out };
+}
+
+// ---------- 렌더: 명식판 ----------
+function pillarHTML(cap, gz, dayStem) {
+  if (!gz) return `<div class="pillar"><div class="pillar-cap">${cap}</div>
+    <div class="gzbox" style="opacity:.3"><span class="ch">?</span><span class="ko">미상</span></div>
+    <div class="gzbox" style="opacity:.3"><span class="ch">?</span><span class="ko">미상</span></div></div>`;
+  const s = gz[0], b = gz[1];
+  const se = elemOfStem(s), be = elemOfBranch(b);
+  const tgS = dayStem ? (s === dayStem && cap === '일주' ? '일간' : tenGod(dayStem, s)) : '';
+  const tgB = dayStem ? tenGodBranch(dayStem, b) : '';
+  const hid = HIDDEN[b].map(([c]) =>
+    `<span class="e-${elemOfStem(c)}">${H(c)}<small>${dayStem?tenGod(dayStem,c)||'':''}</small></span>`).join(' ');
+  return `<div class="pillar">
+    <div class="pillar-cap">${cap}</div>
+    <div class="gzbox b-${se}"><span class="ch e-${se}">${H(s)}</span><span class="ko">${s}</span><span class="tg">${tgS||''}</span></div>
+    <div class="gzbox b-${be}"><span class="ch e-${be}">${H(b)}</span><span class="ko">${b}</span><span class="tg">${tgB||''}</span></div>
+    <div class="hidden-row"><div class="lbl">지장간</div><div class="hg">${hid}</div></div>
+  </div>`;
+}
+
+function myeongsikHTML(p, withHour = true) {
+  const ds = p.day[0];
+  return `<div class="myeongsik">
+    ${pillarHTML('시주', withHour?p.hour:null, ds)}
+    ${pillarHTML('일주', p.day, ds)}
+    ${pillarHTML('월주', p.month, ds)}
+    ${pillarHTML('년주', p.year, ds)}
+  </div>`;
+}
+
+// ---------- 뷰: 오늘 ----------
+function viewToday() {
+  const now = new Date();
+  const k = nowKST();
+  const p = computeSaju(now, k.h, k.mi);
+  const terms = monthTerms(k.y);
+  const nextTerm = terms.find(t => t.date > now) || monthTerms(k.y+1)[0];
+  const dd = Math.ceil((nextTerm.date - now)/86400000);
+  const wk = ['일','월','화','수','목','금','토'][k.dow];
+
+  return `<div class="today-date">
+    <div class="d">${isoKST(now)} ${wk}요일</div>
+    <div class="big">${p.year}년 ${p.month}월 ${p.day}일 ${p.hour}시</div>
+    <div class="term-strip">
+      <span>절기 <b>${MONTH_TERMS[p.termIndex].name}</b> 중</span>
+      <span>· 다음 <b>${nextTerm.name}</b> ${dd}일 후 (${fmtKST(nextTerm.date)})</span>
+    </div>
+  </div>
+  ${myeongsikHTML(p)}
+  <div class="note">천간·지지 아래는 일간 기준 십성입니다. 하단은 지지 속 지장간.<br>
+  절입 시각 기준으로 년·월주가 바뀝니다 (양력 1일 아님).</div>`;
+}
+
+/**
+ * 달력에 보이는 양력 달이 걸쳐 있는 모든 월주 구간을 구한다.
+ * 양력 1일이 아니라 절입 시각에 월주가 바뀌므로, 한 양력 달에
+ * 보통 두 개의 월주가 걸린다. (예: 2026년 7월 = 을미월 + 병신월)
+ */
+function monthSegments(y, m) {
+  const first = new Date(y, m, 1, 0, 0, 0);
+  const last  = new Date(y, m + 1, 0, 23, 59, 59);
+  const segs = [];
+  let cur = null;
+
+  for (let d = 1; d <= last.getDate(); d++) {
+    const dt = fromKST(y, m, d, 12);
+    const { termIndex, sajuYear } = termIndexOf(dt);
+    const gz = monthGanji(yearGanjiRaw(sajuYear)[0], termIndex);
+    const yGz = yearGanjiRaw(sajuYear);
+    if (!cur || cur.gz !== gz) {
+      cur = { gz, yearGz: yGz, termIndex, from: d, to: d,
+              termName: MONTH_TERMS[termIndex].name };
+      segs.push(cur);
+    } else cur.to = d;
+  }
+
+  // 각 구간의 정확한 절입 시각 (구간 시작이 이 달 안에 있을 때만)
+  for (const s of segs) {
+    const terms = [...monthTerms(y - 1), ...monthTerms(y), ...monthTerms(y + 1)];
+    const t = terms.find(t => { const kp = kstParts(t.date);
+      return t.name === s.termName && kp.y === y && kp.m === m; });
+    s.enterAt = t ? t.date : null;
+  }
+  return segs;
+}
+
+const fmtTime = d => `${d.getMonth()+1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+// ---------- 뷰: 캘린더 ----------
+function viewCalendar() {
+  const c = state.cal;
+  const y = c.getFullYear(), m = c.getMonth();
+  const first = new Date(y, m, 1), last = new Date(y, m+1, 0);
+  const pad = first.getDay();
+  const today = isoKST(new Date());
+
+  const terms = [...monthTerms(y), ...monthTerms(y-1), ...monthTerms(y+1)];
+  const termOn = {};
+  for (const t of terms) { const kp = kstParts(t.date); if (kp.y===y && kp.m===m) termOn[kp.d] = t.name; }
+
+  let cells = '';
+  for (let i=0;i<pad;i++) cells += `<div class="cell pad"></div>`;
+  for (let d=1; d<=last.getDate(); d++) {
+    const dt = fromKST(y,m,d,12), k = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, gz = dayGanji(dt);
+    const e = state.entries[k];
+    const isT = k === today;
+    const warn = state.warnSet && state.warnSet.has(k);
+    let dots = '';
+    if (e) {
+      const ms = moodList(e);
+      // 다중 선택이므로 개별 기분이 아니라 그날 종합 점수로 색을 정한다
+      const sc = ms.length ? composite({ mood: ms, body: 3 }) : null;
+      const moodColor = sc === null ? null
+        : sc > 0.4 ? 'var(--ok)' : sc < -0.4 ? 'var(--alert)' : 'var(--to)';
+      dots = `<div class="dots">
+        ${moodColor?`<div class="dot" style="background:${moodColor}"></div>`:''}
+        ${e.body?`<div class="dot" style="background:${e.body>=4?'var(--ok)':e.body<=2?'var(--alert)':'var(--to)'}"></div>`:''}
+        ${e.memo?`<div class="dot" style="background:var(--mute)"></div>`:''}
+      </div>`;
+    }
+    cells += `<div class="cell ${isT?'today':''} ${state.sel===k?'sel':''} ${warn?'warn':''}" data-d="${k}">
+      ${termOn[d]?`<div class="term">${termOn[d]}</div>`:''}
+      <div class="n">${d}</div>
+      <div class="gz"><span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span></div>
+      ${dots}
+    </div>`;
+  }
+
+  const nowY = nowKST().y;
+  const years = [];
+  for (let yy = nowY - 80; yy <= nowY + 20; yy++) years.push(yy);
+
+  const segs = monthSegments(y, m);
+  const segLabel = segs.map(s => `${s.gz}월`).join(' · ');
+
+  return `<div class="cal-nav">
+    <button id="pm" aria-label="이전 달">‹</button>
+    <div class="t">
+      <div class="picks">
+        <div class="pick">
+          <select id="sy" aria-label="연도 선택">
+            ${years.map(yy=>`<option value="${yy}" ${yy===y?'selected':''}>${yy}년</option>`).join('')}
+          </select>
+        </div>
+        <div class="pick">
+          <select id="sm" aria-label="월 선택">
+            ${Array.from({length:12},(_,i)=>`<option value="${i}" ${i===m?'selected':''}>${i+1}월</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <small class="gzline">
+        ${segs[0].yearGz} · ${segLabel}
+        <button class="info" id="segI" aria-label="절기 구간 보기" aria-expanded="false">i</button>
+      </small>
+    </div>
+    <button id="nm" aria-label="다음 달">›</button>
+  </div>
+  <div class="pop" id="segPop" hidden>
+    <div class="pop-hd">이 달의 월주 구간</div>
+    ${segs.map(s=>`<div class="seg">
+      <div class="seg-gz"><span class="e-${elemOfStem(s.gz[0])}">${H(s.gz[0])}</span><span class="e-${elemOfBranch(s.gz[1])}">${H(s.gz[1])}</span>
+        <span class="seg-ko">${s.yearGz}년 ${s.gz}월</span></div>
+      <div class="seg-range">${m+1}월 ${s.from}일 ~ ${m+1}월 ${s.to}일</div>
+      <div class="seg-term">${s.enterAt
+        ? `${s.termName} 절입 · ${fmtKST(s.enterAt)}부터`
+        : `${s.termName} 절기 중 · 지난달부터 이어짐`}</div>
+    </div>`).join('')}
+    <div class="pop-note">월주는 양력 1일이 아니라 <b>절입 시각</b>에 바뀝니다.
+    그래서 한 양력 달에 두 개의 월주가 걸칩니다. 시각은 한국 표준시입니다.</div>
+  </div>
+  ${(y!==nowY||m!==nowKST().m)?'<div class="jump"><button id="tdy">오늘로</button></div>':''}
+  <div class="dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+  <div class="grid" id="grid">${cells}</div>
+  <div class="note">날짜를 눌러 만세력 확인과 기록을 남기세요. 점은 기분·몸상태·메모 유무입니다.
+  ${state.warnSet && state.warnSet.size ? '<br>상단 붉은 선은 “주의 날짜” 예측일입니다.' : ''}</div>`;
+}
+
+// ---------- 기록 시트 ----------
+function openSheet(k) {
+  state.sel = k;
+  const [ky,km,kd] = k.split('-').map(Number);
+  const dt = fromKST(ky, km-1, kd, 12);
+  const p = computeSaju(dt, 12);
+  const e = state.entries[k] || {};
+  const curMoods = moodList(e);
+  $('#shDt').textContent = k + ' ' + ['일','월','화','수','목','금','토'][kstParts(dt).dow] + '요일';
+  $('#shGz').textContent = `${p.year}년 ${p.month}월 ${p.day}일`;
+
+  let rel = '';
+  if (state.natal) {
+    const tags = extractTags(natalObj(), p.day);
+    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
+    const good = t => /육합|용희신|천을귀인/.test(t);
+    rel = `<div class="f-lbl">내 명식과의 관계</div><div class="day-tags">
+      ${tags.filter(t=>!t.startsWith('일주:')).map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}
+    </div>`;
+  }
+
+  $('#shBody').innerHTML = `
+    ${myeongsikHTML({...p, hour:null}, false)}
+    ${rel}
+    <div class="f-lbl">기분 <span class="hint">여러 개 선택할 수 있어요</span></div>
+    <div class="moods" id="moods">
+      ${Object.entries(MOOD).map(([k2,v])=>`<div class="mood ${curMoods.includes(k2)?'on':''}" data-m="${k2}" role="checkbox" aria-checked="${curMoods.includes(k2)}" tabindex="0">
+        <span class="em">${v.icon}</span><span class="nm">${v.label}</span></div>`).join('')}
+    </div>
+    <div class="f-lbl">몸상태 (5 = 가장 좋음)</div>
+    <div class="bodies" id="bodies">
+      ${[1,2,3,4,5].map(n=>`<div class="bd ${e.body===n?'on':''}" data-b="${n}">${n}
+        <small>${['매우 낮음','낮음','보통','좋음','아주 좋음'][n-1]}</small></div>`).join('')}
+    </div>
+    <div class="f-lbl">메모</div>
+    <textarea id="memo" placeholder="오늘 어땠나요">${e.memo||''}</textarea>
+    <button class="btn" id="save">기록 저장</button>
+    ${state.entries[k]?'<button class="btn ghost" id="del">이 기록 지우기</button>':''}
+  `;
+
+  let sel = { mood: [...curMoods], body: e.body };
+  $('#moods').onclick = ev => { const t=ev.target.closest('.mood'); if(!t)return;
+    const k2 = t.dataset.m;
+    const i = sel.mood.indexOf(k2);
+    if (i >= 0) sel.mood.splice(i,1); else sel.mood.push(k2);
+    t.classList.toggle('on', i < 0);
+    t.setAttribute('aria-checked', i < 0);
+  };
+  $('#moods').onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ ev.preventDefault(); ev.target.closest('.mood')?.click(); } };
+  $('#bodies').onclick = ev => { const t=ev.target.closest('.bd'); if(!t)return;
+    [...$('#bodies').children].forEach(x=>x.classList.remove('on')); t.classList.add('on'); sel.body=+t.dataset.b; };
+  $('#save').onclick = () => {
+    const memo = $('#memo').value.trim();
+    if (!sel.mood.length && !sel.body && !memo) { closeSheet(); return; }
+    state.entries[k] = { mood: sel.mood, body:sel.body, memo };
+    recomputeWarn(); queueSave(); closeSheet(); render();
+  };
+  if ($('#del')) $('#del').onclick = () => { delete state.entries[k]; recomputeWarn(); queueSave(); closeSheet(); render(); };
+
+  $('#sheet').classList.add('on'); $('#sbg').classList.add('on');
+}
+const closeSheet = () => { $('#sheet').classList.remove('on'); $('#sbg').classList.remove('on'); state.sel=null; };
+
+// ---------- 뷰: 내 명식 ----------
+function viewNatal() {
+  if (!state.natal) return natalForm();
+  const n = state.natal;
+  const birth = new Date(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0);
+  const p = computeSaju(birth, n.h, n.mi);
+  const ys = analyzeYongsin(p);
+  const du = computeDaeun(p, birth, n.gender);
+  const nowY = new Date().getFullYear();
+  const age = nowY - n.y + 1;
+  const cur = [...du.list].reverse().find(x => age >= x.age) || du.list[0];
+  const seun = yearGanjiRaw(nowY);
+
+  const shin = [];
+  for (const [nm,gz] of [['년',p.year],['월',p.month],['일',p.day],['시',p.hour]]) {
+    if(!gz) continue;
+    for (const s of shinsal(p.day[0], p.day[1], gz[1], gz)) shin.push(`${nm}지 ${s}`);
+  }
+
+  const maxE = Math.max(...Object.values(ys.count));
+  return `
+  ${myeongsikHTML(p, n.h!=null)}
+  <div class="card"><h3>오행 세력</h3>
+    ${Object.entries(ys.count).map(([e,v])=>`
+      <div class="stat-row"><span class="e-${e}">${e}</span>
+      <div style="flex:1;margin:0 12px"><div class="bar"><i style="width:${v/maxE*100}%;background:var(--${{목:'mok',화:'hwa',토:'to',금:'geum',수:'su'}[e]})"></i></div></div>
+      <span class="n">${v.toFixed(1)}</span></div>`).join('')}
+  </div>
+  <div class="card"><h3>용희신 / 구기신</h3>
+    <div class="kv"><span class="k">일간</span><span><span class="e-${ys.me}">${H(p.day[0])} ${p.day[0]}</span> (${ys.me})</span></div>
+    <div class="kv"><span class="k">신강/신약</span><span>${ys.strong?'신강':'신약'} <span style="color:var(--mute);font-size:11px">(비겁+인성 ${(ys.ratio*100).toFixed(0)}%)</span></span></div>
+    <div class="kv"><span class="k">용희신</span><span>${ys.yongsin.map(e=>`<span class="e-${e}">${e}</span>`).join(' · ')}</span></div>
+    <div class="kv"><span class="k">구기신</span><span>${ys.gisin.map(e=>`<span class="e-${e}">${e}</span>`).join(' · ')}</span></div>
+    <div class="note" style="margin-top:12px">억부(오행 세력 균형)만 본 근사치입니다. 조후·통관·병약을 함께 봐야 하는 명식은 결과가 달라질 수 있습니다.</div>
+  </div>
+  <div class="card"><h3>신살 · 귀인</h3>
+    <div class="day-tags">${shin.length?shin.map(s=>`<span class="tag ${/귀인/.test(s)?'good':/양인|백호|괴강/.test(s)?'bad':''}">${s}</span>`).join(''):'<span style="color:var(--mute);font-size:12px">해당 없음</span>'}</div>
+  </div>
+  <div class="card"><h3>대운 <span style="color:var(--mute);font-size:11px;letter-spacing:0">${du.forward?'순행':'역행'} · ${du.startAge}세 시작</span></h3>
+    <div class="luck">${du.list.map(x=>`<div class="luck-i ${x===cur?'now':''}">
+      <div class="age">${x.age}세</div>
+      <div class="g"><span class="e-${elemOfStem(x.gz[0])}">${H(x.gz[0])}</span><br><span class="e-${elemOfBranch(x.gz[1])}">${H(x.gz[1])}</span></div>
+    </div>`).join('')}</div>
+  </div>
+  <div class="card"><h3>세운</h3>
+    <div class="luck">${Array.from({length:8},(_,i)=>{const yy=nowY-1+i;const g=yearGanjiRaw(yy);
+      return `<div class="luck-i ${yy===nowY?'now':''}"><div class="age">${yy}</div>
+      <div class="g"><span class="e-${elemOfStem(g[0])}">${H(g[0])}</span><br><span class="e-${elemOfBranch(g[1])}">${H(g[1])}</span></div></div>`;}).join('')}</div>
+  </div>
+  <button class="btn ghost" id="reset">명식 다시 입력</button>`;
+}
+
+function natalForm() {
+  return `<div class="card" style="margin-top:0">
+    <h3>명식 입력</h3>
+    <div class="form-row">
+      <div><label class="fl">생년</label><input id="iy" type="number" placeholder="1990" value="1990"></div>
+      <div><label class="fl">성별</label><select id="ig"><option value="M">남</option><option value="F">여</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><label class="fl">월</label><input id="im" type="number" min="1" max="12" placeholder="1" value="1"></div>
+      <div><label class="fl">일</label><input id="id" type="number" min="1" max="31" placeholder="1" value="1"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="fl">시 (0-23, 모르면 비움)</label><input id="ih" type="number" min="0" max="23" placeholder="미상"></div>
+      <div><label class="fl">분</label><input id="imi" type="number" min="0" max="59" placeholder="0" value="0"></div>
+    </div>
+    <button class="btn" id="mk">만세력 산출</button>
+    <div class="note">양력 기준입니다. 연·월주는 절입 시각으로 판정하므로 절기 경계 출생이면 분까지 입력하세요.</div>
+  </div>`;
+}
+
+function natalObj() {
+  const n = state.natal;
+  const p = computeSaju(new Date(n.y,n.m-1,n.d,n.h??12,n.mi??0), n.h, n.mi);
+  const ys = analyzeYongsin(p);
+  return { year:p.year, month:p.month, day:p.day, hour:p.hour, yongsin:ys.yongsin, gisin:ys.gisin };
+}
+
+// ---------- 동기화 표시 ----------
+function syncHTML() {
+  const map = {
+    off:     ['', ''],
+    idle:    ['·', '동기화됨'],
+    saving:  ['◌', '저장 중'],
+    saved:   ['✓', '저장됨'],
+    error:   ['!', '저장 실패'],
+    offline: ['', ''],
+  };
+  const [ic, tx] = map[state.sync] || ['',''];
+  if (!tx) return `<span id="sync"></span>`;
+  return `<span id="sync" class="sync ${state.sync}">${ic} ${tx}</span>`;
+}
+
+// ---------- 뷰: 계정 ----------
+function viewAccount() {
+  if (!SERVER_MODE) return `<div class="card" style="margin-top:0">
+    <h3>로컬 전용 모드</h3>
+    <p class="lead">지금은 파일로 직접 열려 있어서 계정과 동기화를 쓸 수 없습니다.
+    서버에서 실행하면 아이디로 로그인해 여러 기기에서 같은 기록을 볼 수 있습니다.</p>
+    <div class="note" style="margin-top:14px">기록은 새로고침하면 사라집니다.
+    아래로 파일 백업은 지금도 가능합니다.</div>
+    ${backupBlockHTML(true)}
+  </div>`;
+
+  if (!state.user) return `<div class="card" style="margin-top:0">
+    <h3 id="authTtl">로그인</h3>
+    <p class="lead">아이디로 로그인하면 기록이 서버에 저장되어 다른 기기에서도 이어서 쓸 수 있습니다.</p>
+    <div style="margin-top:16px">
+      <label class="fl">아이디</label>
+      <input id="au" autocomplete="username" placeholder="영문·숫자 3~24자">
+    </div>
+    <div style="margin-top:10px">
+      <label class="fl">비밀번호</label>
+      <input id="ap" type="password" autocomplete="current-password" placeholder="8자 이상">
+    </div>
+    <div id="aerr" class="err"></div>
+    <button class="btn" id="ago">로그인</button>
+    <button class="btn ghost" id="aswap">계정이 없으신가요? 가입하기</button>
+    ${backupBlockHTML(true)}
+  </div>`;
+
+  return `<div class="card" style="margin-top:0">
+    <h3>계정</h3>
+    <div class="kv"><span class="k">아이디</span><span>${esc(state.user)}</span></div>
+    <div class="kv"><span class="k">기록</span><span>${Object.keys(state.entries).length}일</span></div>
+    <div class="kv"><span class="k">동기화</span><span>${state.sync==='error'?'<span style="color:var(--alert)">실패 — 다시 시도해주세요</span>':'서버에 저장됨 (v'+state.rev+')'}</span></div>
+    <button class="btn ghost" id="alo">로그아웃</button>
+  </div>
+  ${backupBlockHTML(false)}
+  <div class="card">
+    <h3>비밀번호 변경</h3>
+    <div><label class="fl">현재 비밀번호</label><input id="pc" type="password" autocomplete="current-password"></div>
+    <div style="margin-top:10px"><label class="fl">새 비밀번호</label><input id="pn" type="password" autocomplete="new-password" placeholder="8자 이상"></div>
+    <div id="perr" class="err"></div>
+    <button class="btn ghost" id="pgo">변경하기</button>
+    <div class="note" style="margin-top:12px">변경하면 다른 기기의 로그인이 모두 해제됩니다.</div>
+  </div>
+  <div class="card danger">
+    <h3>계정 삭제</h3>
+    <p class="lead">기록이 모두 지워지며 되돌릴 수 없습니다. 먼저 백업을 받아두세요.</p>
+    <div style="margin-top:12px"><label class="fl">비밀번호 확인</label><input id="dp" type="password"></div>
+    <div id="derr" class="err"></div>
+    <button class="btn ghost danger-btn" id="dgo">계정 영구 삭제</button>
+  </div>`;
+}
+
+function backupBlockHTML(localOnly) {
+  return `<div class="card"><h3>백업</h3>
+    <p class="lead">기록을 파일로 내려받아 보관하거나, 백업 파일에서 되살릴 수 있습니다.</p>
+    <div class="bk">
+      <button class="btn ghost" id="bkOut">백업 파일 내려받기</button>
+      <button class="btn ghost" id="bkIn">백업 파일에서 복원</button>
+    </div>
+    <input type="file" id="bkFile" accept="application/json,.json" hidden>
+    <div id="bkMsg" class="err"></div>
+    <div class="note" style="margin-top:12px">복원하면 <b>같은 날짜</b>의 기록은 백업본이 아니라 현재 기록을 남깁니다(병합).
+    ${localOnly?'':'복원 결과는 서버에도 반영됩니다.'}</div>
+  </div>`;
+}
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---------- 백업 ----------
+function exportBackup() {
+  const dump = {
+    format: 'manseryeok-diary/v1',
+    exported: new Date().toISOString(),
+    username: state.user || null,
+    rev: state.rev,
+    data: { natal: state.natal, entries: state.entries },
+  };
+  const blob = new Blob([JSON.stringify(dump, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `manseryeok-backup-${isoKST(new Date())}.json`;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+async function importBackup(file, msgEl) {
+  const show = (t, bad=true) => { msgEl.textContent = t; msgEl.className = 'err' + (bad?'':' ok'); };
+  try {
+    const dump = JSON.parse(await file.text());
+    if (dump.format !== 'manseryeok-diary/v1') return show('이 앱의 백업 파일이 아닙니다.');
+    const d = dump.data || {};
+    if (typeof d.entries !== 'object' || d.entries === null) return show('백업 파일이 손상되었습니다.');
+
+    // 병합: 같은 날짜는 현재 기록을 우선한다 (복원이 최근 기록을 덮지 않도록)
+    const before = Object.keys(state.entries).length;
+    state.entries = { ...d.entries, ...state.entries };
+    state.natal = state.natal || d.natal || null;
+    const added = Object.keys(state.entries).length - before;
+
+    recomputeWarn();
+    if (state.user) await pushNow();
+    show(`복원 완료 — ${added}일 추가 (전체 ${Object.keys(state.entries).length}일)`, false);
+    setTimeout(render, 900);
+  } catch {
+    show('파일을 읽을 수 없습니다.');
+  }
+}
+
+// ---------- 뷰: 주의 날짜 ----------
+function viewWarn() {
+  if (!state.natal) return `<div class="empty"><div class="ic">命</div>
+    <p>먼저 <b>내 명식</b>에서 사주를 입력해주세요.<br>기록을 명식과 대조해야 분석할 수 있습니다.</p></div>`;
+
+  const list = Object.entries(state.entries)
+    .filter(([,v]) => moodList(v).length || v.body)
+    .map(([k,v]) => ({ date:k, mood:v.mood, body:v.body }));
+
+  if (list.length < 10) return `<div class="empty"><div class="ic">數</div>
+    <p>기록 <b>${list.length}일</b> / 최소 10일 필요<br>
+    <span style="font-size:11.5px">패턴을 신뢰하려면 표본이 쌓여야 합니다.<br>
+    월별 만세력에서 기분·몸상태를 기록해주세요.</span></p></div>`;
+
+  const nat = natalObj();
+  const st = buildStats(nat, list, { minSamples:3 });
+  const fc = forecast(nat, list, { days:180, from:new Date(), minSamples:3 });
+  const risky = fc.riskTags.slice().sort((a,b)=>a.delta-b.delta);
+
+  if (!fc.days.length) return `<div class="empty"><div class="ic">靜</div>
+    <p>아직 뚜렷한 위험 패턴이 없습니다.<br>
+    <span style="font-size:11.5px">기록 ${list.length}일 · 베이스라인 ${st.baseline.toFixed(2)}<br>
+    반복되는 구조가 나타나면 여기에 표시됩니다.</span></p></div>`;
+
+  const seen = new Set(); const uniq = [];
+  for (const d of fc.days) { if (seen.has(d.date)) continue; seen.add(d.date); uniq.push(d); }
+
+  return `
+  <div class="card" style="margin-top:0"><h3>분석 요약</h3>
+    <div class="kv"><span class="k">기록 일수</span><span>${list.length}일</span></div>
+    <div class="kv"><span class="k">평소 컨디션 (베이스라인)</span><span>${st.baseline.toFixed(2)}</span></div>
+    <div class="kv"><span class="k">발견된 위험 구조</span><span>${risky.length}개</span></div>
+    <div class="kv"><span class="k">향후 180일 주의일</span><span>${uniq.length}일</span></div>
+  </div>
+  <div class="card"><h3>반복 확인된 구조</h3>
+    ${risky.slice(0,8).map(s=>`<div class="stat-row">
+      <span>${s.tag}${s.aliases&&s.aliases.length?`<span style="color:var(--mute);font-size:10px;margin-left:6px">= ${s.aliases.join(' · ')}</span>`:''}</span>
+      <span class="n">${s.n}회 · ${s.level}</span>
+      <span class="delta neg">${s.delta.toFixed(2)}</span>
+    </div>`).join('')}
+  </div>
+  <div style="margin-top:18px">
+  ${uniq.slice(0,14).map(d=>{
+    const dd = Math.ceil((new Date(d.date+'T12:00') - new Date())/86400000);
+    return `<div class="warn-i">
+      <div class="top">
+        <div><span class="dt">${d.date}</span><span class="gz"><span class="e-${elemOfStem(d.ganji[0])}">${H(d.ganji[0])}</span><span class="e-${elemOfBranch(d.ganji[1])}">${H(d.ganji[1])}</span></span>
+        <span style="color:var(--mute);font-size:11px;margin-left:6px">D-${dd}</span></div>
+        <span class="cf">신뢰도 ${d.level} ${(d.confidence*100).toFixed(0)}%</span>
+      </div>
+      <div class="bar"><i style="width:${Math.min(100,Math.abs(d.predicted)/3*100)}%"></i></div>
+      <div class="day-tags">${d.reasons.map(r=>`<span class="tag bad">${r.tag} <span style="color:var(--mute)">n=${r.n}</span></span>`).join('')}</div>
+    </div>`;
+  }).join('')}
+  </div>
+  <div class="note"><b>읽는 법.</b> 이 목록은 예언이 아니라 당신의 기록에서 반복된 패턴입니다.
+  신뢰도는 표본 수와 효과 크기로 계산되며, 어떤 경우에도 90%를 넘기지 않습니다.<br><br>
+  주의일을 미리 알면 그날 실제로 나쁘게 기록할 확률이 올라갑니다(확증편향).
+  판단이 흔들린다고 느끼면 그날도 평소처럼 기록하세요. 데이터가 스스로를 교정합니다.</div>`;
+}
+
+function recomputeWarn() {
+  state.warnSet = new Set();
+  if (!state.natal) return;
+  const list = Object.entries(state.entries).filter(([,v])=>moodList(v).length||v.body).map(([k,v])=>({date:k,...v}));
+  if (list.length < 10) return;
+  try {
+    const fc = forecast(natalObj(), list, { days:365, from:new Date() });
+    for (const d of fc.days) if (d.confidence >= 0.35) state.warnSet.add(d.date);
+  } catch(e) {}
+}
+
+// ---------- 라우팅 ----------
+const TABS = [
+  { id:'today', gz:'今', name:'오늘의 만세력' },
+  { id:'cal',   gz:'月', name:'월별 만세력 보기' },
+  { id:'natal', gz:'命', name:'내 명식' },
+  { id:'warn',  gz:'警', name:'주의 날짜' },
+  { id:'acct',  gz:'戶', name:'계정 · 백업' },
+];
+
+function render() {
+  $('#nav').innerHTML = TABS.map(t=>`<div class="nav-i ${state.tab===t.id?'on':''}" data-t="${t.id}">
+    <span class="gz">${t.gz}</span>${t.name}</div>`).join('');
+  $('#ttl').innerHTML = TABS.find(t=>t.id===state.tab).name + syncHTML();
+  const v = $('#view');
+  v.innerHTML = state.tab==='today' ? viewToday()
+    : state.tab==='cal' ? viewCalendar()
+    : state.tab==='natal' ? viewNatal()
+    : state.tab==='acct' ? viewAccount()
+    : viewWarn();
+
+  $('#nav').onclick = e => { const t=e.target.closest('.nav-i'); if(!t)return;
+    state.tab=t.dataset.t; closeNav(); render(); };
+
+  if (state.tab==='cal') {
+    $('#pm').onclick = ()=>{ state.cal=new Date(state.cal.getFullYear(),state.cal.getMonth()-1,1); render(); };
+    $('#nm').onclick = ()=>{ state.cal=new Date(state.cal.getFullYear(),state.cal.getMonth()+1,1); render(); };
+    $('#sy').onchange = e => { state.cal=new Date(+e.target.value, state.cal.getMonth(), 1); render(); };
+    $('#sm').onchange = e => { state.cal=new Date(state.cal.getFullYear(), +e.target.value, 1); render(); };
+    if ($('#tdy')) $('#tdy').onclick = ()=>{ const n=nowKST(); state.cal=new Date(n.y,n.m,1); render(); };
+    const si=$('#segI'), sp=$('#segPop');
+    if (si) si.onclick = e => { e.stopPropagation();
+      const open = sp.hasAttribute('hidden');
+      sp.toggleAttribute('hidden', !open);
+      si.setAttribute('aria-expanded', open);
+      si.classList.toggle('on', open);
+    };
+    document.addEventListener('click', e => {
+      if (sp && !sp.hasAttribute('hidden') && !sp.contains(e.target) && e.target !== si) {
+        sp.setAttribute('hidden',''); si?.classList.remove('on'); si?.setAttribute('aria-expanded','false');
+      }
+    }, { once: true });
+    $('#grid').onclick = e => { const c=e.target.closest('.cell'); if(!c||c.classList.contains('pad'))return;
+      openSheet(c.dataset.d); };
+  }
+  if (state.tab==='natal') {
+    if ($('#mk')) $('#mk').onclick = () => {
+      const y=+$('#iy').value, m=+$('#im').value, d=+$('#id').value;
+      const hv=$('#ih').value, h = hv===''?null:+hv, mi=+($('#imi').value||0);
+      if(!y||!m||!d){alert('생년월일을 입력해주세요');return;}
+      state.natal={y,m,d,h,mi,gender:$('#ig').value}; recomputeWarn(); queueSave(); render();
+    };
+    if ($('#reset')) $('#reset').onclick = ()=>{ state.natal=null; state.warnSet=new Set(); queueSave(); render(); };
+  }
+  if (state.tab==='acct') bindAccount();
+}
+
+// ---------- 계정 핸들러 ----------
+function bindAccount() {
+  const bkOut = $('#bkOut'), bkIn = $('#bkIn'), bkFile = $('#bkFile');
+  if (bkOut) bkOut.onclick = exportBackup;
+  if (bkIn)  bkIn.onclick  = () => bkFile.click();
+  if (bkFile) bkFile.onchange = e => { const f=e.target.files[0]; if(f) importBackup(f, $('#bkMsg')); e.target.value=''; };
+
+  let mode = 'login';
+  const err = (el, t) => { const e=$(el); if(e){ e.textContent=t; e.className='err'; } };
+
+  if ($('#aswap')) $('#aswap').onclick = () => {
+    mode = mode==='login' ? 'signup' : 'login';
+    $('#authTtl').textContent = mode==='login' ? '로그인' : '가입하기';
+    $('#ago').textContent     = mode==='login' ? '로그인' : '가입하고 시작하기';
+    $('#aswap').textContent   = mode==='login' ? '계정이 없으신가요? 가입하기' : '이미 계정이 있으신가요? 로그인';
+    $('#ap').setAttribute('autocomplete', mode==='login'?'current-password':'new-password');
+    err('#aerr','');
+  };
+
+  if ($('#ago')) $('#ago').onclick = async () => {
+    const u = $('#au').value.trim(), p = $('#ap').value;
+    if (!u || !p) return err('#aerr','아이디와 비밀번호를 입력해주세요.');
+    $('#ago').disabled = true;
+    try {
+      const r = await (mode==='login' ? API.login(u,p) : API.signup(u,p));
+      state.user = r.username; state.rev = r.rev ?? 0;
+      const sd = r.data || { natal:null, entries:{} };
+      // 로그인 전 로컬에 쓴 기록이 있으면 서버 기록과 합친다
+      const localCount = Object.keys(state.entries).length;
+      state.entries = { ...sd.entries, ...state.entries };
+      state.natal = state.natal || sd.natal;
+      state.sync = 'idle';
+      recomputeWarn();
+      if (localCount) await pushNow();
+      render();
+    } catch (e) {
+      err('#aerr', e.message);
+      $('#ago').disabled = false;
+    }
+  };
+
+  if ($('#alo')) $('#alo').onclick = async () => {
+    try { await API.logout(); } catch {}
+    state.user=null; state.rev=0; state.sync='off';
+    state.entries={}; state.natal=null; state.warnSet=new Set();
+    render();
+  };
+
+  if ($('#pgo')) $('#pgo').onclick = async () => {
+    const c=$('#pc').value, n=$('#pn').value;
+    if(!c||!n) return err('#perr','두 칸 모두 입력해주세요.');
+    $('#pgo').disabled=true;
+    try { await API.passwd(c,n); const e=$('#perr'); e.textContent='비밀번호를 변경했습니다.'; e.className='err ok';
+      $('#pc').value=''; $('#pn').value=''; }
+    catch(e){ err('#perr', e.message); }
+    $('#pgo').disabled=false;
+  };
+
+  if ($('#dgo')) $('#dgo').onclick = async () => {
+    const p=$('#dp').value;
+    if(!p) return err('#derr','비밀번호를 입력해주세요.');
+    if(!confirm('정말 계정을 삭제할까요? 모든 기록이 사라지며 되돌릴 수 없습니다.')) return;
+    try { await API.del(p); state.user=null; state.entries={}; state.natal=null; state.rev=0; state.sync='off'; state.tab='today'; render(); }
+    catch(e){ err('#derr', e.message); }
+  };
+}
+
+const openNav = ()=>{ $('#side').classList.add('on'); $('#scrim').classList.add('on'); };
+const closeNav = ()=>{ $('#side').classList.remove('on'); $('#scrim').classList.remove('on'); };
+$('#bg').onclick = openNav;
+$('#scrim').onclick = closeNav;
+$('#sbg').onclick = closeSheet;
+$('#shX').onclick = closeSheet;
+
+// ---------- 부팅 ----------
+(async function boot() {
+  if (SERVER_MODE) {
+    try {
+      const me = await API.me();
+      state.user = me.username; state.rev = me.rev ?? 0;
+      state.natal = me.data?.natal ?? null;
+      state.entries = me.data?.entries ?? {};
+      state.sync = 'idle';
+      recomputeWarn();
+    } catch (e) {
+      if (e.status !== 401) SERVER_MODE = false;   // 서버 없음 → 로컬 모드
+    }
+  }
+  render();
+})();
+
+</script>
+</body>
+</html>
