@@ -318,10 +318,46 @@ label.fl{display:block;font-size:10.5px;color:var(--mute);margin-bottom:5px;lett
 .sync.saved{color:var(--ok)}
 .sync.error{color:var(--alert)}
 button:disabled{opacity:.5;cursor:default}
+
+/* ---------- 용희신 (억부·조후·통관·병약) ---------- */
+.ys-main{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:16px 0 4px}
+.ys-box{border:1px solid var(--line);border-radius:var(--r);background:var(--ink3);padding:11px 4px;text-align:center}
+.ys-box.good{border-color:rgba(75,158,122,.35)}
+.ys-box.bad{border-color:rgba(196,81,75,.3)}
+.ys-lbl{font-size:9.5px;color:var(--mute);letter-spacing:.16em;margin-bottom:6px}
+.ys-el{font-family:'Noto Serif KR',serif;font-size:15px;letter-spacing:.08em}
+.ys-why{
+  font-size:12px;color:var(--paper-dim);line-height:1.8;margin-top:14px;
+  padding:11px 12px;background:var(--ink3);border-radius:var(--r);border:1px solid var(--line);
+}
+.ys-why b{color:var(--to)}
+.ys-conf{display:block;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mute);letter-spacing:.06em}
+.mth{border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);padding:11px 12px;margin-bottom:6px}
+.mth.primary{border-color:rgba(185,138,62,.45);background:rgba(185,138,62,.06)}
+.mth.off{opacity:.5}
+.mth-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.mth-nm{font-family:'Noto Serif KR',serif;font-size:12.5px;letter-spacing:.1em}
+.mth-nm em{
+  font-style:normal;font-size:9px;color:var(--to);border:1px solid rgba(185,138,62,.5);
+  border-radius:2px;padding:1px 4px;margin-left:6px;letter-spacing:.08em;
+}
+.mth-w{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--mute)}
+.mth-y{font-size:12px;margin-bottom:4px;letter-spacing:.04em}
+.mth-r{font-size:11px;color:var(--mute);line-height:1.7}
+.hrs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.hr{display:flex;align-items:center;gap:5px;background:var(--ink3);border:1px solid var(--line);border-radius:2px;padding:5px 6px}
+.hr.on{border-color:var(--to);background:rgba(185,138,62,.12)}
+.hr-b{font-family:'Noto Serif KR',serif;font-size:12px;flex:none}
+.hr-t{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--paper-dim);letter-spacing:-.02em}
+
 @media(min-width:900px){
   aside{transform:none;position:sticky;height:100vh}
   #scrim{display:none} .burger{display:none}
   main{margin-left:0}
+}
+@media(max-width:520px){
+  .ys-main{grid-template-columns:repeat(2,1fr)}
+  .hrs{grid-template-columns:repeat(2,1fr)}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -526,17 +562,77 @@ function dayGanji(date) {
   return ganjiFromIndex(EPOCH_IDX + days);
 }
 
+// ============================================================
 // ---------- 시주 계산 ----------
-// 조자시/야자시 정책: 'jo' = 야자시를 다음날로, 'ya' = 당일 유지
-function hourGanji(dayStemChar, hour, minute = 0, policy = 'ja') {
-  const t = hour * 60 + minute;
-  let bIdx;
-  if (t >= 23 * 60 || t < 60) bIdx = 0;
-  else bIdx = Math.floor((t + 60) / 120) % 12;
+//
+// 한국 표준시(UTC+9)는 동경 135도 기준이지만 서울은 동경 약 127도다.
+// 경도 1도당 태양시가 4분씩 늦으므로 (135-127)*4 ≈ 32분, 관례로 30분을 보정한다.
+// 그래서 자시가 23:00이 아니라 23:30에 시작한다.
+//
+//   자시 23:30~01:29 / 축시 01:30~03:29 / 인시 03:30~05:29
+//   묘시 05:30~07:29 / 진시 07:30~09:29 / 사시 09:30~11:29
+//   오시 11:30~13:29 / 미시 13:30~15:29 / 신시 15:30~17:29
+//   유시 17:30~19:29 / 술시 19:30~21:29 / 해시 21:30~23:29
+// ============================================================
 
-  const dIdx = STEMS.indexOf(dayStemChar);
+/** 시지별 시각 범위 (표시용) */
+const HOUR_RANGES = [
+  ['자','23:30','01:29'], ['축','01:30','03:29'], ['인','03:30','05:29'],
+  ['묘','05:30','07:29'], ['진','07:30','09:29'], ['사','09:30','11:29'],
+  ['오','11:30','13:29'], ['미','13:30','15:29'], ['신','15:30','17:29'],
+  ['유','17:30','19:29'], ['술','19:30','21:29'], ['해','21:30','23:29'],
+];
+
+/**
+ * 보정된 시각으로 시지 인덱스를 구한다.
+ * @param lonCorrection 경도 보정(분). 서울 기준 30. 끄려면 0.
+ */
+function hourBranchIndex(hour, minute, lonCorrection) {
+  const t = hour * 60 + minute - lonCorrection;
+  const m = ((t % 1440) + 1440) % 1440;
+  // 보정 후 기준으로는 23:00~00:59가 자시
+  if (m >= 23 * 60 || m < 60) return 0;
+  return Math.floor((m + 60) / 120) % 12;
+}
+
+/**
+ * 시주 간지.
+ * @param opts.lonCorrection 경도 보정(분). 기본 30 (서울).
+ *        다른 지역은 (135 - 현지경도) * 4. 부산(129°)이면 24.
+ * @param opts.nightJa 야자시 처리:
+ *        'same'(기본) — 23:30 이후도 당일 일간 기준 (야자시설)
+ *        'next'       — 다음날 일간 기준 (조자시설)
+ */
+function hourGanji(dayStemChar, hour, minute = 0, opts = {}) {
+  const lon = (opts && opts.lonCorrection != null) ? opts.lonCorrection : 30;
+  const bIdx = hourBranchIndex(hour, minute, lon);
+
+  let stemBase = dayStemChar;
+  if (opts && opts.nightJa === 'next' && bIdx === 0 &&
+      (hour * 60 + minute - lon) >= 23 * 60) {
+    const i = STEMS.indexOf(dayStemChar);
+    stemBase = STEMS[(i + 1) % 10];
+  }
+
+  const dIdx = STEMS.indexOf(stemBase);
   const startStem = (dIdx % 5) * 2;
   return STEMS[(startStem + bIdx) % 10] + BRANCHES[bIdx];
+}
+
+/**
+ * 일주 경계.
+ * 사주의 하루는 자정이 아니라 자시에 시작한다.
+ * 보정 시각 23:30 이후면 일주가 다음날로 넘어간다.
+ */
+function dayShiftForHour(hour, minute = 0, opts = {}) {
+  const lon = (opts && opts.lonCorrection != null) ? opts.lonCorrection : 30;
+  return (hour * 60 + minute - lon) >= 23 * 60 ? 1 : 0;
+}
+
+/** 시지 이름 (표시용) */
+function hourBranchName(hour, minute = 0, opts = {}) {
+  const lon = (opts && opts.lonCorrection != null) ? opts.lonCorrection : 30;
+  return BRANCHES[hourBranchIndex(hour, minute, lon)];
 }
 
 // ---------- 연주 (입춘 기준) ----------
@@ -567,7 +663,6 @@ function monthGanji(yearStemChar, termIndex) {
   const startStem = ((yi % 5) * 2 + 2) % 10;  // 갑/기년 → 병인월
   return STEMS[(startStem + termIndex) % 10] + BRANCHES[bIdx];
 }
-
 // ===== src/engine/solarterm.js =====
 // ============================================================
 // 24절기 계산 (태양황경 기준)
@@ -805,7 +900,6 @@ function termIndexOf(date) {
   }
   return { termIndex: 0, sajuYear: y };
 }
-
 // ===== src/engine/analysis.js =====
 // ============================================================
 // 주의 날짜 분석 엔진
@@ -1147,8 +1241,399 @@ function applyBlinding(forecastDays, { holdout = 0.3, seed = 42 } = {}) {
   const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
   return forecastDays.map(d => ({ ...d, blinded: rnd() < holdout }));
 }
+// ===== 용희신 종합 판정 (억부·조후·통관·병약) =====
+// ============================================================
+// 용희신 종합 판정 — 억부 · 조후 · 통관 · 병약
+//
+// 명리에서 용신은 하나의 잣대로 정해지지 않는다. 네 가지 관점이 있고,
+// 명식마다 어느 것이 우선인지가 다르다. 여기서는 넷을 각각 계산한 뒤
+// 명식의 상태를 보고 우선순위를 정해 조정(arbitration)한다.
+//
+//   억부(抑扶) — 일간의 강약을 덜거나 보태 균형을 맞춘다. 가장 일반적.
+//   조후(調候) — 계절의 한난조습을 조절한다. 겨울 금수/여름 화토처럼
+//                기후가 극단이면 억부보다 우선한다.
+//   통관(通關) — 두 세력이 팽팽히 대립하면 그 사이를 흐르게 하는 오행.
+//   병약(病藥) — 명식을 망치는 특정 글자(병)가 있으면 그것을 제거하는
+//                글자(약)가 용신이 된다.
+// ============================================================
 
+const ELEMS = ['목','화','토','금','수'];
 
+// 오행 관계
+const GEN_OF  = { 목:'수', 화:'목', 토:'화', 금:'토', 수:'금' };  // 나를 생하는
+const DRAIN   = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' };  // 내가 생하는(설기)
+const CTRL    = { 목:'토', 화:'금', 토:'수', 금:'목', 수:'화' };  // 내가 극하는(재)
+const OVR_OF  = { 목:'금', 화:'수', 토:'목', 금:'화', 수:'토' };  // 나를 극하는(관살)
+
+// 지지 → 계절/월령
+const SEASON = {
+  '인':'봄','묘':'봄','진':'봄',
+  '사':'여름','오':'여름','미':'여름',
+  '신':'가을','유':'가을','술':'가을',
+  '해':'겨울','자':'겨울','축':'겨울',
+};
+
+// 한난(寒暖) — 월지별 기온 지수. -2(극한) ~ +2(극열)
+const TEMP_IDX = {
+  '자':-2,'축':-2,'인':-1,'묘':0,'진':0,'사':1,
+  '오':2,'미':2,'신':1,'유':0,'술':0,'해':-1,
+};
+// 조습(燥濕) — -2(극습) ~ +2(극조)
+const WET_IDX = {
+  '자':-2,'축':-2,'인':0,'묘':0,'진':-1,'사':1,
+  '오':2,'미':2,'신':0,'유':1,'술':1,'해':-1,
+};
+
+/** 오행 세력 계산 (지장간 가중 포함) */
+function elementPower(p) {
+  const c = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  const stemOf = ch => STEM_ELEM[STEMS.indexOf(ch)];
+  const branchOf = ch => BRANCH_ELEM[BRANCHES.indexOf(ch)];
+
+  // 월지는 계절을 지배하므로 가중치가 크다
+  const W = [[p.year,1],[p.month,1.5],[p.day,1],[p.hour,1]];
+  for (const [gz,w] of W) {
+    if (!gz) continue;
+    c[stemOf(gz[0])] += w;
+    c[branchOf(gz[1])] += w;
+    for (const [hs, days] of HIDDEN[gz[1]]) {
+      c[stemOf(hs)] += w * (days/30) * 0.5;
+    }
+  }
+  return c;
+}
+
+/**
+ * 월령 득령 판정.
+ * 단순히 "월지가 목록에 있나"로 보면 틀린다. 진(辰)은 토지만 을(乙)이
+ * 지장간에 있어 목을 조금 돕는 정도인데, 이를 완전한 득령으로 치면
+ * 목이 1.4밖에 없는 명식이 '신강'으로 뒤집힌다.
+ * → 월지의 지장간을 실제로 뜯어 일간을 돕는 비중을 계산한다.
+ */
+function monthSupportRatio(me, monthBranch) {
+  const stemOf = ch => STEM_ELEM[STEMS.indexOf(ch)];
+  const branchElem = BRANCH_ELEM[BRANCHES.indexOf(monthBranch)];
+  let helping = 0, total = 0;
+
+  for (const [hs, days] of HIDDEN[monthBranch]) {
+    const e = stemOf(hs);
+    total += days;
+    if (e === me) helping += days;             // 비겁 — 같은 오행
+    else if (GEN_OF[me] === e) helping += days * 0.8;  // 인성 — 나를 생함
+  }
+  // 지지 본기 오행 자체도 반영
+  let base = 0;
+  if (branchElem === me) base = 1;
+  else if (GEN_OF[me] === branchElem) base = 0.8;
+
+  return Math.max(base, helping / total);
+}
+
+function strength(p) {
+  const me = STEM_ELEM[STEMS.indexOf(p.day[0])];
+  const c = elementPower(p);
+  const total = Object.values(c).reduce((a,b)=>a+b,0);
+
+  const support = c[me] + c[GEN_OF[me]];
+  const oppose  = c[DRAIN[me]] + c[CTRL[me]] + c[OVR_OF[me]];
+  const ratio   = support / total;
+
+  // 득령: 월지가 일간을 돕는 비중 (0~1). 0.5 이상이면 득령으로 본다.
+  const ryeongRatio = monthSupportRatio(me, p.month[1]);
+  const deukryeong = ryeongRatio >= 0.5;
+  // 득지: 일지가 일간을 돕는가
+  const jiRatio = monthSupportRatio(me, p.day[1]);
+  const deukji = jiRatio >= 0.5;
+  // 득세: 전체 세력
+  const deukse = support > oppose;
+
+  // 점수: 득령은 비중에 비례해 0~2점
+  const score = Math.round((ryeongRatio * 2 + (deukji?1:0) + (deukse?1:0)) * 100) / 100;
+
+  /**
+   * 종격(從格) 판정.
+   * 비율만 보면 안 된다. 종왕은 "일간이 지나치게 강하고 대항 세력이 사실상 없을 때",
+   * 종약은 "일간이 뿌리가 전혀 없을 때"만 성립한다.
+   * 조금이라도 견제/뿌리가 있으면 정격(억부)으로 본다.
+   */
+  let extreme = null;
+  const opposeRatio = oppose / total;
+  if (ratio > 0.75 && score >= 3.2 && opposeRatio < 0.12) {
+    // 일간 세력이 압도적이고 대항 세력이 거의 없음 → 종왕
+    extreme = 'super_strong';
+  } else if (ratio < 0.18 && score < 0.5 && !deukryeong && !deukji) {
+    // 일간이 월지·일지 어디에도 뿌리가 없음 → 종약
+    extreme = 'super_weak';
+  }
+
+  return { me, count:c, total, support, oppose, ratio, opposeRatio,
+           deukryeong, deukji, deukse, score,
+           strong: score >= 2, extreme };
+}
+
+// ------------------------------------------------------------
+// 1. 억부용신
+// ------------------------------------------------------------
+function eokbu(p, st) {
+  const me = st.me;
+  if (st.extreme === 'super_strong') {
+    // 종왕격: 거스르지 말고 따른다
+    return { method:'억부', yong:[me, GEN_OF[me]], gi:[OVR_OF[me], CTRL[me]],
+             reason:'일간이 극도로 강해 억제가 통하지 않음 (종왕). 세력을 따르는 오행이 용신.',
+             weight: 1.0, special:'종왕' };
+  }
+  if (st.extreme === 'super_weak') {
+    // 종약격: 강한 세력에 종한다
+    const strongest = ELEMS.filter(e=>e!==me)
+      .sort((a,b)=>st.count[b]-st.count[a])[0];
+    return { method:'억부', yong:[strongest, DRAIN[strongest]], gi:[me, GEN_OF[me]],
+             reason:`일간이 뿌리 없이 약해 도움이 무의미 (종약). 가장 강한 ${strongest} 세력을 따름.`,
+             weight: 1.0, special:'종약' };
+  }
+  if (st.strong) {
+    // 신강 → 설기(식상) · 극(관살) · 소모(재성)
+    // 어느 것을 쓸지는 무엇이 부족한지로 결정
+    const cands = [DRAIN[me], OVR_OF[me], CTRL[me]];
+    cands.sort((a,b)=>st.count[a]-st.count[b]);   // 적은 것부터
+    return { method:'억부', yong:[cands[0], cands[1]], gi:[GEN_OF[me], me],
+             reason:`일간 ${me}이(가) 강함(${st.score.toFixed(1)}/4). 덜어내는 ${cands[0]}·${cands[1]}이 용신.`,
+             weight: 1.0 };
+  }
+  // 신약 → 생조(인성) · 방조(비겁)
+  return { method:'억부', yong:[GEN_OF[me], me], gi:[OVR_OF[me], DRAIN[me]],
+           reason:`일간 ${me}이(가) 약함(${st.score.toFixed(1)}/4). 돕는 ${GEN_OF[me]}(인성)·${me}(비겁)이 용신.`,
+           weight: 1.0 };
+}
+
+// ------------------------------------------------------------
+// 2. 조후용신 — 계절의 한난조습
+// ------------------------------------------------------------
+function johu(p, st) {
+  const mb = p.month[1];
+  const temp = TEMP_IDX[mb], wet = WET_IDX[mb];
+  const season = SEASON[mb];
+  const c = st.count;
+
+  const yong = [], notes = [];
+  let urgency = 0;
+
+  // 한(寒) — 겨울생은 불이 필요하다
+  if (temp <= -2) {
+    if (c['화'] < 1.5) { yong.push('화'); urgency += 2;
+      notes.push(`${season}(${mb}월)의 극한. 화(火)로 따뜻하게 해야 명식이 산다.`); }
+    else { notes.push(`${season}생이나 화가 이미 ${c['화'].toFixed(1)}로 충분.`); }
+  } else if (temp === -1) {
+    if (c['화'] < 1) { yong.push('화'); urgency += 1; notes.push(`${season}의 한기. 화가 필요.`); }
+  }
+  // 열(熱) — 여름생은 물이 필요하다
+  if (temp >= 2) {
+    if (c['수'] < 1.5) { yong.push('수'); urgency += 2;
+      notes.push(`${season}(${mb}월)의 극열. 수(水)로 식혀야 한다.`); }
+    else { notes.push(`${season}생이나 수가 이미 ${c['수'].toFixed(1)}로 충분.`); }
+  } else if (temp === 1) {
+    if (c['수'] < 1) { yong.push('수'); urgency += 1; notes.push(`${season}의 열기. 수가 필요.`); }
+  }
+  // 조(燥) — 메마르면 물기
+  if (wet >= 2 && c['수'] < 1 && !yong.includes('수')) {
+    yong.push('수'); urgency += 1; notes.push('메마른 명식. 수로 적셔야 한다.');
+  }
+  // 습(濕) — 축축하면 불기
+  if (wet <= -2 && c['화'] < 1 && !yong.includes('화')) {
+    yong.push('화'); urgency += 1; notes.push('한습한 명식. 화로 말려야 한다.');
+  }
+
+  if (!yong.length) {
+    return { method:'조후', yong:[], gi:[], weight:0,
+             reason:`${season}(${mb}월)생이나 한난조습이 치우치지 않아 조후가 급하지 않음.` };
+  }
+  const gi = yong.includes('화') ? ['수'] : yong.includes('수') ? ['화'] : [];
+  return { method:'조후', yong:[...new Set(yong)], gi, weight: urgency / 2,
+           reason: notes.join(' '), urgency };
+}
+
+// ------------------------------------------------------------
+// 3. 통관용신 — 대립하는 두 세력 사이를 흐르게
+// ------------------------------------------------------------
+function tonggwan(p, st) {
+  const c = st.count;
+  // 서로 극하는 쌍 중 둘 다 강하고 세력이 비슷한 경우를 찾는다
+  let best = null;
+  for (const a of ELEMS) {
+    const b = CTRL[a];   // a가 b를 극함
+    const pa = c[a], pb = c[b];
+    if (pa < 1.5 || pb < 1.5) continue;         // 둘 다 어느 정도 강해야
+    const balance = Math.min(pa,pb) / Math.max(pa,pb);
+    if (balance < 0.6) continue;                // 세력이 팽팽해야
+    // a와 b 사이를 통하게 하는 것 = a가 생하고 b를 생하는 오행
+    const bridge = DRAIN[a];                    // a → bridge
+    if (DRAIN[bridge] !== b) continue;          // bridge → b 여야 통관 성립
+    const strengthOfClash = (pa + pb) * balance;
+    if (!best || strengthOfClash > best.clash)
+      best = { a, b, bridge, clash: strengthOfClash, balance, pa, pb };
+  }
+  if (!best) return { method:'통관', yong:[], gi:[], weight:0,
+                      reason:'뚜렷하게 대립하는 두 세력이 없어 통관이 필요치 않음.' };
+
+  // 다리 역할 오행이 이미 충분하면 통관은 이미 이루어진 것
+  if (c[best.bridge] >= 1.5)
+    return { method:'통관', yong:[], gi:[], weight:0,
+             reason:`${best.a}와 ${best.b}가 대립하나 ${best.bridge}(${c[best.bridge].toFixed(1)})이 이미 통관 중.` };
+
+  return { method:'통관', yong:[best.bridge], gi:[], weight: Math.min(1, best.clash / 6),
+           reason:`${best.a}(${best.pa.toFixed(1)})와 ${best.b}(${best.pb.toFixed(1)})가 팽팽히 대립. `
+                + `${best.bridge}(으)로 흐름을 터야 한다.`,
+           clash: best.clash };
+}
+
+// ------------------------------------------------------------
+// 4. 병약용신 — 명식을 망치는 글자(병)와 그것을 없애는 글자(약)
+// ------------------------------------------------------------
+function byeongyak(p, st, base) {
+  const c = st.count;
+  const me = st.me;
+
+  // 병(病) = 용신을 극하거나, 지나치게 넘쳐 명식을 흔드는 오행
+  const baseYong = base.yong[0];
+  if (!baseYong) return { method:'병약', yong:[], gi:[], weight:0,
+                          reason:'기준 용신이 없어 병약 판정 불가.' };
+
+  const candidates = [];
+
+  // (1) 용신을 극하는 오행이 강하면 그것이 병
+  const killer = OVR_OF[baseYong];
+  if (c[killer] >= 2 && killer !== me) {
+    candidates.push({ byeong: killer, yak: OVR_OF[killer], power: c[killer],
+      why: `용신 ${baseYong}을(를) 극하는 ${killer}이(가) ${c[killer].toFixed(1)}로 강함` });
+  }
+  // (2) 특정 오행이 지나치게 편중되면 그것이 병
+  // 단 일간 자신의 오행이 많은 것은 '병'이 아니라 신강일 뿐 — 억부가 다룬다.
+  const total = st.total;
+  for (const e of ELEMS) {
+    if (e === baseYong || e === me) continue;
+    if (c[e] / total >= 0.42) {
+      candidates.push({ byeong: e, yak: OVR_OF[e], power: c[e],
+        why: `${e}이(가) 전체의 ${(c[e]/total*100).toFixed(0)}%로 편중` });
+    }
+  }
+  if (!candidates.length)
+    return { method:'병약', yong:[], gi:[], weight:0,
+             reason:'명식을 뚜렷하게 해치는 병(病)이 없음.' };
+
+  candidates.sort((a,b)=>b.power-a.power);
+  const top = candidates[0];
+  return { method:'병약', yong:[top.yak], gi:[top.byeong],
+           weight: Math.min(1, top.power / 4),
+           reason:`병(病): ${top.byeong} — ${top.why}. 약(藥): ${top.yak}(으)로 제거해야 한다.`,
+           byeong: top.byeong, yak: top.yak };
+}
+
+// ============================================================
+// 종합 판정
+// 네 방법의 결과를 명식 상태에 따라 가중 조정한다.
+// ============================================================
+function analyzeYongsinFull(p) {
+  const st = strength(p);
+  const A = eokbu(p, st);
+  const B = johu(p, st);
+  const C = tonggwan(p, st);
+  const D = byeongyak(p, st, A);
+
+  const methods = [A, B, C, D];
+
+  // ---- 우선순위 결정 ----
+  // 조후가 급하면 억부보다 앞선다. 겨울 금수·여름 화토가 대표적.
+  // 다만 종격은 명식 전체가 한 세력으로 쏠린 특수 구조라 억부가 기준이 된다.
+  // 단, 종격이어도 한난이 극단(urgency>=2)이면 조후를 함께 반영해야 한다.
+  // (예: 여름 화 종왕 → 수로 식히지 않으면 명식이 타버린다)
+  let primary = A, rationale = [];
+
+  if (st.extreme && B.urgency >= 2) {
+    // 종격이지만 기후가 극단 → 조후를 우선하되 종격 성질도 남긴다
+    primary = B;
+    rationale.push(`${A.special}격이나 한난이 극단이라 조후(${B.yong.join('')})가 급합니다. `
+      + `세력을 따르되 기후 조절이 먼저입니다.`);
+  } else if (st.extreme) {
+    primary = A;
+    rationale.push(`${A.special}격이므로 억부가 절대 기준입니다.`);
+  } else if (B.urgency >= 2) {
+    primary = B;
+    rationale.push('한난조습이 극단이라 조후가 억부에 앞섭니다.');
+  } else if (D.weight >= 0.75) {
+    primary = D;
+    rationale.push('명식을 해치는 병이 뚜렷해 병약이 우선입니다.');
+  } else if (C.weight >= 0.7) {
+    primary = C;
+    rationale.push('두 세력의 대립이 심해 통관이 우선입니다.');
+  } else {
+    rationale.push('한난조습·대립·병이 두드러지지 않아 억부를 기준으로 봅니다.');
+  }
+
+  // ---- 점수 합산 ----
+  // 각 방법이 지목한 오행에 가중치를 더한다. 여러 방법이 같은 오행을
+  // 가리키면 그만큼 확실해진다.
+  const score = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  const against = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+
+  for (const mth of methods) {
+    if (!mth.weight) continue;
+    const w = mth === primary ? mth.weight * 1.6 : mth.weight;
+    mth.yong.forEach((e, i) => { score[e] += w * (i === 0 ? 1 : 0.6); });
+    mth.gi.forEach((e, i)   => { against[e] += w * (i === 0 ? 1 : 0.6); });
+  }
+
+  // 용신은 기신을 겸할 수 없다 — 상쇄
+  for (const e of ELEMS) {
+    const net = score[e] - against[e];
+    score[e] = Math.max(0, net);
+    against[e] = Math.max(0, -net);
+  }
+
+  const rank = ELEMS.filter(e => score[e] > 0).sort((a,b)=>score[b]-score[a]);
+  const giRank = ELEMS.filter(e => against[e] > 0).sort((a,b)=>against[b]-against[a]);
+
+  const yongsin = rank[0] ? [rank[0]] : primary.yong.slice(0,1);
+  const huisin  = rank[1] ? [rank[1]] : primary.yong.slice(1,2);
+  const gisin   = giRank.slice(0, 2);
+
+  // 구신(仇神) = 기신을 생하는 오행
+  const gusin = gisin.length ? [...new Set(gisin.map(e => GEN_OF[e]))]
+    .filter(e => !yongsin.includes(e) && !huisin.includes(e)) : [];
+
+  // ---- 신뢰도 ----
+  // 방법들이 일치할수록, 지목이 선명할수록 높다.
+  const active = methods.filter(m => m.weight > 0);
+  const agree = rank.length ? active.filter(m => m.yong.includes(rank[0])).length : 0;
+  const conf = active.length ? Math.min(0.9, (agree / active.length) * 0.6
+    + (rank.length && score[rank[0]] >= 1.5 ? 0.3 : 0.1)) : 0.3;
+
+  return {
+    ...st,
+    methods: { eokbu:A, johu:B, tonggwan:C, byeongyak:D },
+    primary: primary.method,
+    rationale: rationale[0],
+    yongsin, huisin, gisin, gusin,
+    scores: score,
+    confidence: conf,
+    // 하위 호환 (기존 코드가 쓰던 필드)
+    yongsin_legacy: [...yongsin, ...huisin],
+  };
+}
+
+// ============================================================
+// 하위 호환 래퍼 — 기존 호출부(natalObj, extractTags 등)가 그대로 동작하도록
+// ============================================================
+function analyzeYongsin(p) {
+  const r = analyzeYongsinFull(p);
+  return {
+    count: r.count,
+    me: r.me,
+    strong: r.strong,
+    ratio: r.ratio,
+    yongsin: [...r.yongsin, ...r.huisin],   // 기존 코드는 배열 2개를 기대
+    gisin: r.gisin,
+    full: r,                                 // 상세 결과 접근용
+  };
+}
 // ===== app =====
 // ============================================================
 // 앱 로직
@@ -1213,8 +1698,7 @@ const state = {
 };
 
 // ============================================================
-// 서버 연동
-// 서버가 없으면(파일로 직접 열었을 때) 자동으로 로컬 전용 모드로 동작한다.
+// 서버 연동 (Supabase)
 // ============================================================
 const SUPABASE_URL =
 'https://rjzzleyydxhmnwcqbzlt.supabase.co';
@@ -1234,7 +1718,6 @@ const supabaseClient = window.supabase.createClient(
   }
 );
 
-// 여기에 추가
 async function loginWithGoogle() {
   const { error } = await supabaseClient.auth.signInWithOAuth({
     provider: 'google',
@@ -1343,7 +1826,7 @@ const API = {
     const { data: current, error: readError } =
       await supabaseClient
         .from('user_data')
-        .select('rev')
+        .select('rev, data')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -1357,8 +1840,11 @@ const API = {
       );
 
       conflict.status = 409;
+      // 병합에 쓰도록 서버 데이터도 함께 전달한다
       conflict.body = {
         currentRev,
+        serverRev: currentRev,
+        serverData: current?.data ?? { natal: null, entries: {} },
       };
 
       throw conflict;
@@ -1473,52 +1959,29 @@ async function pushNow() {
 }
 
 // ---------- 사주 산출 ----------
+// 사주의 하루는 자정이 아니라 자시(보정 후 23:30)에 시작한다.
+// 23:30 이후 출생이면 일주가 다음날로 넘어간다.
 function computeSaju(date, hour, minute) {
+  const shift = (hour == null) ? 0 : dayShiftForHour(hour, minute || 0);
+  const dayDate = shift ? new Date(date.getTime() + 86400000) : date;
+
   const { termIndex, sajuYear } = termIndexOf(date);
   const yGz = yearGanjiRaw(sajuYear);
   const mGz = monthGanji(yGz[0], termIndex);
-  const dGz = dayGanji(date);
-  const hGz = (hour === null || hour === undefined) ? null : hourGanji(dGz[0], hour, minute || 0);
-  return { year: yGz, month: mGz, day: dGz, hour: hGz, termIndex, sajuYear };
-}
-
-// ---------- 용희신 (간이 판정) ----------
-// 일간 기준 신강/신약 → 억부용신. 실제 명리는 조후/통관/병약 등 복합 판단이 필요하므로
-// 여기서는 오행 세력 균형만 본 근사치임을 UI에 명시한다.
-function analyzeYongsin(p) {
-  const count = {목:0,화:0,토:0,금:0,수:0};
-  const add = (e,w)=>{count[e]+=w;};
-  for (const [gz,w] of [[p.year,1],[p.month,1.5],[p.day,1],[p.hour,1]]) {
-    if (!gz) continue;
-    add(elemOfStem(gz[0]), w);
-    add(elemOfBranch(gz[1]), w);
-    for (const [hs, days] of HIDDEN[gz[1]]) add(elemOfStem(hs), w * days/30 * 0.5);
-  }
-  const me = elemOfStem(p.day[0]);
-  const GENOF = {목:'수',화:'목',토:'화',금:'토',수:'금'};
-  const OVROF = {목:'금',화:'수',토:'목',금:'화',수:'토'};
-  const DRAIN = {목:'화',화:'토',토:'금',금:'수',수:'목'};
-  const CTRL  = {목:'토',화:'금',토:'수',금:'목',수:'화'};
-
-  const support = count[me] + count[GENOF[me]];
-  const drain = count[DRAIN[me]] + count[OVROF[me]] + count[CTRL[me]];
-  const strong = support > drain;
-  const total = Object.values(count).reduce((a,b)=>a+b,0);
-  const ratio = support / total;
-
-  const yong = strong ? [DRAIN[me], OVROF[me]] : [GENOF[me], me];
-  const gi   = strong ? [GENOF[me], me] : [DRAIN[me], OVROF[me]];
-  return { count, me, strong, ratio, yongsin:yong, gisin:gi };
+  const dGz = dayGanji(dayDate);
+  const hGz = (hour === null || hour === undefined)
+    ? null : hourGanji(dGz[0], hour, minute || 0);
+  return { year: yGz, month: mGz, day: dGz, hour: hGz, termIndex, sajuYear, dayShift: shift };
 }
 
 // ---------- 대운 ----------
 function computeDaeun(p, birth, gender) {
   const yinYear = STEM_YIN[STEMS.indexOf(p.year[0])];
   const forward = (gender === 'M') !== yinYear;   // 양남음녀 순행
-  const terms = monthTerms(birth.getFullYear());
-  let prev = null, next = null;
-  const all = [...monthTerms(birth.getFullYear()-1), ...terms, ...monthTerms(birth.getFullYear()+1)]
+  const by = kstParts(birth).y;
+  const all = [...monthTerms(by-1), ...monthTerms(by), ...monthTerms(by+1)]
     .map(t=>t.date).sort((a,b)=>a-b);
+  let prev = null, next = null;
   for (const t of all) { if (t <= birth) prev = t; else if (!next) next = t; }
   const days = forward ? (next - birth)/86400000 : (birth - prev)/86400000;
   const startAge = Math.max(1, Math.round(days / 3 * 10) / 10);
@@ -1569,6 +2032,8 @@ function viewToday() {
   const nextTerm = terms.find(t => t.date > now) || monthTerms(k.y+1)[0];
   const dd = Math.ceil((nextTerm.date - now)/86400000);
   const wk = ['일','월','화','수','목','금','토'][k.dow];
+  const hb = hourBranchName(k.h, k.mi);
+  const hr = HOUR_RANGES.find(r => r[0] === hb);
 
   return `<div class="today-date">
     <div class="d">${isoKST(now)} ${wk}요일</div>
@@ -1577,10 +2042,15 @@ function viewToday() {
       <span>절기 <b>${MONTH_TERMS[p.termIndex].name}</b> 중</span>
       <span>· 다음 <b>${nextTerm.name}</b> ${dd}일 후 (${fmtKST(nextTerm.date)})</span>
     </div>
+    <div class="term-strip">
+      <span><b>${hb}시</b> ${hr[1]}~${hr[2]}</span>
+      ${p.dayShift?'<span>· 자시 이후라 일주는 다음날 기준</span>':''}
+    </div>
   </div>
   ${myeongsikHTML(p)}
   <div class="note">천간·지지 아래는 일간 기준 십성입니다. 하단은 지지 속 지장간.<br>
-  절입 시각 기준으로 년·월주가 바뀝니다 (양력 1일 아님).</div>`;
+  절입 시각 기준으로 년·월주가 바뀝니다 (양력 1일 아님).
+  시주는 동경 135도 보정을 적용해 자시가 23:30에 시작합니다.</div>`;
 }
 
 /**
@@ -1589,8 +2059,7 @@ function viewToday() {
  * 보통 두 개의 월주가 걸린다. (예: 2026년 7월 = 을미월 + 병신월)
  */
 function monthSegments(y, m) {
-  const first = new Date(y, m, 1, 0, 0, 0);
-  const last  = new Date(y, m + 1, 0, 23, 59, 59);
+  const last  = new Date(y, m + 1, 0);
   const segs = [];
   let cur = null;
 
@@ -1615,8 +2084,6 @@ function monthSegments(y, m) {
   }
   return segs;
 }
-
-const fmtTime = d => `${d.getMonth()+1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 
 // ---------- 뷰: 캘린더 ----------
 function viewCalendar() {
@@ -1770,18 +2237,95 @@ function openSheet(k) {
 }
 const closeSheet = () => { $('#sheet').classList.remove('on'); $('#sbg').classList.remove('on'); state.sel=null; };
 
+// ============================================================
+// 용희신 카드 — 네 가지 판정법 표시
+// ============================================================
+function yongsinCardHTML(ys, p) {
+  const chip = e => `<span class="e-${e}">${e}</span>`;
+  const M = ys.methods;
+
+  const methodRow = (m, isPrimary) => {
+    const active = m.weight > 0;
+    return `<div class="mth ${isPrimary?'primary':''} ${active?'':'off'}">
+      <div class="mth-hd">
+        <span class="mth-nm">${m.method}${isPrimary?'<em>주법</em>':''}</span>
+        <span class="mth-w">${active?`가중 ${m.weight.toFixed(2)}`:'해당 없음'}</span>
+      </div>
+      ${active&&m.yong.length?`<div class="mth-y">용신 ${m.yong.map(chip).join(' · ')}${
+        m.gi&&m.gi.length?` &nbsp;/&nbsp; 기신 ${m.gi.map(chip).join(' · ')}`:''}</div>`:''}
+      <div class="mth-r">${m.reason}</div>
+    </div>`;
+  };
+
+  return `<div class="card"><h3>용희신 / 구기신</h3>
+    <div class="kv"><span class="k">일간</span>
+      <span><span class="e-${ys.me}">${H(p.day[0])} ${p.day[0]}</span> (${ys.me})</span></div>
+    <div class="kv"><span class="k">강약</span>
+      <span>${ys.strong?'신강':'신약'} ${ys.extreme?`<b style="color:var(--to)">· ${ys.extreme==='super_strong'?'종왕':'종약'}격</b>`:''}
+      <span style="color:var(--mute);font-size:11px">${ys.score.toFixed(1)}/4
+      (령${ys.deukryeong?'○':'×'} 지${ys.deukji?'○':'×'} 세${ys.deukse?'○':'×'})</span></span></div>
+
+    <div class="ys-main">
+      <div class="ys-box good">
+        <div class="ys-lbl">용신</div>
+        <div class="ys-el">${ys.yongsin.map(chip).join(' ')}</div>
+      </div>
+      <div class="ys-box good">
+        <div class="ys-lbl">희신</div>
+        <div class="ys-el">${ys.huisin.length?ys.huisin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
+      </div>
+      <div class="ys-box bad">
+        <div class="ys-lbl">기신</div>
+        <div class="ys-el">${ys.gisin.length?ys.gisin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
+      </div>
+      <div class="ys-box bad">
+        <div class="ys-lbl">구신</div>
+        <div class="ys-el">${ys.gusin.length?ys.gusin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
+      </div>
+    </div>
+
+    <div class="ys-why">
+      <b>${ys.primary}</b>을(를) 주법으로 봅니다. ${ys.rationale}
+      <span class="ys-conf">판정 신뢰도 ${(ys.confidence*100).toFixed(0)}%</span>
+    </div>
+
+    <div class="f-lbl" style="margin:18px 0 9px">네 가지 판정법</div>
+    ${methodRow(M.eokbu,     ys.primary==='억부')}
+    ${methodRow(M.johu,      ys.primary==='조후')}
+    ${methodRow(M.tonggwan,  ys.primary==='통관')}
+    ${methodRow(M.byeongyak, ys.primary==='병약')}
+
+    <div class="note" style="margin-top:14px">네 방법이 같은 오행을 가리킬수록 신뢰도가 올라갑니다.
+    명리는 사람마다 해석이 갈리는 분야이고, 특히 종격·조후 판정은 술사마다 견해가 다릅니다.
+    이 결과는 참고용 계산이지 정답이 아닙니다.</div>
+  </div>`;
+}
+
+/** 12간지 시간표 (명식 입력 폼용) */
+function hourTableHTML(curH, curMi) {
+  const on = (curH != null) ? hourBranchName(curH, curMi || 0) : null;
+  return `<div class="pop-note" style="margin-top:12px;border:none;padding:0">
+    <div style="color:var(--mute);font-size:10px;letter-spacing:.14em;margin-bottom:7px">12간지 시간 (동경 135도 보정)</div>
+    <div class="hrs">
+      ${HOUR_RANGES.map(([b,s,e])=>`<div class="hr ${on===b?'on':''}"><span class="hr-b e-${
+        BRANCH_ELEM[BRANCHES.indexOf(b)]}">${H(b)}</span><span class="hr-t">${s}~${e}</span></div>`).join('')}
+    </div>
+    <div style="margin-top:8px">한국은 동경 135도 표준시를 쓰지만 서울은 동경 127도라
+    시계가 태양시보다 약 30분 빠릅니다. 그래서 자시가 23:00이 아니라 <b>23:30</b>에 시작합니다.</div>
+  </div>`;
+}
+
 // ---------- 뷰: 내 명식 ----------
 function viewNatal() {
   if (!state.natal) return natalForm();
   const n = state.natal;
-  const birth = new Date(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0);
+  const birth = fromKST(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0);
   const p = computeSaju(birth, n.h, n.mi);
-  const ys = analyzeYongsin(p);
+  const ys = analyzeYongsinFull(p);
   const du = computeDaeun(p, birth, n.gender);
-  const nowY = new Date().getFullYear();
+  const nowY = nowKST().y;
   const age = nowY - n.y + 1;
   const cur = [...du.list].reverse().find(x => age >= x.age) || du.list[0];
-  const seun = yearGanjiRaw(nowY);
 
   const shin = [];
   for (const [nm,gz] of [['년',p.year],['월',p.month],['일',p.day],['시',p.hour]]) {
@@ -1790,21 +2334,22 @@ function viewNatal() {
   }
 
   const maxE = Math.max(...Object.values(ys.count));
+  const hb = n.h != null ? hourBranchName(n.h, n.mi || 0) : null;
+  const hr = hb ? HOUR_RANGES.find(r => r[0] === hb) : null;
+
   return `
   ${myeongsikHTML(p, n.h!=null)}
+  ${hr?`<div class="term-strip" style="margin-top:14px">
+    <span><b>${hb}시</b> ${hr[1]}~${hr[2]}</span>
+    ${p.dayShift?'<span>· 자시 이후 출생이라 일주는 다음날 기준</span>':''}
+  </div>`:''}
   <div class="card"><h3>오행 세력</h3>
     ${Object.entries(ys.count).map(([e,v])=>`
       <div class="stat-row"><span class="e-${e}">${e}</span>
       <div style="flex:1;margin:0 12px"><div class="bar"><i style="width:${v/maxE*100}%;background:var(--${{목:'mok',화:'hwa',토:'to',금:'geum',수:'su'}[e]})"></i></div></div>
       <span class="n">${v.toFixed(1)}</span></div>`).join('')}
   </div>
-  <div class="card"><h3>용희신 / 구기신</h3>
-    <div class="kv"><span class="k">일간</span><span><span class="e-${ys.me}">${H(p.day[0])} ${p.day[0]}</span> (${ys.me})</span></div>
-    <div class="kv"><span class="k">신강/신약</span><span>${ys.strong?'신강':'신약'} <span style="color:var(--mute);font-size:11px">(비겁+인성 ${(ys.ratio*100).toFixed(0)}%)</span></span></div>
-    <div class="kv"><span class="k">용희신</span><span>${ys.yongsin.map(e=>`<span class="e-${e}">${e}</span>`).join(' · ')}</span></div>
-    <div class="kv"><span class="k">구기신</span><span>${ys.gisin.map(e=>`<span class="e-${e}">${e}</span>`).join(' · ')}</span></div>
-    <div class="note" style="margin-top:12px">억부(오행 세력 균형)만 본 근사치입니다. 조후·통관·병약을 함께 봐야 하는 명식은 결과가 달라질 수 있습니다.</div>
-  </div>
+  ${yongsinCardHTML(ys, p)}
   <div class="card"><h3>신살 · 귀인</h3>
     <div class="day-tags">${shin.length?shin.map(s=>`<span class="tag ${/귀인/.test(s)?'good':/양인|백호|괴강/.test(s)?'bad':''}">${s}</span>`).join(''):'<span style="color:var(--mute);font-size:12px">해당 없음</span>'}</div>
   </div>
@@ -1839,12 +2384,13 @@ function natalForm() {
     </div>
     <button class="btn" id="mk">만세력 산출</button>
     <div class="note">양력 기준입니다. 연·월주는 절입 시각으로 판정하므로 절기 경계 출생이면 분까지 입력하세요.</div>
+    ${hourTableHTML()}
   </div>`;
 }
 
 function natalObj() {
   const n = state.natal;
-  const p = computeSaju(new Date(n.y,n.m-1,n.d,n.h??12,n.mi??0), n.h, n.mi);
+  const p = computeSaju(fromKST(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0), n.h, n.mi);
   const ys = analyzeYongsin(p);
   return { year:p.year, month:p.month, day:p.day, hour:p.hour, yongsin:ys.yongsin, gisin:ys.gisin };
 }
@@ -1923,7 +2469,7 @@ ${backupBlockHTML(true)}
     <h3>계정</h3>
     <div class="kv">
      <span class="k">이메일</span>
-     <span>${state.user?.email ?? ''}</span>
+     <span>${esc(state.user?.email ?? '')}</span>
     </div>
     <div class="kv"><span class="k">기록</span><span>${Object.keys(state.entries).length}일</span></div>
     <div class="kv"><span class="k">동기화</span><span>${state.sync==='error'?'<span style="color:var(--alert)">실패 — 다시 시도해주세요</span>':'서버에 저장됨 (v'+state.rev+')'}</span></div>
@@ -1968,7 +2514,7 @@ function exportBackup() {
   const dump = {
     format: 'manseryeok-diary/v1',
     exported: new Date().toISOString(),
-    username: state.user || null,
+    username: state.user?.email ?? null,
     rev: state.rev,
     data: { natal: state.natal, entries: state.entries },
   };
@@ -2156,16 +2702,23 @@ function bindAccount() {
 
   if ($('#ago')) $('#ago').onclick = async () => {
     const u = $('#au').value.trim(), p = $('#ap').value;
-    if (!u || !p) return err('#aerr','아이디와 비밀번호를 입력해주세요.');
+    if (!u || !p) return err('#aerr','이메일과 비밀번호를 입력해주세요.');
     $('#ago').disabled = true;
     try {
-      const r = await (mode==='login' ? API.login(u,p) : API.signup(u,p));
-      state.user = r.username; state.rev = r.rev ?? 0;
-      const sd = r.data || { natal:null, entries:{} };
+      await (mode==='login' ? API.login(u,p) : API.signup(u,p));
+      // 가입 시 이메일 인증이 필요하면 세션이 없을 수 있다
+      const me = await API.me();
+      if (!me.user) {
+        err('#aerr','가입 확인 메일을 보냈습니다. 메일함을 확인해주세요.');
+        $('#ago').disabled = false;
+        return;
+      }
+      state.user = me.user; state.rev = me.rev ?? 0;
+      const sd = me.data || { natal:null, entries:{} };
       // 로그인 전 로컬에 쓴 기록이 있으면 서버 기록과 합친다
       const localCount = Object.keys(state.entries).length;
-      state.entries = { ...sd.entries, ...state.entries };
-      state.natal = state.natal || sd.natal;
+      state.entries = { ...(sd.entries||{}), ...state.entries };
+      state.natal = state.natal || sd.natal || null;
       state.sync = 'idle';
       recomputeWarn();
       if (localCount) await pushNow();
