@@ -349,6 +349,8 @@ button:disabled{opacity:.5;cursor:default}
   </div>
   <div class="sheet-body" id="shBody"></div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ===== src/engine/core.js =====
 // ============================================================
@@ -1213,10 +1215,10 @@ const state = {
 // 서버가 없으면(파일로 직접 열었을 때) 자동으로 로컬 전용 모드로 동작한다.
 // ============================================================
 const SUPABASE_URL =
-  '여기에_본인의_PROJECT_URL';
+'https://rjzzlevydxhmnwcqbzlt.supabase.co';
 
 const SUPABASE_KEY =
-  '여기에_본인의_PUBLISHABLE_KEY';
+  'sb_publishable_z-geOXJNmk1Y52TtC1bq6Q_Zjm84JV1';
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
