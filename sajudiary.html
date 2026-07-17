@@ -1914,7 +1914,10 @@ ${backupBlockHTML(true)}
 
   return `<div class="card" style="margin-top:0">
     <h3>계정</h3>
-    <div class="kv"><span class="k">아이디</span><span>${esc(state.user)}</span></div>
+    <div class="kv">
+     <span class="k">이메일</span>
+     <span>${state.user?.email ?? ''}</span>
+    </div>
     <div class="kv"><span class="k">기록</span><span>${Object.keys(state.entries).length}일</span></div>
     <div class="kv"><span class="k">동기화</span><span>${state.sync==='error'?'<span style="color:var(--alert)">실패 — 다시 시도해주세요</span>':'서버에 저장됨 (v'+state.rev+')'}</span></div>
     <button class="btn ghost" id="alo">로그아웃</button>
