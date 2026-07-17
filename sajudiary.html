@@ -319,7 +319,7 @@ label.fl{display:block;font-size:10.5px;color:var(--mute);margin-bottom:5px;lett
 .sync.error{color:var(--alert)}
 button:disabled{opacity:.5;cursor:default}
 
-/* ---------- 용희신 (억부·조후·통관·병약) ---------- */
+/* ---------- 용희신 (전왕·조후·통관·격국·억부) ---------- */
 .ys-main{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:16px 0 4px}
 .ys-box{border:1px solid var(--line);border-radius:var(--r);background:var(--ink3);padding:11px 4px;text-align:center}
 .ys-box.good{border-color:rgba(75,158,122,.35)}
@@ -1241,399 +1241,251 @@ function applyBlinding(forecastDays, { holdout = 0.3, seed = 42 } = {}) {
   const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
   return forecastDays.map(d => ({ ...d, blinded: rnd() < holdout }));
 }
-// ===== 용희신 종합 판정 (억부·조후·통관·병약) =====
+// ===== 용희신 종합 판정 (월지·일주 중심 / 엄격 우선순위) =====
 // ============================================================
-// 용희신 종합 판정 — 억부 · 조후 · 통관 · 병약
-//
-// 명리에서 용신은 하나의 잣대로 정해지지 않는다. 네 가지 관점이 있고,
-// 명식마다 어느 것이 우선인지가 다르다. 여기서는 넷을 각각 계산한 뒤
-// 명식의 상태를 보고 우선순위를 정해 조정(arbitration)한다.
-//
-//   억부(抑扶) — 일간의 강약을 덜거나 보태 균형을 맞춘다. 가장 일반적.
-//   조후(調候) — 계절의 한난조습을 조절한다. 겨울 금수/여름 화토처럼
-//                기후가 극단이면 억부보다 우선한다.
-//   통관(通關) — 두 세력이 팽팽히 대립하면 그 사이를 흐르게 하는 오행.
-//   병약(病藥) — 명식을 망치는 특정 글자(병)가 있으면 그것을 제거하는
-//                글자(약)가 용신이 된다.
+// 판정 순서: 전왕 → 조후 → 통관 → 격국 → 억부
+// 핵심 원칙:
+// 1) 월지(월령)를 계절과 격국의 중심으로 본다.
+// 2) 일주, 특히 일지의 통근·생극 관계를 먼저 확인한다.
+// 3) 특수 구조가 성립하면 뒤 단계의 억부 계산으로 결론을 뒤집지 않는다.
 // ============================================================
 
 const ELEMS = ['목','화','토','금','수'];
+const GEN_OF  = { 목:'수', 화:'목', 토:'화', 금:'토', 수:'금' }; // 나를 생함
+const DRAIN   = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' }; // 내가 생함
+const CTRL    = { 목:'토', 화:'금', 토:'수', 금:'목', 수:'화' }; // 내가 극함
+const OVR_OF  = { 목:'금', 화:'수', 토:'목', 금:'화', 수:'토' }; // 나를 극함
 
-// 오행 관계
-const GEN_OF  = { 목:'수', 화:'목', 토:'화', 금:'토', 수:'금' };  // 나를 생하는
-const DRAIN   = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' };  // 내가 생하는(설기)
-const CTRL    = { 목:'토', 화:'금', 토:'수', 금:'목', 수:'화' };  // 내가 극하는(재)
-const OVR_OF  = { 목:'금', 화:'수', 토:'목', 금:'화', 수:'토' };  // 나를 극하는(관살)
-
-// 지지 → 계절/월령
 const SEASON = {
-  '인':'봄','묘':'봄','진':'봄',
-  '사':'여름','오':'여름','미':'여름',
-  '신':'가을','유':'가을','술':'가을',
-  '해':'겨울','자':'겨울','축':'겨울',
+  '인':'봄','묘':'봄','진':'봄','사':'여름','오':'여름','미':'여름',
+  '신':'가을','유':'가을','술':'가을','해':'겨울','자':'겨울','축':'겨울',
 };
+const TEMP_IDX = {'자':-2,'축':-2,'인':-1,'묘':0,'진':0,'사':1,'오':2,'미':2,'신':1,'유':0,'술':0,'해':-1};
+const WET_IDX  = {'자':-2,'축':-2,'인':0,'묘':0,'진':-1,'사':1,'오':2,'미':2,'신':0,'유':1,'술':1,'해':-1};
 
-// 한난(寒暖) — 월지별 기온 지수. -2(극한) ~ +2(극열)
-const TEMP_IDX = {
-  '자':-2,'축':-2,'인':-1,'묘':0,'진':0,'사':1,
-  '오':2,'미':2,'신':1,'유':0,'술':0,'해':-1,
-};
-// 조습(燥濕) — -2(극습) ~ +2(극조)
-const WET_IDX = {
-  '자':-2,'축':-2,'인':0,'묘':0,'진':-1,'사':1,
-  '오':2,'미':2,'신':0,'유':1,'술':1,'해':-1,
-};
+const elemOfStem = s => STEM_ELEM[STEMS.indexOf(s)];
+const elemOfBranch = b => BRANCH_ELEM[BRANCHES.indexOf(b)];
 
-/** 오행 세력 계산 (지장간 가중 포함) */
 function elementPower(p) {
   const c = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-  const stemOf = ch => STEM_ELEM[STEMS.indexOf(ch)];
-  const branchOf = ch => BRANCH_ELEM[BRANCHES.indexOf(ch)];
-
-  // 월지는 계절을 지배하므로 가중치가 크다
-  const W = [[p.year,1],[p.month,1.5],[p.day,1],[p.hour,1]];
-  for (const [gz,w] of W) {
-    if (!gz) continue;
-    c[stemOf(gz[0])] += w;
-    c[branchOf(gz[1])] += w;
+  const pillars = [p.year,p.month,p.day,p.hour].filter(Boolean);
+  pillars.forEach((gz, i) => {
+    const isMonth = i === 1;
+    const stemW = isMonth ? 1.35 : 1;
+    const branchW = isMonth ? 2.4 : (i === 2 ? 1.55 : 1.15);
+    c[elemOfStem(gz[0])] += stemW;
+    c[elemOfBranch(gz[1])] += branchW;
     for (const [hs, days] of HIDDEN[gz[1]]) {
-      c[stemOf(hs)] += w * (days/30) * 0.5;
+      c[elemOfStem(hs)] += branchW * (days / 30) * 0.55;
     }
-  }
+  });
   return c;
 }
 
-/**
- * 월령 득령 판정.
- * 단순히 "월지가 목록에 있나"로 보면 틀린다. 진(辰)은 토지만 을(乙)이
- * 지장간에 있어 목을 조금 돕는 정도인데, 이를 완전한 득령으로 치면
- * 목이 1.4밖에 없는 명식이 '신강'으로 뒤집힌다.
- * → 월지의 지장간을 실제로 뜯어 일간을 돕는 비중을 계산한다.
- */
-function monthSupportRatio(me, monthBranch) {
-  const stemOf = ch => STEM_ELEM[STEMS.indexOf(ch)];
-  const branchElem = BRANCH_ELEM[BRANCHES.indexOf(monthBranch)];
-  let helping = 0, total = 0;
-
-  for (const [hs, days] of HIDDEN[monthBranch]) {
-    const e = stemOf(hs);
-    total += days;
-    if (e === me) helping += days;             // 비겁 — 같은 오행
-    else if (GEN_OF[me] === e) helping += days * 0.8;  // 인성 — 나를 생함
+function supportRatio(me, branch) {
+  let support = 0, total = 0;
+  for (const [hs, days] of HIDDEN[branch]) {
+    const e = elemOfStem(hs); total += days;
+    if (e === me) support += days;
+    else if (e === GEN_OF[me]) support += days * 0.8;
   }
-  // 지지 본기 오행 자체도 반영
-  let base = 0;
-  if (branchElem === me) base = 1;
-  else if (GEN_OF[me] === branchElem) base = 0.8;
-
-  return Math.max(base, helping / total);
+  return total ? support / total : 0;
 }
 
-function strength(p) {
-  const me = STEM_ELEM[STEMS.indexOf(p.day[0])];
-  const c = elementPower(p);
+function relationLabel(me, target) {
+  if (target === me) return '비겁으로 일간과 같은 기운';
+  if (target === GEN_OF[me]) return '인성으로 일간을 생조';
+  if (target === DRAIN[me]) return '식상으로 일간의 기운을 설기';
+  if (target === CTRL[me]) return '재성으로 일간이 극하고 소모';
+  if (target === OVR_OF[me]) return '관살로 일간을 제어';
+  return '';
+}
+
+function coreRelation(p) {
+  const me = elemOfStem(p.day[0]);
+  const mb = p.month[1], db = p.day[1];
+  const monthElem = elemOfBranch(mb), dayElem = elemOfBranch(db);
+  const monthRatio = supportRatio(me, mb), dayRatio = supportRatio(me, db);
+  const monthToDay = monthElem === dayElem ? '동기' : generates(monthElem, dayElem) ? '월지가 일지를 생함' : generates(dayElem, monthElem) ? '일지가 월지를 생함' : overcomes(monthElem, dayElem) ? '월지가 일지를 극함' : overcomes(dayElem, monthElem) ? '일지가 월지를 극함' : '직접 생극 없음';
+  return {
+    me, monthBranch:mb, dayBranch:db, monthElem, dayElem,
+    monthRatio, dayRatio, monthToDay,
+    text:`월지 ${mb}(${monthElem})는 ${relationLabel(me, monthElem)}하고, 일지 ${db}(${dayElem})는 ${relationLabel(me, dayElem)}합니다. 월지와 일지는 ${monthToDay} 관계입니다.`
+  };
+}
+
+function strength(p, core = coreRelation(p)) {
+  const me = core.me, c = elementPower(p);
   const total = Object.values(c).reduce((a,b)=>a+b,0);
-
   const support = c[me] + c[GEN_OF[me]];
-  const oppose  = c[DRAIN[me]] + c[CTRL[me]] + c[OVR_OF[me]];
-  const ratio   = support / total;
-
-  // 득령: 월지가 일간을 돕는 비중 (0~1). 0.5 이상이면 득령으로 본다.
-  const ryeongRatio = monthSupportRatio(me, p.month[1]);
-  const deukryeong = ryeongRatio >= 0.5;
-  // 득지: 일지가 일간을 돕는가
-  const jiRatio = monthSupportRatio(me, p.day[1]);
-  const deukji = jiRatio >= 0.5;
-  // 득세: 전체 세력
-  const deukse = support > oppose;
-
-  // 점수: 득령은 비중에 비례해 0~2점
-  const score = Math.round((ryeongRatio * 2 + (deukji?1:0) + (deukse?1:0)) * 100) / 100;
-
-  /**
-   * 종격(從格) 판정.
-   * 비율만 보면 안 된다. 종왕은 "일간이 지나치게 강하고 대항 세력이 사실상 없을 때",
-   * 종약은 "일간이 뿌리가 전혀 없을 때"만 성립한다.
-   * 조금이라도 견제/뿌리가 있으면 정격(억부)으로 본다.
-   */
-  let extreme = null;
-  const opposeRatio = oppose / total;
-  if (ratio > 0.75 && score >= 3.2 && opposeRatio < 0.12) {
-    // 일간 세력이 압도적이고 대항 세력이 거의 없음 → 종왕
-    extreme = 'super_strong';
-  } else if (ratio < 0.18 && score < 0.5 && !deukryeong && !deukji) {
-    // 일간이 월지·일지 어디에도 뿌리가 없음 → 종약
-    extreme = 'super_weak';
-  }
-
-  return { me, count:c, total, support, oppose, ratio, opposeRatio,
-           deukryeong, deukji, deukse, score,
-           strong: score >= 2, extreme };
+  const oppose = total - support;
+  const deukryeong = core.monthRatio >= 0.5 || core.monthElem === me || core.monthElem === GEN_OF[me];
+  const deukji = core.dayRatio >= 0.5 || core.dayElem === me || core.dayElem === GEN_OF[me];
+  const deukse = support >= oppose;
+  const score = (deukryeong?2:0) + (deukji?1:0) + (deukse?1:0);
+  return { me,count:c,total,support,oppose,ratio:support/total,deukryeong,deukji,deukse,score,strong:score>=2.5,core };
 }
 
-// ------------------------------------------------------------
-// 1. 억부용신
-// ------------------------------------------------------------
-function eokbu(p, st) {
-  const me = st.me;
-  if (st.extreme === 'super_strong') {
-    // 종왕격: 거스르지 말고 따른다
-    return { method:'억부', yong:[me, GEN_OF[me]], gi:[OVR_OF[me], CTRL[me]],
-             reason:'일간이 극도로 강해 억제가 통하지 않음 (종왕). 세력을 따르는 오행이 용신.',
-             weight: 1.0, special:'종왕' };
-  }
-  if (st.extreme === 'super_weak') {
-    // 종약격: 강한 세력에 종한다
-    const strongest = ELEMS.filter(e=>e!==me)
-      .sort((a,b)=>st.count[b]-st.count[a])[0];
-    return { method:'억부', yong:[strongest, DRAIN[strongest]], gi:[me, GEN_OF[me]],
-             reason:`일간이 뿌리 없이 약해 도움이 무의미 (종약). 가장 강한 ${strongest} 세력을 따름.`,
-             weight: 1.0, special:'종약' };
-  }
-  if (st.strong) {
-    // 신강 → 설기(식상) · 극(관살) · 소모(재성)
-    // 어느 것을 쓸지는 무엇이 부족한지로 결정
-    const cands = [DRAIN[me], OVR_OF[me], CTRL[me]];
-    cands.sort((a,b)=>st.count[a]-st.count[b]);   // 적은 것부터
-    return { method:'억부', yong:[cands[0], cands[1]], gi:[GEN_OF[me], me],
-             reason:`일간 ${me}이(가) 강함(${st.score.toFixed(1)}/4). 덜어내는 ${cands[0]}·${cands[1]}이 용신.`,
-             weight: 1.0 };
-  }
-  // 신약 → 생조(인성) · 방조(비겁)
-  return { method:'억부', yong:[GEN_OF[me], me], gi:[OVR_OF[me], DRAIN[me]],
-           reason:`일간 ${me}이(가) 약함(${st.score.toFixed(1)}/4). 돕는 ${GEN_OF[me]}(인성)·${me}(비겁)이 용신.`,
-           weight: 1.0 };
+function directElementCounts(p) {
+  const c = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  [p.year,p.month,p.day,p.hour].filter(Boolean).forEach(gz => {
+    c[elemOfStem(gz[0])]++;
+    c[elemOfBranch(gz[1])]++;
+  });
+  return c;
 }
 
-// ------------------------------------------------------------
-// 2. 조후용신 — 계절의 한난조습
-// ------------------------------------------------------------
-function johu(p, st) {
-  const mb = p.month[1];
-  const temp = TEMP_IDX[mb], wet = WET_IDX[mb];
-  const season = SEASON[mb];
-  const c = st.count;
-
-  const yong = [], notes = [];
-  let urgency = 0;
-
-  // 한(寒) — 겨울생은 불이 필요하다
-  if (temp <= -2) {
-    if (c['화'] < 1.5) { yong.push('화'); urgency += 2;
-      notes.push(`${season}(${mb}월)의 극한. 화(火)로 따뜻하게 해야 명식이 산다.`); }
-    else { notes.push(`${season}생이나 화가 이미 ${c['화'].toFixed(1)}로 충분.`); }
-  } else if (temp === -1) {
-    if (c['화'] < 1) { yong.push('화'); urgency += 1; notes.push(`${season}의 한기. 화가 필요.`); }
-  }
-  // 열(熱) — 여름생은 물이 필요하다
-  if (temp >= 2) {
-    if (c['수'] < 1.5) { yong.push('수'); urgency += 2;
-      notes.push(`${season}(${mb}월)의 극열. 수(水)로 식혀야 한다.`); }
-    else { notes.push(`${season}생이나 수가 이미 ${c['수'].toFixed(1)}로 충분.`); }
-  } else if (temp === 1) {
-    if (c['수'] < 1) { yong.push('수'); urgency += 1; notes.push(`${season}의 열기. 수가 필요.`); }
-  }
-  // 조(燥) — 메마르면 물기
-  if (wet >= 2 && c['수'] < 1 && !yong.includes('수')) {
-    yong.push('수'); urgency += 1; notes.push('메마른 명식. 수로 적셔야 한다.');
-  }
-  // 습(濕) — 축축하면 불기
-  if (wet <= -2 && c['화'] < 1 && !yong.includes('화')) {
-    yong.push('화'); urgency += 1; notes.push('한습한 명식. 화로 말려야 한다.');
-  }
-
-  if (!yong.length) {
-    return { method:'조후', yong:[], gi:[], weight:0,
-             reason:`${season}(${mb}월)생이나 한난조습이 치우치지 않아 조후가 급하지 않음.` };
-  }
-  const gi = yong.includes('화') ? ['수'] : yong.includes('수') ? ['화'] : [];
-  return { method:'조후', yong:[...new Set(yong)], gi, weight: urgency / 2,
-           reason: notes.join(' '), urgency };
-}
-
-// ------------------------------------------------------------
-// 3. 통관용신 — 대립하는 두 세력 사이를 흐르게
-// ------------------------------------------------------------
-function tonggwan(p, st) {
-  const c = st.count;
-  // 서로 극하는 쌍 중 둘 다 강하고 세력이 비슷한 경우를 찾는다
+// 1순위: 전왕
+function jeonwang(p, st) {
+  const d = directElementCounts(p);
   let best = null;
-  for (const a of ELEMS) {
-    const b = CTRL[a];   // a가 b를 극함
-    const pa = c[a], pb = c[b];
-    if (pa < 1.5 || pb < 1.5) continue;         // 둘 다 어느 정도 강해야
-    const balance = Math.min(pa,pb) / Math.max(pa,pb);
-    if (balance < 0.6) continue;                // 세력이 팽팽해야
-    // a와 b 사이를 통하게 하는 것 = a가 생하고 b를 생하는 오행
-    const bridge = DRAIN[a];                    // a → bridge
-    if (DRAIN[bridge] !== b) continue;          // bridge → b 여야 통관 성립
-    const strengthOfClash = (pa + pb) * balance;
-    if (!best || strengthOfClash > best.clash)
-      best = { a, b, bridge, clash: strengthOfClash, balance, pa, pb };
-  }
-  if (!best) return { method:'통관', yong:[], gi:[], weight:0,
-                      reason:'뚜렷하게 대립하는 두 세력이 없어 통관이 필요치 않음.' };
-
-  // 다리 역할 오행이 이미 충분하면 통관은 이미 이루어진 것
-  if (c[best.bridge] >= 1.5)
-    return { method:'통관', yong:[], gi:[], weight:0,
-             reason:`${best.a}와 ${best.b}가 대립하나 ${best.bridge}(${c[best.bridge].toFixed(1)})이 이미 통관 중.` };
-
-  return { method:'통관', yong:[best.bridge], gi:[], weight: Math.min(1, best.clash / 6),
-           reason:`${best.a}(${best.pa.toFixed(1)})와 ${best.b}(${best.pb.toFixed(1)})가 팽팽히 대립. `
-                + `${best.bridge}(으)로 흐름을 터야 한다.`,
-           clash: best.clash };
-}
-
-// ------------------------------------------------------------
-// 4. 병약용신 — 명식을 망치는 글자(병)와 그것을 없애는 글자(약)
-// ------------------------------------------------------------
-function byeongyak(p, st, base) {
-  const c = st.count;
-  const me = st.me;
-
-  // 병(病) = 용신을 극하거나, 지나치게 넘쳐 명식을 흔드는 오행
-  const baseYong = base.yong[0];
-  if (!baseYong) return { method:'병약', yong:[], gi:[], weight:0,
-                          reason:'기준 용신이 없어 병약 판정 불가.' };
-
-  const candidates = [];
-
-  // (1) 용신을 극하는 오행이 강하면 그것이 병
-  const killer = OVR_OF[baseYong];
-  if (c[killer] >= 2 && killer !== me) {
-    candidates.push({ byeong: killer, yak: OVR_OF[killer], power: c[killer],
-      why: `용신 ${baseYong}을(를) 극하는 ${killer}이(가) ${c[killer].toFixed(1)}로 강함` });
-  }
-  // (2) 특정 오행이 지나치게 편중되면 그것이 병
-  // 단 일간 자신의 오행이 많은 것은 '병'이 아니라 신강일 뿐 — 억부가 다룬다.
-  const total = st.total;
-  for (const e of ELEMS) {
-    if (e === baseYong || e === me) continue;
-    if (c[e] / total >= 0.42) {
-      candidates.push({ byeong: e, yak: OVR_OF[e], power: c[e],
-        why: `${e}이(가) 전체의 ${(c[e]/total*100).toFixed(0)}%로 편중` });
+  for (const base of ELEMS) {
+    const following = new Set([base, DRAIN[base]]); // 같은 세력 또는 상생하여 흘러가는 구조
+    const n = ELEMS.reduce((s,e)=>s+(following.has(e)?d[e]:0),0);
+    const monthIncluded = following.has(st.core.monthElem);
+    const dayIncluded = following.has(st.core.dayElem) || following.has(st.me);
+    const opposing = ELEMS.reduce((s,e)=>s+(!following.has(e)?d[e]:0),0);
+    if (n >= 5 && monthIncluded && dayIncluded && opposing <= 3) {
+      if (!best || n > best.n) best = { base, n, opposing, following:[...following] };
     }
   }
-  if (!candidates.length)
-    return { method:'병약', yong:[], gi:[], weight:0,
-             reason:'명식을 뚜렷하게 해치는 병(病)이 없음.' };
+  if (!best) return {method:'전왕',active:false,weight:0,yong:[],gi:[],reason:'월지를 포함해 5글자 이상이 한 세력 또는 순생 구조로 몰린 전왕 조건이 성립하지 않음.'};
 
-  candidates.sort((a,b)=>b.power-a.power);
-  const top = candidates[0];
-  return { method:'병약', yong:[top.yak], gi:[top.byeong],
-           weight: Math.min(1, top.power / 4),
-           reason:`병(病): ${top.byeong} — ${top.why}. 약(藥): ${top.yak}(으)로 제거해야 한다.`,
-           byeong: top.byeong, yak: top.yak };
+  const yong = best.following;
+  const gi = ELEMS.filter(e=>!yong.includes(e) && (OVR_OF[best.base]===e || CTRL[best.base]===e));
+  return {method:'전왕',active:true,weight:1,yong,gi,special:`${best.base} 전왕`,
+    reason:`월지 ${st.core.monthBranch}를 포함한 8글자 중 ${best.n}글자가 ${best.following.join('→')} 세력에 속합니다. 억부로 거스르지 않고 왕한 흐름에 순응합니다.`};
 }
 
-// ============================================================
-// 종합 판정
-// 네 방법의 결과를 명식 상태에 따라 가중 조정한다.
-// ============================================================
-function analyzeYongsinFull(p) {
-  const st = strength(p);
-  const A = eokbu(p, st);
-  const B = johu(p, st);
-  const C = tonggwan(p, st);
-  const D = byeongyak(p, st, A);
+// 2순위: 조후
+function johu(p, st) {
+  const mb=st.core.monthBranch, temp=TEMP_IDX[mb], wet=WET_IDX[mb], c=st.count;
+  const yong=[], notes=[]; let urgency=0;
+  if (['해','자','축'].includes(mb)) {
+    if (c.화 < 2.2) { yong.push('화'); urgency=2; notes.push(`${mb}월의 한랭함을 화로 덥혀야 함`); }
+    if (wet<=-1 && c.토<1.5) { yong.push('토'); notes.push('한습을 거두고 수기를 제방할 토가 보조로 필요'); }
+  }
+  if (['사','오','미'].includes(mb)) {
+    if (c.수 < 2.2) { yong.push('수'); urgency=2; notes.push(`${mb}월의 조열함을 수로 식히고 적셔야 함`); }
+    if (wet>=1 && c.금<1.2) { yong.push('금'); notes.push('수원을 돕는 금이 보조로 필요'); }
+  }
+  // 계절 외에도 실제 화·수 편중이 극단이면 조후 인정
+  if (!yong.length && c.화/Math.max(c.수,.1)>=4 && c.화>=4) { yong.push('수'); urgency=2; notes.push('원국의 화기가 수기보다 지나치게 강해 조열함'); }
+  if (!yong.length && c.수/Math.max(c.화,.1)>=4 && c.수>=4) { yong.push('화'); urgency=2; notes.push('원국의 수기가 화기보다 지나치게 강해 한습함'); }
+  if (!yong.length) return {method:'조후',active:false,weight:0,yong:[],gi:[],urgency:0,reason:`${SEASON[mb]} ${mb}월이나 생존 조건을 좌우할 정도의 한난조습 편중은 확인되지 않음.`};
+  const uniq=[...new Set(yong)], gi=uniq.includes('수')?['화']:uniq.includes('화')?['수']:[];
+  return {method:'조후',active:true,weight:1,yong:uniq,gi,urgency,reason:notes.join('. ')+'.'};
+}
 
-  const methods = [A, B, C, D];
+// 3순위: 통관
+function tonggwan(p, st) {
+  const c=st.count; let best=null;
+  for (const a of ELEMS) {
+    const b=CTRL[a], pa=c[a], pb=c[b];
+    if (pa<2 || pb<2) continue;
+    const balance=Math.min(pa,pb)/Math.max(pa,pb);
+    if (balance<0.72) continue;
+    const bridge=DRAIN[a];
+    if (DRAIN[bridge]!==b || c[bridge]>=1.4) continue;
+    const power=(pa+pb)*balance;
+    if (!best || power>best.power) best={a,b,bridge,pa,pb,balance,power};
+  }
+  if (!best) return {method:'통관',active:false,weight:0,yong:[],gi:[],reason:'서로 극하는 두 세력이 대등하게 충돌하면서 중간 오행이 비어 있는 구조가 아님.'};
+  return {method:'통관',active:true,weight:1,yong:[best.bridge],gi:[],reason:`${best.a}(${best.pa.toFixed(1)})와 ${best.b}(${best.pb.toFixed(1)})가 대등하게 충돌합니다. ${best.a}→${best.bridge}→${best.b}로 흐름을 잇는 ${best.bridge}을 통관용신으로 삼습니다.`};
+}
 
-  // ---- 우선순위 결정 ----
-  // 조후가 급하면 억부보다 앞선다. 겨울 금수·여름 화토가 대표적.
-  // 다만 종격은 명식 전체가 한 세력으로 쏠린 특수 구조라 억부가 기준이 된다.
-  // 단, 종격이어도 한난이 극단(urgency>=2)이면 조후를 함께 반영해야 한다.
-  // (예: 여름 화 종왕 → 수로 식히지 않으면 명식이 타버린다)
-  let primary = A, rationale = [];
+function monthHiddenOrder(branch) {
+  return [...HIDDEN[branch]].sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+}
 
-  if (st.extreme && B.urgency >= 2) {
-    // 종격이지만 기후가 극단 → 조후를 우선하되 종격 성질도 남긴다
-    primary = B;
-    rationale.push(`${A.special}격이나 한난이 극단이라 조후(${B.yong.join('')})가 급합니다. `
-      + `세력을 따르되 기후 조절이 먼저입니다.`);
-  } else if (st.extreme) {
-    primary = A;
-    rationale.push(`${A.special}격이므로 억부가 절대 기준입니다.`);
-  } else if (B.urgency >= 2) {
-    primary = B;
-    rationale.push('한난조습이 극단이라 조후가 억부에 앞섭니다.');
-  } else if (D.weight >= 0.75) {
-    primary = D;
-    rationale.push('명식을 해치는 병이 뚜렷해 병약이 우선입니다.');
-  } else if (C.weight >= 0.7) {
-    primary = C;
-    rationale.push('두 세력의 대립이 심해 통관이 우선입니다.');
+// 4순위 전반: 격국
+function gyeokguk(p, st) {
+  const dayStem=p.day[0], monthBranch=p.month[1];
+  const hidden=monthHiddenOrder(monthBranch);
+  const visible=[p.year?.[0],p.month?.[0],p.hour?.[0]].filter(Boolean);
+  const projected=hidden.find(h=>visible.includes(h));
+  const standard=projected || hidden[0];
+  const god=tenGod(dayStem, standard);
+  const elem=elemOfStem(standard);
+  const nameMap={비견:'건록격',겁재:'월겁격',식신:'식신격',상관:'상관격',편재:'편재격',정재:'정재격',편관:'편관격',정관:'정관격',편인:'편인격',정인:'정인격'};
+  return {method:'격국',active:true,weight:1,yong:[],gi:[],gyeok:nameMap[god]||`${god||'월령'}격`,standard,standardElem:elem,projected:!!projected,
+    reason:`월지 ${monthBranch}의 지장간 ${hidden.join('·')} 중 ${projected?`${standard}이 천간에 투출`:`투출이 없어 정기 ${standard}을 기준`}하여 ${nameMap[god]||god}으로 봅니다.`};
+}
+
+// 4순위 후반: 억부. 격국이 확립된 일반 명식에서만 사용
+function eokbu(p, st, gyeok) {
+  const me=st.me, c=st.count;
+  let yong=[],gi=[],reason='';
+  if (st.strong) {
+    const candidates=[DRAIN[me],CTRL[me],OVR_OF[me]];
+    // 격국을 살리면서 월령의 병목을 해소하는 순서
+    candidates.sort((a,b)=>c[a]-c[b]);
+    yong=[candidates[0]];
+    const helper=GEN_OF[yong[0]];
+    if (helper!==me && !yong.includes(helper)) yong.push(helper);
+    gi=[me,GEN_OF[me]];
+    reason=`월지·일지 관계와 득령·득지·득세를 종합하면 일간이 강합니다. ${gyeok.gyeok}의 흐름을 해치지 않으면서 ${yong[0]}로 설기·제어합니다.`;
   } else {
-    rationale.push('한난조습·대립·병이 두드러지지 않아 억부를 기준으로 봅니다.');
+    yong=[GEN_OF[me],me];
+    gi=[OVR_OF[me],DRAIN[me]];
+    reason=`월지·일지 관계와 득령·득지·득세를 종합하면 일간이 약합니다. ${gyeok.gyeok}을 감당하도록 ${GEN_OF[me]} 인성과 ${me} 비겁으로 생조합니다.`;
   }
+  return {method:'억부',active:true,weight:1,yong:[...new Set(yong)],gi:[...new Set(gi)],reason};
+}
 
-  // ---- 점수 합산 ----
-  // 각 방법이 지목한 오행에 가중치를 더한다. 여러 방법이 같은 오행을
-  // 가리키면 그만큼 확실해진다.
-  const score = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-  const against = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-
-  for (const mth of methods) {
-    if (!mth.weight) continue;
-    const w = mth === primary ? mth.weight * 1.6 : mth.weight;
-    mth.yong.forEach((e, i) => { score[e] += w * (i === 0 ? 1 : 0.6); });
-    mth.gi.forEach((e, i)   => { against[e] += w * (i === 0 ? 1 : 0.6); });
+function deriveFour(primary, st) {
+  const yongsin=primary.yong.slice(0,1);
+  let huisin=primary.yong.slice(1,2);
+  if (!huisin.length && yongsin.length) {
+    const helper=GEN_OF[yongsin[0]];
+    if (!yongsin.includes(helper)) huisin=[helper];
   }
+  let gisin=[...new Set(primary.gi||[])].filter(e=>!yongsin.includes(e)&&!huisin.includes(e));
+  if (!gisin.length && yongsin.length) gisin=[OVR_OF[yongsin[0]]];
+  const gusin=[...new Set(gisin.map(e=>GEN_OF[e]))].filter(e=>!yongsin.includes(e)&&!huisin.includes(e)&&!gisin.includes(e));
+  return {yongsin,huisin,gisin:gisin.slice(0,2),gusin:gusin.slice(0,2)};
+}
 
-  // 용신은 기신을 겸할 수 없다 — 상쇄
-  for (const e of ELEMS) {
-    const net = score[e] - against[e];
-    score[e] = Math.max(0, net);
-    against[e] = Math.max(0, -net);
-  }
+function analyzeYongsinFull(p) {
+  const core=coreRelation(p), st=strength(p,core);
+  const A=jeonwang(p,st);
+  const B=johu(p,st);
+  const C=tonggwan(p,st);
+  const D=gyeokguk(p,st);
+  const E=eokbu(p,st,D);
 
-  const rank = ELEMS.filter(e => score[e] > 0).sort((a,b)=>score[b]-score[a]);
-  const giRank = ELEMS.filter(e => against[e] > 0).sort((a,b)=>against[b]-against[a]);
+  let primary, rationale;
+  if (A.active) { primary=A; rationale='전왕 조건이 성립하므로 뒤 단계의 조후·통관·격국·억부가 결론을 뒤집지 않습니다.'; }
+  else if (B.active) { primary=B; rationale='월령의 한난조습이 생존 조건을 좌우하므로 조후를 억부보다 우선합니다.'; }
+  else if (C.active) { primary=C; rationale='대등한 두 세력의 충돌이 핵심 병목이므로 통관을 우선합니다.'; }
+  else { primary=E; rationale=`특수 구조가 아니므로 월지에서 ${D.gyeok}을 세운 뒤 일주의 강약을 보조적으로 적용합니다.`; }
 
-  const yongsin = rank[0] ? [rank[0]] : primary.yong.slice(0,1);
-  const huisin  = rank[1] ? [rank[1]] : primary.yong.slice(1,2);
-  const gisin   = giRank.slice(0, 2);
-
-  // 구신(仇神) = 기신을 생하는 오행
-  const gusin = gisin.length ? [...new Set(gisin.map(e => GEN_OF[e]))]
-    .filter(e => !yongsin.includes(e) && !huisin.includes(e)) : [];
-
-  // ---- 신뢰도 ----
-  // 방법들이 일치할수록, 지목이 선명할수록 높다.
-  const active = methods.filter(m => m.weight > 0);
-  const agree = rank.length ? active.filter(m => m.yong.includes(rank[0])).length : 0;
-  const conf = active.length ? Math.min(0.9, (agree / active.length) * 0.6
-    + (rank.length && score[rank[0]] >= 1.5 ? 0.3 : 0.1)) : 0.3;
+  const four=deriveFour(primary,st);
+  const checks={jeonwang:A.active,johu:B.active,tonggwan:C.active};
+  const passed=[A,B,C].filter(x=>x.active).length;
+  const confidence=A.active?0.82:B.active?0.78:C.active?0.76:0.72;
 
   return {
-    ...st,
-    methods: { eokbu:A, johu:B, tonggwan:C, byeongyak:D },
-    primary: primary.method,
-    rationale: rationale[0],
-    yongsin, huisin, gisin, gusin,
-    scores: score,
-    confidence: conf,
-    // 하위 호환 (기존 코드가 쓰던 필드)
-    yongsin_legacy: [...yongsin, ...huisin],
+    ...st, ...four, core,
+    methods:{jeonwang:A,johu:B,tonggwan:C,gyeokguk:D,eokbu:E},
+    primary:primary.method,
+    rationale,
+    confidence:Math.min(.9,confidence+(passed>1?.04:0)),
+    filterLines:[
+      `전왕: ${A.active?'해당':'비해당'} — ${A.reason}`,
+      `조후: ${B.active?'해당':'비해당'} — ${B.reason}`,
+      `통관: ${C.active?'해당':'비해당'} — ${C.reason}`,
+    ],
+    finalReason:`${core.text} ${primary.reason}`,
+    yongsin_legacy:[...four.yongsin,...four.huisin],
   };
 }
 
-// ============================================================
-// 하위 호환 래퍼 — 기존 호출부(natalObj, extractTags 등)가 그대로 동작하도록
-// ============================================================
 function analyzeYongsin(p) {
-  const r = analyzeYongsinFull(p);
-  return {
-    count: r.count,
-    me: r.me,
-    strong: r.strong,
-    ratio: r.ratio,
-    yongsin: [...r.yongsin, ...r.huisin],   // 기존 코드는 배열 2개를 기대
-    gisin: r.gisin,
-    full: r,                                 // 상세 결과 접근용
-  };
+  const r=analyzeYongsinFull(p);
+  return {count:r.count,me:r.me,strong:r.strong,ratio:r.ratio,yongsin:[...r.yongsin,...r.huisin],gisin:r.gisin,full:r};
 }
+
 // ===== app =====
 // ============================================================
 // 앱 로직
@@ -1679,8 +1531,6 @@ const fmtKST = d => {
 const HANJA_S = {'갑':'甲','을':'乙','병':'丙','정':'丁','무':'戊','기':'己','경':'庚','신':'辛','임':'壬','계':'癸'};
 const HANJA_B = {'자':'子','축':'丑','인':'寅','묘':'卯','진':'辰','사':'巳','오':'午','미':'未','신':'申','유':'酉','술':'戌','해':'亥'};
 const H = c => HANJA_S[c] || HANJA_B[c] || c;
-const elemOfStem  = c => STEM_ELEM[STEMS.indexOf(c)];
-const elemOfBranch= c => BRANCH_ELEM[BRANCHES.indexOf(c)];
 const $ = s => document.querySelector(s);
 
 // 서버 위에서 돌고 있는지 확인. 파일로 직접 열었으면 로컬 전용 모드로 동작한다.
@@ -2245,61 +2095,46 @@ function yongsinCardHTML(ys, p) {
   const M = ys.methods;
 
   const methodRow = (m, isPrimary) => {
-    const active = m.weight > 0;
+    const active = m.active !== false;
     return `<div class="mth ${isPrimary?'primary':''} ${active?'':'off'}">
       <div class="mth-hd">
-        <span class="mth-nm">${m.method}${isPrimary?'<em>주법</em>':''}</span>
-        <span class="mth-w">${active?`가중 ${m.weight.toFixed(2)}`:'해당 없음'}</span>
+        <span class="mth-nm">${m.method}${isPrimary?'<em>최종</em>':''}</span>
+        <span class="mth-w">${active?'판정 반영':'비해당'}</span>
       </div>
-      ${active&&m.yong.length?`<div class="mth-y">용신 ${m.yong.map(chip).join(' · ')}${
-        m.gi&&m.gi.length?` &nbsp;/&nbsp; 기신 ${m.gi.map(chip).join(' · ')}`:''}</div>`:''}
+      ${active&&m.yong?.length?`<div class="mth-y">후보 ${m.yong.map(chip).join(' · ')}${m.gi?.length?` &nbsp;/&nbsp; 주의 ${m.gi.map(chip).join(' · ')}`:''}</div>`:''}
+      ${m.gyeok?`<div class="mth-y">격국 <b>${m.gyeok}</b>${m.projected?' · 월지 지장간 투출':' · 월지 정기 기준'}</div>`:''}
       <div class="mth-r">${m.reason}</div>
     </div>`;
   };
 
   return `<div class="card"><h3>용희신 / 구기신</h3>
-    <div class="kv"><span class="k">일간</span>
-      <span><span class="e-${ys.me}">${H(p.day[0])} ${p.day[0]}</span> (${ys.me})</span></div>
-    <div class="kv"><span class="k">강약</span>
-      <span>${ys.strong?'신강':'신약'} ${ys.extreme?`<b style="color:var(--to)">· ${ys.extreme==='super_strong'?'종왕':'종약'}격</b>`:''}
-      <span style="color:var(--mute);font-size:11px">${ys.score.toFixed(1)}/4
-      (령${ys.deukryeong?'○':'×'} 지${ys.deukji?'○':'×'} 세${ys.deukse?'○':'×'})</span></span></div>
+    <div class="kv"><span class="k">사주 원국</span><span>${p.year} · ${p.month} · ${p.day}${p.hour?` · ${p.hour}`:''}</span></div>
+    <div class="kv"><span class="k">핵심축</span><span>월지 <b>${ys.core.monthBranch}</b>(${ys.core.monthElem}) · 일주 <b>${p.day}</b> · 일지 <b>${ys.core.dayBranch}</b>(${ys.core.dayElem})</span></div>
+    <div class="kv"><span class="k">월지↔일지</span><span>${ys.core.monthToDay}</span></div>
+    <div class="kv"><span class="k">보조 강약</span><span>${ys.strong?'신강':'신약'} <span style="color:var(--mute);font-size:11px">(령${ys.deukryeong?'○':'×'} 지${ys.deukji?'○':'×'} 세${ys.deukse?'○':'×'})</span></span></div>
 
     <div class="ys-main">
-      <div class="ys-box good">
-        <div class="ys-lbl">용신</div>
-        <div class="ys-el">${ys.yongsin.map(chip).join(' ')}</div>
-      </div>
-      <div class="ys-box good">
-        <div class="ys-lbl">희신</div>
-        <div class="ys-el">${ys.huisin.length?ys.huisin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
-      </div>
-      <div class="ys-box bad">
-        <div class="ys-lbl">기신</div>
-        <div class="ys-el">${ys.gisin.length?ys.gisin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
-      </div>
-      <div class="ys-box bad">
-        <div class="ys-lbl">구신</div>
-        <div class="ys-el">${ys.gusin.length?ys.gusin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
-      </div>
+      <div class="ys-box good"><div class="ys-lbl">용신</div><div class="ys-el">${ys.yongsin.map(chip).join(' ')||'-'}</div></div>
+      <div class="ys-box good"><div class="ys-lbl">희신</div><div class="ys-el">${ys.huisin.map(chip).join(' ')||'-'}</div></div>
+      <div class="ys-box bad"><div class="ys-lbl">기신</div><div class="ys-el">${ys.gisin.map(chip).join(' ')||'-'}</div></div>
+      <div class="ys-box bad"><div class="ys-lbl">구신</div><div class="ys-el">${ys.gusin.map(chip).join(' ')||'-'}</div></div>
     </div>
 
-    <div class="ys-why">
-      <b>${ys.primary}</b>을(를) 주법으로 봅니다. ${ys.rationale}
+    <div class="ys-why"><b>${ys.primary}</b>을 최종 용신법으로 선택했습니다. ${ys.rationale}<br><br>${ys.finalReason}
       <span class="ys-conf">판정 신뢰도 ${(ys.confidence*100).toFixed(0)}%</span>
     </div>
 
-    <div class="f-lbl" style="margin:18px 0 9px">네 가지 판정법</div>
-    ${methodRow(M.eokbu,     ys.primary==='억부')}
-    ${methodRow(M.johu,      ys.primary==='조후')}
-    ${methodRow(M.tonggwan,  ys.primary==='통관')}
-    ${methodRow(M.byeongyak, ys.primary==='병약')}
+    <div class="f-lbl" style="margin:18px 0 9px">5대 용신법 필터링</div>
+    ${methodRow(M.jeonwang, ys.primary==='전왕')}
+    ${methodRow(M.johu, ys.primary==='조후')}
+    ${methodRow(M.tonggwan, ys.primary==='통관')}
+    ${methodRow(M.gyeokguk, false)}
+    ${methodRow(M.eokbu, ys.primary==='억부')}
 
-    <div class="note" style="margin-top:14px">네 방법이 같은 오행을 가리킬수록 신뢰도가 올라갑니다.
-    명리는 사람마다 해석이 갈리는 분야이고, 특히 종격·조후 판정은 술사마다 견해가 다릅니다.
-    이 결과는 참고용 계산이지 정답이 아닙니다.</div>
+    <div class="note" style="margin-top:14px">판정은 오행 개수 합산으로 결론을 섞지 않습니다. 전왕·조후·통관 중 먼저 성립한 법을 확정하고, 모두 비해당일 때만 월지 격국을 세운 뒤 억부를 적용합니다. 명리 해석은 학파에 따라 달라질 수 있으므로 참고용으로 보세요.</div>
   </div>`;
 }
+
 
 /** 12간지 시간표 (명식 입력 폼용) */
 function hourTableHTML(curH, curMi) {
