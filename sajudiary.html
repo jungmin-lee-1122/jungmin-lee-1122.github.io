@@ -34,7 +34,12 @@ aside{
   display:flex;flex-direction:column;padding:22px 0;
 }
 aside.on{transform:none}
-.brand{padding:0 22px 20px;border-bottom:1px solid var(--line)}
+.brand{
+  padding:0 22px 20px;border-bottom:1px solid var(--line);cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.brand:hover{background:rgba(185,138,62,.07)}
+.brand:focus-visible{outline:2px solid var(--to);outline-offset:-2px}
 .brand h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:19px;letter-spacing:.14em}
 .brand p{font-size:11px;color:var(--mute);margin-top:5px;letter-spacing:.08em}
 nav{padding:14px 0;flex:1}
@@ -540,7 +545,9 @@ button:disabled{opacity:.5;cursor:default}
 <div id="scrim"></div>
 <div id="app">
 <aside id="side">
-  <div class="brand"><h1>萬歲曆 日記</h1><p>만세력 일기</p></div>
+  <div class="brand" id="brandHome" role="button" tabindex="0" aria-label="오늘의 만세력 홈으로 이동">
+    <h1>萬歲曆 日記</h1><p>만세력 일기</p>
+  </div>
   <nav id="nav"></nav>
   <div class="nav-note">기록은 이 브라우저 세션에만 유지됩니다.</div>
 </aside>
@@ -3295,16 +3302,16 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
     if (natalFullObj.yongsin.includes(sElem)) {
       raw += 22 * bg.factor;
-      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 용신 배경을 만듭니다.`, weight:bg.factor });
+      positiveReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 용신 배경을 만듭니다.`, weight:bg.factor });
     } else if (natalFullObj.huisin.includes(sElem)) {
       raw += 12 * bg.factor;
-      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 희신으로 보조합니다.`, weight:bg.factor*0.7 });
+      positiveReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 희신으로 보조합니다.`, weight:bg.factor*0.7 });
     } else if (natalFullObj.gisin.includes(sElem)) {
       raw -= 22 * bg.factor;
-      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 기신 배경을 강화합니다.`, weight:bg.factor });
+      negativeReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 기신 배경을 강화합니다.`, weight:bg.factor });
     } else if (natalFullObj.gusin.includes(sElem)) {
       raw -= 12 * bg.factor;
-      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
+      negativeReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
     }
 
     if (natalFullObj.yongsin.includes(bElem)) raw += 8 * bg.factor;
@@ -3338,7 +3345,7 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
     if (rel) {
       raw += relScore * factor;
-      const text = `${aName} ${aGz}와 ${bName} ${bGz}가 ${rel} 관계`;
+      const text = `그날 ${aName} ${aGz}와 ${bName} ${bGz}가 ${rel} 관계`;
       if (relScore < 0) negativeReasons.push({ src:'명식', text:`${text}라 날짜 내부 흐름이 부딪힙니다.`, weight:Math.abs(relScore/8)*factor });
       else positiveReasons.push({ src:'명식', text:`${text}로 날짜 내부 흐름이 이어집니다.`, weight:(relScore/8)*factor });
     }
@@ -4226,6 +4233,11 @@ function bindAccount() {
 
 const openNav = ()=>{ $('#side').classList.add('on'); $('#scrim').classList.add('on'); };
 const closeNav = ()=>{ $('#side').classList.remove('on'); $('#scrim').classList.remove('on'); };
+const goHome = ()=>{ state.tab='today'; closeNav(); render(); };
+$('#brandHome').onclick = goHome;
+$('#brandHome').onkeydown = e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+};
 $('#bg').onclick = openNav;
 $('#scrim').onclick = closeNav;
 $('#sbg').onclick = closeSheet;
