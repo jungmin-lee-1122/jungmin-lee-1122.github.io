@@ -185,6 +185,12 @@ header h2{font-family:'Noto Serif KR',serif;font-weight:500;font-size:15px;lette
   content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--alert);
   border-radius:var(--r) var(--r) 0 0;
 }
+.cell.good::before{
+  content:'';position:absolute;right:4px;bottom:4px;width:5px;height:5px;
+  border-radius:50%;background:var(--ok);box-shadow:0 0 0 1px var(--ink2);
+}
+.cell.mixed::before{background:var(--to);box-shadow:0 0 0 1px var(--ink2),0 0 7px rgba(185,138,62,.45)}
+.cell.good .dots,.cell.mixed .dots{left:4px;right:auto}
 
 /* ---------- 기록 패널 ---------- */
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:60;opacity:0;pointer-events:none;transition:.25s}
@@ -293,6 +299,30 @@ label.fl{display:block;font-size:10.5px;color:var(--mute);margin-bottom:5px;lett
 .warn-i .dt{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
 .warn-i .gz{font-family:'Noto Serif KR',serif;font-size:15px;margin-left:8px}
 .warn-i .cf{font-size:10px;color:var(--mute);letter-spacing:.06em}
+.warn-i.good{border-left-color:var(--ok)}
+.warn-i.mixed{border-left-color:var(--to)}
+.flow-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px}
+.flow-tab{border:0;background:transparent;color:var(--mute);padding:10px 8px;border-radius:2px;font-family:'Gowun Batang',serif;font-size:12.5px;cursor:pointer}
+.flow-tab.on{background:var(--ink3);color:var(--paper);box-shadow:inset 0 -1px 0 var(--to)}
+.flow-sub{font-size:10.5px;color:var(--mute);text-align:center;margin:-5px 0 15px;letter-spacing:.03em}
+.flow-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.flow-controls label{font-size:10px;color:var(--mute);display:block;margin-bottom:5px;letter-spacing:.08em}
+.flow-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:11px}
+.flow-meta div{background:var(--ink2);padding:9px 10px;min-width:0}
+.flow-meta small{display:block;color:var(--mute);font-size:9.5px;margin-bottom:4px}
+.flow-meta b{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:11.5px;overflow-wrap:anywhere}
+.flow-score{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--paper)}
+.flow-score.neg{color:#E0938E}.flow-score.pos{color:#7FC4A4}.flow-score.mix{color:var(--to)}
+.reason-list{display:grid;gap:7px;margin-top:10px}
+.reason{font-size:11.5px;color:var(--paper-dim);line-height:1.65;padding-left:0}
+.src{display:inline-block;border:1px solid var(--line2);border-radius:2px;padding:1px 5px;margin-right:6px;color:var(--mute);font-size:9px;letter-spacing:.04em;vertical-align:1px;white-space:nowrap}
+.src.emp{border-color:rgba(75,158,122,.42);color:#7FC4A4}
+.src.natal{border-color:rgba(185,138,62,.45);color:#D4AD6C}
+.src.fortune{border-color:rgba(74,111,165,.55);color:#84A6D5}
+.hour-recs{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.hour-chip{font-size:10px;border:1px solid var(--line);background:var(--ink3);padding:5px 7px;border-radius:2px;color:var(--paper-dim)}
+.caution-line{font-size:10.5px;color:#E0A09B;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.disclaimer{font-size:10.5px;color:var(--mute);line-height:1.75;margin-top:16px;padding:13px;border:1px solid var(--line);background:var(--ink2)}
 .bar{height:2px;background:var(--ink3);border-radius:1px;overflow:hidden;margin:9px 0 8px}
 .bar i{display:block;height:100%;background:var(--alert)}
 .stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
@@ -358,6 +388,10 @@ button:disabled{opacity:.5;cursor:default}
 @media(max-width:520px){
   .ys-main{grid-template-columns:repeat(2,1fr)}
   .hrs{grid-template-columns:repeat(2,1fr)}
+  .flow-controls{grid-template-columns:1fr}
+  .flow-meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .warn-i .top{align-items:flex-start;gap:8px}
+  .warn-i .cf{text-align:right;line-height:1.5}
 }
 
 /* ---------- 구글 로그인 버튼 ---------- */
@@ -988,7 +1022,7 @@ function termIndexOf(date) {
 }
 // ===== src/engine/analysis.js =====
 // ============================================================
-// 주의 날짜 분석 엔진
+// 운의 흐름 분석 엔진
 // ============================================================
 
 // ---------- 기분 → 점수 ----------
@@ -1038,7 +1072,9 @@ function moodScore(entry) {
 // 종합 점수: 기분 + 몸상태(1~5 → -2~+2)
 function composite(entry) {
   const m = moodScore(entry) ?? 0;
-  const b = (entry.body ?? 3) - 3;
+  const rawBody = Number(entry?.body);
+  const body = Number.isFinite(rawBody) ? Math.min(5, Math.max(1, rawBody)) : 3;
+  const b = body - 3;
   return m * 0.6 + b * 0.4 * 1.5;
 }
 
@@ -1046,6 +1082,7 @@ function composite(entry) {
 // 태그 추출: 하루의 일진 × 내 명식 → 관계 태그 배열
 // ============================================================
 function extractTags(natal, dayGz, ctx = {}) {
+  if (!natal?.day || typeof dayGz !== 'string' || dayGz.length < 2) return [];
   const tags = [];
   const dStem = dayGz[0], dBranch = dayGz[1];
   const me = natal.day[0];  // 일간
@@ -1104,13 +1141,21 @@ function extractTags(natal, dayGz, ctx = {}) {
   // --- 세운/대운 동조 ---
   if (ctx.daeun && isChung(dBranch, ctx.daeun[1])) tags.push('충:대운지');
   if (ctx.seun  && isChung(dBranch, ctx.seun[1]))  tags.push('충:세운지');
+  if (ctx.daeun && isYukhap(dBranch, ctx.daeun[1])) tags.push('육합:대운지');
+  if (ctx.seun  && isYukhap(dBranch, ctx.seun[1]))  tags.push('육합:세운지');
 
-  // --- 용신/기신 운 ---
-  if (natal.yongsin) {
-    const de = STEM_ELEM[STEMS.indexOf(dStem)];
-    if (natal.yongsin.includes(de)) tags.push('용희신운');
-    if (natal.gisin?.includes(de))  tags.push('구기신운');
-  }
+  // --- 용신·희신·기신·구신 운: 서로 다른 강도로 평가할 수 있도록 분리 ---
+  const de = STEM_ELEM[STEMS.indexOf(dStem)];
+  const be = BRANCH_ELEM[BRANCHES.indexOf(dBranch)];
+  const addElementTag = (elem, suffix='') => {
+    if (!elem) return;
+    if (natal.yongsin?.includes(elem)) tags.push(`용신운${suffix}`);
+    if (natal.huisin?.includes(elem))  tags.push(`희신운${suffix}`);
+    if (natal.gisin?.includes(elem))   tags.push(`기신운${suffix}`);
+    if (natal.gusin?.includes(elem))   tags.push(`구신운${suffix}`);
+  };
+  addElementTag(de);
+  addElementTag(be, ':지지');
 
   // --- 일주 자체 ---
   tags.push(`일주:${dayGz}`);
@@ -1123,11 +1168,14 @@ function extractTags(natal, dayGz, ctx = {}) {
 // ============================================================
 function buildStats(natal, entries, opts = {}) {
   const MIN_N = opts.minSamples ?? 3;
-  const scored = entries.map(e => ({
-    ...e,
-    score: composite(e),
-    tags: extractTags(natal, e.ganji ?? dayGanji(new Date(e.date)), e.ctx),
-  }));
+  const scored = (Array.isArray(entries) ? entries : []).map(e => {
+    try {
+      const dt = dateFromKey(e.date);
+      const gz = e.ganji ?? (dt ? dayGanji(dt) : null);
+      const ctx = { ...luckContextForDate(natal, e.date), ...(e.ctx || {}) };
+      return { ...e, score: composite(e), tags: extractTags(natal, gz, ctx) };
+    } catch { return null; }
+  }).filter(Boolean);
 
   // 개인 베이스라인
   const all = scored.map(s => s.score);
@@ -1175,6 +1223,7 @@ function buildStats(natal, entries, opts = {}) {
       tag, n, mean: m, delta, effect: d, confidence,
       level: confidence >= 0.5 ? '높음' : confidence >= 0.25 ? '중간' : '낮음',
       risk: delta < -0.4 && confidence >= 0.25 && n >= MIN_N && !tooSpecific,
+      opportunity: delta > 0.4 && confidence >= 0.25 && n >= MIN_N && !tooSpecific,
     });
   }
 
@@ -1197,6 +1246,7 @@ function tagFamily(tag) {
   if (['충','원진','형','해','파','육합'].includes(kind)) return 'branch-rel';
   if (kind === '일진십성' || kind === '일진지지십성') return 'tengod';
   if (kind === '오행' || kind === '지지오행') return 'element';
+  if (/^(용신운|희신운|기신운|구신운)/.test(kind)) return 'element-favor';
   if (kind === '삼합' || kind === '반합' || kind === '방합') return 'hap';
   if (kind === '신살') return 'shinsal';
   return kind;
@@ -1217,8 +1267,9 @@ function collapseByFamily(hits) {
 // (충/형은 1차 관계, 원진/파/해는 파생적 표현으로 본다)
 const KIND_PRIORITY = {
   '충':0, '형':1, '원진':2, '해':3, '파':4, '육합':5,
-  '일진십성':6, '일진지지십성':7, '신살':8, '삼합':9, '반합':10, '방합':11,
-  '오행':12, '지지오행':13,
+  '용신운':6, '기신운':7, '희신운':8, '구신운':9,
+  '일진십성':10, '일진지지십성':11, '신살':12, '삼합':13, '반합':14, '방합':15,
+  '오행':16, '지지오행':17,
 };
 const kindRank = tag => {
   const k = tag.split(':')[0];
@@ -1316,6 +1367,306 @@ function forecast(natal, entries, { days = 365, from = new Date(), minSamples = 
 
   out.sort((a,b) => a.predicted - b.predicted);
   return { days: out, riskTags: independent, baseline };
+}
+
+// ============================================================
+// 종합 날짜 분석: 개인 기록 + 명식 흐름
+// 날짜 점수는 모두 결정론적으로 계산하며 AI 응답과 무관하게 동작한다.
+// ============================================================
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, Number.isFinite(n) ? n : 0));
+
+function dateFromKey(key, hour = 12) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(key || ''));
+  if (!m) return null;
+  const y=+m[1], mo=+m[2], d=+m[3];
+  if (mo<1 || mo>12 || d<1 || d>daysInMonth(y,mo)) return null;
+  return fromKST(y,mo-1,d,hour,0);
+}
+
+function analysisDate(from, offset) {
+  const p = kstParts(from instanceof Date && !isNaN(from) ? from : new Date());
+  return fromKST(p.y,p.m,p.d + offset,12,0);
+}
+
+function luckContextForDate(natal, dateKey) {
+  const dt = dateFromKey(dateKey) || new Date();
+  const y = kstParts(dt).y;
+  const age = natal?.birthYear ? y - natal.birthYear + 1 : null;
+  const list = Array.isArray(natal?.daeunList) ? natal.daeunList : [];
+  const dae = age == null ? natal?.currentDaeun : ([...list].reverse().find(x=>age>=x.age) || list[0]);
+  let seun=null;
+  try { seun=computeSaju(dt,12,0).year; } catch { seun=yearGanjiRaw(y); }
+  return { daeun:dae?.gz || natal?.currentDaeun || null, seun, year:y };
+}
+
+const PURPOSES = {
+  decision:{ label:'중요한 결정', good:['정인','편인','정관','식신'], bad:['편관','겁재','상관'], stable:true },
+  money:{ label:'계약·금전', good:['정재','편재','정인','정관'], bad:['겁재','상관','편관'], stable:true },
+  exam:{ label:'시험·면접', good:['정인','편인','정관','식신','상관'], bad:['겁재','편관'], stable:false },
+  launch:{ label:'시작·오픈', good:['식신','상관','정재','편재'], bad:['겁재','편관'], stable:false },
+  travel:{ label:'이사·이동·여행', good:['정인','정재','식신'], bad:['편관'], stable:true },
+  relation:{ label:'관계·만남·대화', good:['식신','정관','정재','편재'], bad:['상관','겁재','편관'], stable:false },
+  creative:{ label:'창작·발표', good:['식신','상관','정인','편인'], bad:['편관'], stable:false },
+};
+
+function purposeLabel(key) { return (PURPOSES[key] || PURPOSES.decision).label; }
+
+const REL_WEIGHTS = { 충:-32, 형:-25, 원진:-20, 해:-15, 파:-13, 육합:18 };
+const PILLAR_WEIGHTS = { 월:1, 일:.9, 시:.45, 년:.4 };
+
+function evidence(source, text, score, family, detail={}) {
+  return { source, text, score, family, ...detail };
+}
+
+// 같은 계열은 최강 근거 하나만 점수에 반영한다. 부정·긍정은 각각 보존해
+// 좋은 요소와 주의 요소가 함께 있는 혼합 흐름을 설명할 수 있게 한다.
+function collapseEvidence(items) {
+  const best = new Map();
+  for (const item of items) {
+    const sign = item.score < 0 ? '-' : item.score > 0 ? '+' : '0';
+    const key = `${item.family}:${sign}`;
+    const cur = best.get(key);
+    if (!cur || Math.abs(item.score) > Math.abs(cur.score)) best.set(key,item);
+  }
+  return [...best.values()];
+}
+
+function evaluateNatalDate(natalAnalysis, date, context = {}, purpose = 'decision') {
+  const dt = typeof date === 'string' ? dateFromKey(date) : date;
+  if (!natalAnalysis?.day || !(dt instanceof Date) || isNaN(dt)) {
+    return { natalScore:0,natalConfidence:0,positiveReasons:[],negativeReasons:[],neutralReasons:[evidence('명식','날짜 또는 명식 값이 올바르지 않아 중립으로 처리했습니다.',0,'input')] };
+  }
+  const dateKey = isoKST(dt);
+  const dayGz = context.targetGz || dayGanji(dt);
+  if (!dayGz || dayGz.length<2) return { natalScore:0,natalConfidence:0,positiveReasons:[],negativeReasons:[],neutralReasons:[] };
+  const stem=dayGz[0], branch=dayGz[1], stemElem=elemOfStem(stem), branchElem=elemOfBranch(branch);
+  const targetLabel=context.isHour?'시지':'일지';
+  const cfg = PURPOSES[purpose] || PURPOSES.decision;
+  const items=[];
+  const pillars=[['월',natalAnalysis.month],['일',natalAnalysis.day],['시',natalAnalysis.hour],['년',natalAnalysis.year]].filter(([,gz])=>gz);
+
+  // 1~2순위: 월지·월령, 일주·일지. 년지·시지는 보조 가중치만 준다.
+  for (const [pos,gz] of pillars) {
+    const nb=gz[1], pw=PILLAR_WEIGHTS[pos];
+    const rels=[];
+    if (isChung(branch,nb)) rels.push('충');
+    if (isHyung(branch,nb)) rels.push('형');
+    if (isWonjin(branch,nb)) rels.push('원진');
+    if (isHae(branch,nb)) rels.push('해');
+    if (isPa(branch,nb)) rels.push('파');
+    if (isYukhap(branch,nb)) rels.push('육합');
+    for (const rel of rels) {
+      let sc=REL_WEIGHTS[rel]*pw;
+      if (cfg.stable && ['충','형','파'].includes(rel)) sc*=1.12;
+      if (purpose==='relation' && ['원진','해'].includes(rel)) sc*=1.25;
+      items.push(evidence('명식',`해당 ${targetLabel} ${branch}은 원국 ${pos}지 ${nb}와 ${rel} 관계입니다.`,sc,'branch-rel',{relation:rel,position:pos}));
+    }
+  }
+
+  // 삼합·반합·방합은 성립 정도를 나누고, 합 계열 중복은 한 번만 반영한다.
+  const natalBranches=pillars.map(([,gz])=>gz[1]);
+  for (const {members,elem} of SAMHAP) if (members.includes(branch)) {
+    const hit=members.filter(x=>x!==branch && natalBranches.includes(x));
+    if (hit.length>=2) items.push(evidence('명식',`${elem} 삼합이 완성되어 기운의 순환이 뚜렷해집니다.`,24,'hap'));
+    else if (hit.length===1) items.push(evidence('명식',`${elem} 반합이 성립해 흐름을 보조합니다.`,12,'hap'));
+  }
+  for (const {members,elem} of BANGHAP) if (members.includes(branch)) {
+    const hit=members.filter(x=>x!==branch && natalBranches.includes(x));
+    if (hit.length>=2) items.push(evidence('명식',`${elem} 방합이 성립해 계절 흐름이 모입니다.`,20,'hap'));
+  }
+
+  // 3순위: 용신·희신·기신·구신을 서로 다른 영향력으로 보존한다.
+  const methodScale={전왕:1.15,조후:1.12,통관:1.08,격국:1.04,억부:1}[natalAnalysis.primary]||1;
+  const elemInfluence = (elem, ratio, where) => {
+    if (natalAnalysis.yongsin?.includes(elem)) items.push(evidence('명식',`${where} ${elem} 기운이 용신을 직접 보완합니다.`,30*ratio,'element-favor'));
+    else if (natalAnalysis.huisin?.includes(elem)) items.push(evidence('명식',`${where} ${elem} 기운이 희신으로 용신을 돕습니다.`,18*ratio,'element-favor'));
+    if (natalAnalysis.gisin?.includes(elem)) items.push(evidence('명식',`${where} ${elem} 기운이 기신을 강화합니다.`,-30*ratio,'element-block'));
+    else if (natalAnalysis.gusin?.includes(elem)) items.push(evidence('명식',`${where} ${elem} 기운이 구신으로 부담을 보탭니다.`,-16*ratio,'element-block'));
+  };
+  elemInfluence(stemElem,.65*methodScale,'일간');
+  elemInfluence(branchElem,.45*methodScale,targetLabel);
+
+  // 일간 강약·득령/득지와 원국 오행 분포는 보정점수로만 사용한다.
+  const roleStem=relationLabel(natalAnalysis.core?.me||elemOfStem(natalAnalysis.day[0]),stemElem);
+  const supportsStem=stemElem===(natalAnalysis.core?.me) || stemElem===GEN_OF[natalAnalysis.core?.me];
+  if (natalAnalysis.strength) {
+    if (!natalAnalysis.strength.strong && supportsStem)
+      items.push(evidence('명식',`신약 쪽 일간에 ${roleStem} 흐름이 보조적으로 힘을 보탭니다.`,6,'strength'));
+    else if (natalAnalysis.strength.strong && !supportsStem)
+      items.push(evidence('명식',`신강 쪽 일간의 기운을 ${roleStem} 흐름이 적절히 순환시킵니다.`,5,'strength'));
+    else if (natalAnalysis.strength.strong && supportsStem)
+      items.push(evidence('명식',`득령·득지·득세를 합친 강한 일간에 같은 편 기운이 더해져 과해질 수 있습니다.`,-4,'strength'));
+  }
+  const counts=natalAnalysis.elements||{};
+  const vals=ELEMS.filter(e=>Number.isFinite(counts[e])).map(e=>[e,counts[e]]);
+  if (vals.length===5) {
+    const low=[...vals].sort((a,b)=>a[1]-b[1])[0], high=[...vals].sort((a,b)=>b[1]-a[1])[0];
+    if ([stemElem,branchElem].includes(low[0])) items.push(evidence('명식',`원국에서 상대적으로 적은 ${low[0]} 기운을 일진이 보완합니다.`,6,'element-balance'));
+    if ([stemElem,branchElem].includes(high[0]) && !natalAnalysis.yongsin?.includes(high[0])) items.push(evidence('명식',`원국에서 이미 많은 ${high[0]} 기운이 더해져 균형이 치우칠 수 있습니다.`,-5,'element-balance'));
+  }
+
+  // 목적별 십성: 목적마다 사용하는 역할과 안정성 조건을 달리한다.
+  const tg=tenGod(natalAnalysis.day[0],stem), tgb=tenGodBranch(natalAnalysis.day[0],branch);
+  for (const [god,ratio] of [[tg,1],[tgb,.58]]) {
+    if (!god) continue;
+    let sc=cfg.good.includes(god)?13*ratio:cfg.bad.includes(god)?-11*ratio:0;
+    const elem = god===tg ? stemElem : branchElem;
+    if (sc>0 && (natalAnalysis.gisin?.includes(elem)||natalAnalysis.gusin?.includes(elem))) {
+      sc*=-.35;
+      items.push(evidence('명식',`${purposeLabel(purpose)}에 쓰이는 ${god}이지만 기신·구신 오행으로 과해질 수 있습니다.`,sc,'purpose'));
+    } else if (sc) items.push(evidence('명식',`${god} 흐름이 ${purposeLabel(purpose)} 목적에 ${sc>0?'도움이 됩니다':'변동성을 더할 수 있습니다'}.`,sc,'purpose'));
+  }
+
+  // 4순위: 해당 시점의 대운·세운. 일진과의 충·합 및 오행 동조를 보조 반영한다.
+  const luck={...luckContextForDate(natalAnalysis,dateKey),...context};
+  for (const [name,gz] of [['대운',luck.daeun],['세운',luck.seun]]) if (gz) {
+    const source='대운·세운', mult=name==='대운'?1:.8, le=elemOfStem(gz[0]);
+    if (isChung(branch,gz[1])) items.push(evidence(source,`현재 ${name} ${gz}과 일진의 지지가 충해 변동성이 커집니다.`,-15*mult,'fortune-rel'));
+    else if (isYukhap(branch,gz[1])) items.push(evidence(source,`현재 ${name} ${gz}과 일진의 지지가 육합으로 연결됩니다.`,9*mult,'fortune-rel'));
+    if (natalAnalysis.yongsin?.includes(le)) items.push(evidence(source,`${name}의 ${le} 기운이 용신 흐름을 받쳐줍니다.`,8*mult,'fortune-elem'));
+    else if (natalAnalysis.huisin?.includes(le)) items.push(evidence(source,`${name}의 ${le} 기운이 희신으로 보조합니다.`,5*mult,'fortune-elem'));
+    if (natalAnalysis.gisin?.includes(le)) items.push(evidence(source,`${name}의 ${le} 기운이 기신 부담을 더합니다.`,-8*mult,'fortune-elem'));
+    else if (natalAnalysis.gusin?.includes(le)) items.push(evidence(source,`${name}의 ${le} 기운이 구신으로 작용합니다.`,-4*mult,'fortune-elem'));
+  }
+
+  // 6순위: 신살은 목적에 맞을 때만 작은 보조점수를 주며 단독 결론을 막는다.
+  const sins=shinsal(natalAnalysis.day[0],natalAnalysis.day[1],branch,dayGz);
+  for (const s of sins) {
+    let sc=0;
+    if (s==='천을귀인' && ['exam','decision','money'].includes(purpose)) sc=4;
+    if (s==='도화' && ['relation','creative'].includes(purpose)) sc=4;
+    if (s==='역마' && purpose==='travel') sc=(natalAnalysis.yongsin?.includes(branchElem)||natalAnalysis.huisin?.includes(branchElem))?7:3;
+    if (s==='화개' && purpose==='creative') sc=3;
+    if (['양인','백호'].includes(s)) sc=-4;
+    if (sc) items.push(evidence('명식',`${s}은(는) 선택 목적에서 보조 요소로만 반영했습니다.`,sc,'shinsal'));
+  }
+
+  const collapsed=collapseEvidence(items);
+  const raw=collapsed.reduce((sum,x)=>sum+x.score,0);
+  const natalScore=clamp(raw,-100,100);
+  const ysConf=clamp(natalAnalysis.confidence ?? .65,0,.9);
+  const coreCount=collapsed.filter(x=>x.family!=='shinsal').length;
+  const natalConfidence=clamp(.38+ysConf*.38+Math.min(.1,coreCount*.012),0,.9);
+  const positiveReasons=collapsed.filter(x=>x.score>0).sort((a,b)=>b.score-a.score);
+  const negativeReasons=collapsed.filter(x=>x.score<0).sort((a,b)=>a.score-b.score);
+  const neutralReasons=[];
+  if (!positiveReasons.length && !negativeReasons.length) neutralReasons.push(evidence('명식',`월지 ${natalAnalysis.month?.[1]||'-'}와 일주 ${natalAnalysis.day}에 특별히 강한 충돌이나 보완이 없습니다.`,0,'neutral'));
+  neutralReasons.push(evidence('명식',`${natalAnalysis.primary || '종합'} 분석을 중심으로 월령·일주·용희신 순서로 평가했습니다.`,0,'method'));
+  if(natalAnalysis.strength) neutralReasons.push(evidence('명식',`일간은 ${natalAnalysis.strength.strong?'신강':'신약'} 쪽이며 득령 ${natalAnalysis.strength.deukryeong?'O':'X'}·득지 ${natalAnalysis.strength.deukji?'O':'X'}·득세 ${natalAnalysis.strength.deukse?'O':'X'}를 보정에 반영했습니다.`,0,'strength-note'));
+  return { natalScore,natalConfidence,positiveReasons,negativeReasons,neutralReasons,ganji:dayGz,items:collapsed };
+}
+
+function empiricalStats(natal, entries, minSamples=3) {
+  const built=buildStats(natal,entries,{minSamples});
+  const risks=dropSubsumed(built.stats.filter(s=>s.risk),built.scored);
+  const opportunities=dropSubsumed(built.stats.filter(s=>s.opportunity),built.scored);
+  return {...built,risks,opportunities,riskMap:new Map(risks.map(x=>[x.tag,x])),opportunityMap:new Map(opportunities.map(x=>[x.tag,x]))};
+}
+
+function evaluateEmpiricalGz(natal, gz, ctx, empirical, sampleTotal) {
+  if (sampleTotal<10 || !empirical) return {empiricalScore:0,empiricalConfidence:0,reasons:[],hits:[]};
+  const tags=extractTags(natal,gz,ctx);
+  const raw=[];
+  for (const t of tags) {
+    const neg=empirical.riskMap.get(t), pos=empirical.opportunityMap.get(t);
+    if (neg) raw.push(neg);
+    if (pos) raw.push(pos);
+  }
+  const hits=collapseByFamily(raw);
+  if (!hits.length) return {empiricalScore:0,empiricalConfidence:.08,reasons:[],hits:[]};
+  const wsum=hits.reduce((s,h)=>s+h.confidence,0) || 1;
+  const delta=hits.reduce((s,h)=>s+h.delta*h.confidence,0)/wsum;
+  const empiricalScore=clamp(delta*30,-100,100);
+  const sorted=[...hits].sort((a,b)=>b.confidence-a.confidence);
+  let conf=sorted[0]?.confidence||0;
+  for(let i=1;i<sorted.length;i++) conf+=sorted[i].confidence*(1-conf)*.45;
+  conf=clamp(conf,0,.9);
+  const reasons=hits.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)).map(h=>evidence('내 기록',`${h.tag}이 있었던 기록 ${h.n}회에서 평소보다 평균 ${Math.abs(h.delta).toFixed(1)}점 ${h.delta>=0?'높았습니다':'낮았습니다'}.`,h.delta,'empirical',{n:h.n,delta:h.delta,tag:h.tag}));
+  return {empiricalScore,empiricalConfidence:conf,reasons,hits};
+}
+
+function sampleWeights(total, empiricalConfidence) {
+  if (total<10) return {empiricalWeight:0,natalWeight:1};
+  const base=total<30?.35:total<60?.55:.70;
+  const quality=clamp(.35+(empiricalConfidence/.9)*.65,.35,1);
+  const empiricalWeight=clamp(base*quality,0,.7);
+  return {empiricalWeight,natalWeight:1-empiricalWeight};
+}
+
+function combineDateScores(empirical,natal,total) {
+  const w=sampleWeights(total,empirical.empiricalConfidence);
+  const combinedScore=clamp(empirical.empiricalScore*w.empiricalWeight+natal.natalScore*w.natalWeight,-100,100);
+  const conflict=total>=10 && Math.sign(empirical.empiricalScore)!==Math.sign(natal.natalScore)
+    && Math.abs(empirical.empiricalScore)>=10 && Math.abs(natal.natalScore)>=10;
+  const aligned=total>=10 && Math.sign(empirical.empiricalScore)===Math.sign(natal.natalScore)
+    && Math.abs(empirical.empiricalScore)>=10 && Math.abs(natal.natalScore)>=10;
+  let confidence=empirical.empiricalConfidence*w.empiricalWeight+natal.natalConfidence*w.natalWeight;
+  if (conflict) confidence*=.72;
+  if (aligned) confidence*=1.05;
+  confidence=clamp(confidence,0,.9);
+  let interaction='명식 기준 흐름';
+  if (total>=10) {
+    if (empirical.empiricalScore<0 && natal.natalScore<0) interaction='명식과 실제 기록의 주의 신호가 겹침';
+    else if (empirical.empiricalScore>0 && natal.natalScore>0) interaction='개인 적합도가 높은 흐름';
+    else if (natal.natalScore<0 && empirical.empiricalScore>0) interaction='명식 부담을 개인 체질상 비교적 잘 받아낸 흐름';
+    else if (natal.natalScore>0 && empirical.empiricalScore<0) interaction='명식상 이점과 달리 개인 기록에는 맞지 않았던 흐름';
+    else interaction='명식과 개인 기록이 상쇄되는 혼합 흐름';
+  }
+  return {...w,combinedScore,confidence,conflict,aligned,interaction};
+}
+
+function analyzeHybridDate(natal, entries, date, purpose='decision', prepared=null, targetGz=null) {
+  const dt=typeof date==='string'?dateFromKey(date):date;
+  const dateKey=dt?isoKST(dt):'';
+  const samples=Array.isArray(entries)?entries:[];
+  const empStats=prepared || empiricalStats(natal,samples,3);
+  const ctx=luckContextForDate(natal,dateKey);
+  const gz=targetGz || dayGanji(dt);
+  const empirical=evaluateEmpiricalGz(natal,gz,ctx,empStats,samples.length);
+  const natalFlow=evaluateNatalDate(natal,dt,{...ctx,targetGz:gz},purpose);
+  const combined=combineDateScores(empirical,natalFlow,samples.length);
+  const strongestPos=Math.max(0,...natalFlow.positiveReasons.map(x=>x.score),empirical.empiricalScore);
+  const strongestNeg=Math.max(0,...natalFlow.negativeReasons.map(x=>Math.abs(x.score)),Math.abs(Math.min(0,empirical.empiricalScore)));
+  return {date:dateKey,ganji:gz,purpose,...empirical,...natalFlow,...combined,
+    mixed:combined.conflict||(strongestPos>=18&&strongestNeg>=18),strongestPos,strongestNeg};
+}
+
+function forecastHybrid(natal, entries, {days=180,from=new Date(),purpose='decision'}={}) {
+  const samples=Array.isArray(entries)?entries:[];
+  const prepared=empiricalStats(natal,samples,3);
+  const all=[];
+  for(let i=0;i<days;i++) {
+    const dt=analysisDate(from,i);
+    try { all.push(analyzeHybridDate(natal,samples,dt,purpose,prepared)); } catch(e) { console.warn('날짜 분석 건너뜀',e); }
+  }
+  return {all,prepared,samples:samples.length};
+}
+
+function forecastOpportunities(natal, entries, options={}) {
+  const fc=forecastHybrid(natal,entries,options);
+  const days=[...fc.all].sort((a,b)=>b.combinedScore-a.combinedScore || b.confidence-a.confidence).slice(0,10);
+  return {...fc,days,opportunityTags:fc.prepared.opportunities};
+}
+
+function recommendedHours(natal, entries, item, purpose, prepared) {
+  const hourSamples=(Array.isArray(entries)?entries:[]).filter(x=>x.scope==='hour');
+  const useEmpirical=hourSamples.length>=10;
+  const hourPrepared=useEmpirical?empiricalStats(natal,hourSamples,3):null;
+  const rows=[];
+  for(const [branch,start,end] of HOUR_RANGES) {
+    try {
+      const gz=hourPillarFor(item.date,branch);
+      const natalFlow=evaluateNatalDate(natal,item.date,{...luckContextForDate(natal,item.date),targetGz:gz,isHour:true},purpose);
+      let score=natalFlow.natalScore, confidence=natalFlow.natalConfidence;
+      if(useEmpirical) {
+        const emp=evaluateEmpiricalGz(natal,gz,luckContextForDate(natal,item.date),hourPrepared,hourSamples.length);
+        const comb=combineDateScores(emp,natalFlow,hourSamples.length);
+        score=comb.combinedScore; confidence=comb.confidence;
+      }
+      rows.push({branch,start,end,gz,score,confidence});
+    } catch {}
+  }
+  return {mode:useEmpirical?'명식 + 시운 기록 추천':'명식 기준 추천 시간',hours:rows.sort((a,b)=>b.score-a.score).slice(0,3)};
 }
 
 // ============================================================
@@ -1676,6 +2027,13 @@ const state = {
   user: null,           // 로그인한 아이디
   rev: 0,               // 서버 데이터 버전
   sync: 'off',          // off | idle | saving | saved | error | offline
+  flowMode: 'warn',     // 운의 흐름 화면: warn | good (세션 상태)
+  flowPurpose: 'decision',
+  flowDays: 60,
+  warnSet: new Set(),
+  goodSet: new Set(),
+  mixedSet: new Set(),
+  flowCache: new Map(),
 };
 
 // ============================================================
@@ -1935,6 +2293,7 @@ async function pushNow() {
       state.entries = { ...sd.entries, ...state.entries };
       state.natal = state.natal || sd.natal;
       state.rev = e.body.serverRev;
+      recomputeWarn();
       return pushNow();
     }
     setSync(e.status === 401 ? 'off' : 'error');
@@ -2088,6 +2447,8 @@ function viewCalendar() {
     const e = state.entries[k];
     const isT = k === today;
     const warn = state.warnSet && state.warnSet.has(k);
+    const good = state.goodSet && state.goodSet.has(k);
+    const mixed = state.mixedSet && state.mixedSet.has(k);
     let dots = '';
     if (e) {
       const ms = moodList(e);
@@ -2101,7 +2462,7 @@ function viewCalendar() {
         ${e.memo?`<div class="dot" style="background:var(--mute)"></div>`:''}
       </div>`;
     }
-    cells += `<div class="cell ${isT?'today':''} ${state.sel===k?'sel':''} ${warn?'warn':''}" data-d="${k}">
+    cells += `<div class="cell ${isT?'today':''} ${state.sel===k?'sel':''} ${warn?'warn':''} ${good?'good':''} ${mixed?'mixed':''}" data-d="${k}">
       ${termOn[d]?`<div class="term">${termOn[d]}</div>`:''}
       <div class="n">${d}</div>
       <div class="gz"><span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span></div>
@@ -2155,7 +2516,7 @@ function viewCalendar() {
   <div class="dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
   <div class="grid" id="grid">${cells}</div>
   <div class="note">날짜를 눌러 만세력 확인과 기록을 남기세요. 점은 기분·몸상태·메모 유무입니다.
-  ${state.warnSet && state.warnSet.size ? '<br>상단 붉은 선은 “주의 날짜” 예측일입니다.' : ''}</div>`;
+  ${(state.warnSet?.size||state.goodSet?.size) ? '<br>상단 붉은 선은 주의 흐름, 오른쪽 아래 초록·황금 표시는 길한 흐름과 혼합 흐름입니다.' : ''}</div>`;
 }
 
 // ---------- 기록 시트 ----------
@@ -2300,8 +2661,8 @@ function openSheet(k) {
   let rel = '';
   if (state.natal) {
     const tags = extractTags(natalObj(), p.day);
-    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
-    const good = t => /육합|용희신|천을귀인/.test(t);
+    const bad = t => /^(충|원진|형|해|파)/.test(t) || /기신운|구신운|편관투출|상관투출/.test(t);
+    const good = t => /육합|용신운|희신운|천을귀인/.test(t);
     rel = `<div class="f-lbl">내 명식과의 관계</div><div class="day-tags">
       ${tags.filter(t=>!t.startsWith('일주:')).map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}
     </div>`;
@@ -2315,7 +2676,7 @@ function openSheet(k) {
     <div class="f-lbl">몸상태 (5 = 가장 좋음)</div>
     ${bodyPickerHTML('bodies', e.body)}
     <div class="f-lbl">메모</div>
-    <textarea id="memo" placeholder="오늘 어땠나요">${e.memo||''}</textarea>
+    <textarea id="memo" placeholder="오늘 어땠나요">${esc(e.memo||'')}</textarea>
 
     <div class="f-lbl" style="margin-top:26px">시운별 일기 <span class="hint">시간대를 눌러 시(時)별로 기록</span></div>
     <div class="hour-lead" id="hourLead">시(時)를 선택해 그 시간대의 기분·몸상태를 따로 기록할 수 있어요.
@@ -2365,8 +2726,8 @@ function openHourSheet(dateKey, branch) {
   let rel = '';
   if (state.natal) {
     const tags = extractTags(natalObj(), gz);
-    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
-    const good = t => /육합|용희신|천을귀인/.test(t);
+    const bad = t => /^(충|원진|형|해|파)/.test(t) || /기신운|구신운|편관투출|상관투출/.test(t);
+    const good = t => /육합|용신운|희신운|천을귀인/.test(t);
     const shown = tags.filter(t=>!t.startsWith('일주:'));
     if (shown.length) rel = `<div class="f-lbl">이 시주와 내 명식의 관계</div><div class="day-tags">
       ${shown.map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}</div>`;
@@ -2381,7 +2742,7 @@ function openHourSheet(dateKey, branch) {
     <div class="f-lbl">몸상태</div>
     ${bodyPickerHTML('hBodies', he.body)}
     <div class="f-lbl">메모</div>
-    <textarea id="hMemo" placeholder="이 시간대는 어땠나요">${he.memo||''}</textarea>
+    <textarea id="hMemo" placeholder="이 시간대는 어땠나요">${esc(he.memo||'')}</textarea>
     <button class="btn" id="hSave">이 시간대 기록</button>
     ${(curMoods.length||he.body!=null||he.memo)?'<button class="btn ghost" id="hClear">이 시간대 기록 지우기</button>':''}
   `;
@@ -2896,9 +3257,23 @@ function parseNatal(raw) {
 
 function natalObj() {
   const n = state.natal;
+  if (!n) return null;
   const p = computeSaju(fromKST(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0), n.h, n.mi);
-  const ys = analyzeYongsin(p);
-  return { year:p.year, month:p.month, day:p.day, hour:p.hour, yongsin:ys.yongsin, gisin:ys.gisin };
+  const ys = analyzeYongsinFull(p);
+  const birth = fromKST(n.y,n.m-1,n.d,n.h ?? 12,n.mi ?? 0);
+  const du = computeDaeun(p,birth,n.gender);
+  const nowY=nowKST().y, age=nowY-n.y+1;
+  const cur=[...du.list].reverse().find(x=>age>=x.age) || du.list[0] || null;
+  return {
+    year:p.year, month:p.month, day:p.day, hour:p.hour,
+    yongsin:[...(ys.yongsin||[])], huisin:[...(ys.huisin||[])],
+    gisin:[...(ys.gisin||[])], gusin:[...(ys.gusin||[])],
+    primary:ys.primary, methods:ys.methods,
+    strength:{ strong:ys.strong, ratio:ys.ratio, deukryeong:ys.deukryeong, deukji:ys.deukji, deukse:ys.deukse, score:ys.score },
+    elements:{...(ys.count||{})}, core:ys.core, confidence:ys.confidence,
+    currentDaeun:cur?.gz||null, currentSeun:computeSaju(new Date(),12,0).year,
+    daeunList:du.list.map(x=>({age:x.age,gz:x.gz})), birthYear:n.y,
+  };
 }
 
 // ---------- 동기화 표시 ----------
@@ -3061,74 +3436,162 @@ async function importBackup(file, msgEl) {
   }
 }
 
-// ---------- 뷰: 주의 날짜 ----------
+// ---------- 뷰: 운의 흐름 ----------
+function flowTabsHTML() {
+  return `<div class="flow-tabs" role="tablist">
+    <button class="flow-tab ${state.flowMode==='warn'?'on':''}" data-flow="warn" role="tab">주의일</button>
+    <button class="flow-tab ${state.flowMode==='good'?'on':''}" data-flow="good" role="tab">길일 찾기</button>
+  </div>${state.flowMode==='good'?'<div class="flow-sub">결정을 돕는 개인 맞춤 날짜 가이드</div>':''}`;
+}
+
+function flowDisclaimer() {
+  return `<div class="disclaimer">이 분석은 사용자의 명식과 누적 기록에서 발견된 경향을 보여주는 참고 자료입니다. 의료·법률·투자·계약 등 중요한 결정은 현실적인 조건과 전문가의 의견을 함께 확인하세요.</div>`;
+}
+
+function personalizationStage(n) { return n<30?'학습 중':n<60?'보통':'충분'; }
+function confLabel(c) { return c>=.65?'높음':c>=.4?'보통':'낮음'; }
+function ddayLabel(key) {
+  const dt=dateFromKey(key), now=analysisDate(new Date(),0);
+  if(!dt) return '';
+  const d=Math.round((dt-now)/86400000);
+  return d===0?'D-day':d>0?`D-${d}`:`D+${Math.abs(d)}`;
+}
+function scoreClass(n) { return n>8?'pos':n<-8?'neg':'mix'; }
+function sourceClass(s) { return s==='내 기록'?'emp':s==='대운·세운'?'fortune':'natal'; }
+function reasonHTML(r) { return `<div class="reason"><span class="src ${sourceClass(r.source)}">${esc(r.source)}</span>${esc(r.text)}</div>`; }
+
+function selectedReasons(item, mode, max=3) {
+  const emp=item.reasons.filter(x=>mode==='good'?x.score>0:x.score<0);
+  const nat=(mode==='good'?item.positiveReasons:item.negativeReasons);
+  const fortune=nat.filter(x=>x.source==='대운·세운');
+  const natalOnly=nat.filter(x=>x.source!=='대운·세운');
+  const pool=[];
+  if(emp[0]) pool.push(emp[0]);
+  if(natalOnly[0]) pool.push(natalOnly[0]);
+  if(fortune[0]) pool.push(fortune[0]);
+  for(const x of [...emp.slice(1),...natalOnly.slice(1),...fortune.slice(1)]) if(!pool.includes(x)) pool.push(x);
+  return pool.slice(0,max);
+}
+
+function flowCacheKey(days,purpose) {
+  return `${days}|${purpose}|${state.natal?.y||''}-${state.natal?.m||''}-${state.natal?.d||''}-${sampleCount()}`;
+}
+function getFlowForecast(days,purpose='decision') {
+  const key=flowCacheKey(days,purpose);
+  if(state.flowCache?.has(key)) return state.flowCache.get(key);
+  const val=forecastHybrid(natalObj(),collectSamples(),{days,from:new Date(),purpose});
+  state.flowCache?.set(key,val);
+  return val;
+}
+
+function analysisSummaryHTML(count,days,modeCount) {
+  const method=count<10?'명식 기준':'명식 + 개인 기록';
+  return `<div class="card" style="margin-top:0"><h3>분석 요약</h3>
+    <div class="kv"><span class="k">분석 방식</span><span>${method}</span></div>
+    <div class="kv"><span class="k">사용 표본</span><span>날짜·시운 기록 ${count}개</span></div>
+    <div class="kv"><span class="k">개인화 단계</span><span>${personalizationStage(count)}</span></div>
+    <div class="kv"><span class="k">분석 기간</span><span>향후 ${days}일</span></div>
+    <div class="kv"><span class="k">표시 결과</span><span>${modeCount}일</span></div>
+    ${count<10?`<div class="note">개인 기록 표본이 부족해 현재는 명식 기준으로 분석합니다. 기록 10개부터 명식 + 개인 기록 분석으로 자동 전환되며, 기록이 늘수록 개인화 비중이 커집니다.</div>`:
+    `<div class="note">명식 흐름과 실제 기록을 함께 분석합니다. 표본이 늘수록 실제 개인 기록의 비중이 최대 70%까지 커집니다.</div>`}
+  </div>`;
+}
+
+function scoreGridHTML(item, finalLabel) {
+  return `<div class="flow-meta">
+    <div><small>${finalLabel}</small><b class="flow-score ${scoreClass(item.combinedScore)}">${Math.round(item.combinedScore)}</b></div>
+    <div><small>종합 신뢰도</small><b>${confLabel(item.confidence)} ${(item.confidence*100).toFixed(0)}%</b></div>
+    <div><small>개인 기록 점수</small><b class="flow-score ${scoreClass(item.empiricalScore)}">${Math.round(item.empiricalScore)}</b></div>
+    <div><small>명식 흐름 점수</small><b class="flow-score ${scoreClass(item.natalScore)}">${Math.round(item.natalScore)}</b></div>
+  </div>`;
+}
+
+function warningCardHTML(item) {
+  const reasons=selectedReasons(item,'warn');
+  return `<div class="warn-i ${item.mixed?'mixed':''}">
+    <div class="top"><div><span class="dt">${item.date}</span><span class="gz"><span class="e-${elemOfStem(item.ganji[0])}">${H(item.ganji[0])}</span><span class="e-${elemOfBranch(item.ganji[1])}">${H(item.ganji[1])}</span></span>
+      <span style="color:var(--mute);font-size:11px;margin-left:6px">${ddayLabel(item.date)}</span></div>
+      <span class="cf">${esc(item.interaction)}</span></div>
+    ${scoreGridHTML(item,'최종 주의 점수')}
+    <div class="reason-list">${reasons.length?reasons.map(reasonHTML).join(''):'<div class="reason">강한 단일 원인보다 여러 작은 변동 요소가 합산된 날짜입니다.</div>'}</div>
+  </div>`;
+}
+
+function opportunityGrade(item) {
+  if(item.mixed||item.conflict) return '혼합 흐름';
+  if(item.combinedScore>=55) return '매우 잘 맞음';
+  if(item.combinedScore>=30) return '잘 맞음';
+  return '무난함';
+}
+
+function opportunityCardHTML(item,natal,entries,prepared) {
+  const reasons=selectedReasons(item,'good');
+  const caution=selectedReasons(item,'warn',1)[0];
+  const rec=recommendedHours(natal,entries,item,item.purpose,prepared);
+  return `<div class="warn-i good ${item.mixed?'mixed':''}">
+    <div class="top"><div><span class="dt">${item.date}</span><span class="gz"><span class="e-${elemOfStem(item.ganji[0])}">${H(item.ganji[0])}</span><span class="e-${elemOfBranch(item.ganji[1])}">${H(item.ganji[1])}</span></span>
+      <span style="color:var(--mute);font-size:11px;margin-left:6px">${ddayLabel(item.date)}</span></div>
+      <span class="cf">${opportunityGrade(item)} · ${esc(purposeLabel(item.purpose))}</span></div>
+    ${scoreGridHTML(item,'종합 적합도')}
+    <div class="reason-list">${reasons.length?reasons.map(reasonHTML).join(''):'<div class="reason">강한 길신 하나보다 전체 균형이 비교적 안정적인 날짜입니다.</div>'}</div>
+    <div class="hour-recs"><span class="hour-chip">${rec.mode}</span>${rec.hours.map(h=>`<span class="hour-chip">${h.branch}시 ${h.start}~${h.end}</span>`).join('')}</div>
+    ${caution?`<div class="caution-line">좋은 요소와 주의 요소가 함께 있음 · ${esc(caution.text)}</div>`:''}
+  </div>`;
+}
+
+function viewWarningFlow() {
+  const list=collectSamples(), nat=natalObj(), fc=getFlowForecast(180,'decision');
+  const risky=[...fc.all].filter(x=>x.combinedScore<=-35 || (x.conflict&&x.combinedScore<10))
+    .sort((a,b)=>a.combinedScore-b.combinedScore || b.confidence-a.confidence).slice(0,14);
+  const risks=fc.prepared.risks.slice().sort((a,b)=>a.delta-b.delta);
+  return `${analysisSummaryHTML(list.length,180,risky.length)}
+    ${list.length>=10&&risks.length?`<div class="card"><h3>내 기록에서 반복 확인된 주의 구조</h3>${risks.slice(0,8).map(s=>`<div class="stat-row"><span>${esc(s.tag)}</span><span class="n">${s.n}회 · ${s.level}</span><span class="delta neg">${s.delta.toFixed(2)}</span></div>`).join('')}</div>`:''}
+    <div style="margin-top:18px">${risky.length?risky.map(warningCardHTML).join(''):`<div class="empty"><div class="ic">靜</div><p>향후 180일에 강하게 치우친 주의 흐름이 없습니다.<br><span style="font-size:11.5px">기록을 이어가면 개인 패턴이 계속 보정됩니다.</span></p></div>`}</div>
+    <div class="note"><b>읽는 법.</b> 음수에 가까울수록 평소보다 컨디션 변동 가능성이 큰 흐름입니다. 명식과 기록이 충돌하면 어느 한쪽을 지우지 않고 혼합 흐름으로 표시하며 신뢰도를 낮춥니다.</div>${flowDisclaimer()}`;
+}
+
+function viewOpportunityFlow() {
+  const list=collectSamples(), nat=natalObj();
+  const days=[30,60,90,180].includes(+state.flowDays)?+state.flowDays:60;
+  const purpose=PURPOSES[state.flowPurpose]?state.flowPurpose:'decision';
+  const fc=forecastOpportunities(nat,list,{days,from:new Date(),purpose});
+  const opts=Object.entries(PURPOSES).map(([k,v])=>`<option value="${k}" ${k===purpose?'selected':''}>${v.label}</option>`).join('');
+  const controls=`<div class="flow-controls">
+    <div><label for="flowPurpose">목적</label><select id="flowPurpose">${opts}</select></div>
+    <div><label for="flowDays">검색 범위</label><select id="flowDays">${[30,60,90,180].map(n=>`<option value="${n}" ${n===days?'selected':''}>향후 ${n}일</option>`).join('')}</select></div>
+  </div>`;
+  return `${controls}${analysisSummaryHTML(list.length,days,fc.days.length)}
+    ${list.length>=10&&fc.opportunityTags.length?`<div class="card"><h3>내 기록에서 반복 확인된 좋은 구조</h3>${fc.opportunityTags.slice().sort((a,b)=>b.delta-a.delta).slice(0,8).map(s=>`<div class="stat-row"><span>${esc(s.tag)}</span><span class="n">${s.n}회 · ${s.level}</span><span class="delta pos">+${s.delta.toFixed(2)}</span></div>`).join('')}</div>`:''}
+    <div style="margin-top:18px">${fc.days.map(x=>opportunityCardHTML(x,nat,list,fc.prepared)).join('')}</div>
+    <div class="note">점수가 높아도 충·형·원진 같은 주의 요소가 함께 있으면 혼합 흐름으로 표시합니다. 이 결과는 성공을 보장하는 택일이 아니라, 선택한 목적과 개인 컨디션의 상대적 적합도를 비교한 가이드입니다.</div>${flowDisclaimer()}`;
+}
+
 function viewWarn() {
-  if (!state.natal) return `<div class="empty"><div class="ic">命</div>
-    <p>먼저 <b>내 명식</b>에서 사주를 입력해주세요.<br>기록을 명식과 대조해야 분석할 수 있습니다.</p></div>`;
+  const tabs=flowTabsHTML();
+  if (!state.natal) return `${tabs}<div class="empty"><div class="ic">命</div><p>먼저 <b>내 명식</b>에서 사주를 입력해주세요.<br>명식이 있어야 날짜 흐름을 분석할 수 있습니다.</p></div>${flowDisclaimer()}`;
+  try { return `${tabs}${state.flowMode==='good'?viewOpportunityFlow():viewWarningFlow()}`; }
+  catch(e) { console.error('운의 흐름 렌더 오류',e); return `${tabs}<div class="empty"><div class="ic">靜</div><p>날짜 분석 중 일부 값이 올바르지 않아 결과를 표시하지 못했습니다.<br>명식 값을 다시 확인해주세요.</p></div>${flowDisclaimer()}`; }
+}
 
-  const list = collectSamples();
-
-  if (list.length < 10) return `<div class="empty"><div class="ic">數</div>
-    <p>기록 <b>${list.length}일</b> / 최소 10일 필요<br>
-    <span style="font-size:11.5px">패턴을 신뢰하려면 표본이 쌓여야 합니다.<br>
-    날짜별 기록과 시운별 기록이 모두 표본에 포함됩니다.</span></p></div>`;
-
-  const nat = natalObj();
-  const st = buildStats(nat, list, { minSamples:3 });
-  const fc = forecast(nat, list, { days:180, from:new Date(), minSamples:3 });
-  const risky = fc.riskTags.slice().sort((a,b)=>a.delta-b.delta);
-
-  if (!fc.days.length) return `<div class="empty"><div class="ic">靜</div>
-    <p>아직 뚜렷한 위험 패턴이 없습니다.<br>
-    <span style="font-size:11.5px">기록 ${list.length}일 · 베이스라인 ${st.baseline.toFixed(2)}<br>
-    반복되는 구조가 나타나면 여기에 표시됩니다.</span></p></div>`;
-
-  const seen = new Set(); const uniq = [];
-  for (const d of fc.days) { if (seen.has(d.date)) continue; seen.add(d.date); uniq.push(d); }
-
-  return `
-  <div class="card" style="margin-top:0"><h3>분석 요약</h3>
-    <div class="kv"><span class="k">기록 일수</span><span>${list.length}일</span></div>
-    <div class="kv"><span class="k">평소 컨디션 (베이스라인)</span><span>${st.baseline.toFixed(2)}</span></div>
-    <div class="kv"><span class="k">발견된 위험 구조</span><span>${risky.length}개</span></div>
-    <div class="kv"><span class="k">향후 180일 주의일</span><span>${uniq.length}일</span></div>
-  </div>
-  <div class="card"><h3>반복 확인된 구조</h3>
-    ${risky.slice(0,8).map(s=>`<div class="stat-row">
-      <span>${s.tag}${s.aliases&&s.aliases.length?`<span style="color:var(--mute);font-size:10px;margin-left:6px">= ${s.aliases.join(' · ')}</span>`:''}</span>
-      <span class="n">${s.n}회 · ${s.level}</span>
-      <span class="delta neg">${s.delta.toFixed(2)}</span>
-    </div>`).join('')}
-  </div>
-  <div style="margin-top:18px">
-  ${uniq.slice(0,14).map(d=>{
-    const dd = Math.ceil((new Date(d.date+'T12:00') - new Date())/86400000);
-    return `<div class="warn-i">
-      <div class="top">
-        <div><span class="dt">${d.date}</span><span class="gz"><span class="e-${elemOfStem(d.ganji[0])}">${H(d.ganji[0])}</span><span class="e-${elemOfBranch(d.ganji[1])}">${H(d.ganji[1])}</span></span>
-        <span style="color:var(--mute);font-size:11px;margin-left:6px">D-${dd}</span></div>
-        <span class="cf">신뢰도 ${d.level} ${(d.confidence*100).toFixed(0)}%</span>
-      </div>
-      <div class="bar"><i style="width:${Math.min(100,Math.abs(d.predicted)/3*100)}%"></i></div>
-      <div class="day-tags">${d.reasons.map(r=>`<span class="tag bad">${r.tag} <span style="color:var(--mute)">n=${r.n}</span></span>`).join('')}</div>
-    </div>`;
-  }).join('')}
-  </div>
-  <div class="note"><b>읽는 법.</b> 이 목록은 예언이 아니라 당신의 기록에서 반복된 패턴입니다.
-  신뢰도는 표본 수와 효과 크기로 계산되며, 어떤 경우에도 90%를 넘기지 않습니다.<br><br>
-  주의일을 미리 알면 그날 실제로 나쁘게 기록할 확률이 올라갑니다(확증편향).
-  판단이 흔들린다고 느끼면 그날도 평소처럼 기록하세요. 데이터가 스스로를 교정합니다.</div>`;
+function invalidateFlowCache() {
+  state.flowCache=new Map(); state.warnSet=new Set(); state.goodSet=new Set(); state.mixedSet=new Set();
 }
 
 function recomputeWarn() {
-  state.warnSet = new Set();
+  invalidateFlowCache();
   if (!state.natal) return;
-  const list = collectSamples();
-  if (list.length < 10) return;
   try {
-    const fc = forecast(natalObj(), list, { days:365, from:new Date() });
-    for (const d of fc.days) if (d.confidence >= 0.35) state.warnSet.add(d.date);
-  } catch(e) {}
+    const fc=getFlowForecast(365,'decision');
+    for(const d of fc.all) {
+      const hasPos=d.empiricalScore>12 || d.positiveReasons.some(x=>x.score>=10);
+      const hasNeg=d.empiricalScore<-12 || d.negativeReasons.some(x=>x.score<=-10);
+      if(d.combinedScore<=-35) state.warnSet.add(d.date);
+      if(d.combinedScore>=28) state.goodSet.add(d.date);
+      if(d.mixed&&hasPos&&hasNeg&&Math.abs(d.combinedScore)<18) {
+        state.warnSet.add(d.date); state.goodSet.add(d.date); state.mixedSet.add(d.date);
+      }
+    }
+  } catch(e) { console.warn('날짜 흐름 재계산 실패',e); }
 }
 
 // ---------- 라우팅 ----------
@@ -3136,7 +3599,7 @@ const TABS = [
   { id:'today', gz:'今', name:'오늘의 만세력' },
   { id:'cal',   gz:'月', name:'월별 만세력 보기' },
   { id:'natal', gz:'命', name:'내 명식' },
-  { id:'warn',  gz:'警', name:'주의 날짜' },
+  { id:'warn',  gz:'運', name:'운의 흐름' },
   { id:'acct',  gz:'戶', name:'계정 · 백업' },
 ];
 
@@ -3203,12 +3666,17 @@ function render() {
       }
       state.natal={y,m,d,h,mi,gender:$('#ig').value}; recomputeWarn(); queueSave(); render();
     };
-    if ($('#reset')) $('#reset').onclick = ()=>{ state.natal=null; state.warnSet=new Set(); queueSave(); render(); };
+    if ($('#reset')) $('#reset').onclick = ()=>{ state.natal=null; invalidateFlowCache(); queueSave(); render(); };
     if ($('#aiGo')) $('#aiGo').onclick = () => {
       const nn = state.natal;
       const bp = computeSaju(fromKST(nn.y, nn.m-1, nn.d, nn.h ?? 12, nn.mi ?? 0), nn.h, nn.mi);
       requestAIInterpretation(bp, analyzeYongsinFull(bp), computeDaeun(bp, fromKST(nn.y, nn.m-1, nn.d, nn.h ?? 12, nn.mi ?? 0), nn.gender), nn);
     };
+  }
+  if (state.tab==='warn') {
+    document.querySelectorAll('[data-flow]').forEach(btn=>btn.onclick=()=>{ state.flowMode=btn.dataset.flow; render(); });
+    if ($('#flowPurpose')) $('#flowPurpose').onchange=e=>{ state.flowPurpose=e.target.value; render(); };
+    if ($('#flowDays')) $('#flowDays').onchange=e=>{ state.flowDays=+e.target.value; render(); };
   }
   if (state.tab==='acct') bindAccount();
 }
@@ -3268,7 +3736,7 @@ function bindAccount() {
   if ($('#alo')) $('#alo').onclick = async () => {
     try { await API.logout(); } catch {}
     state.user=null; state.rev=0; state.sync='off';
-    state.entries={}; state.natal=null; state.warnSet=new Set();
+    state.entries={}; state.natal=null; invalidateFlowCache();
     render();
   };
 
@@ -3286,7 +3754,7 @@ function bindAccount() {
     const p=$('#dp').value;
     if(!p) return err('#derr','비밀번호를 입력해주세요.');
     if(!confirm('정말 계정을 삭제할까요? 모든 기록이 사라지며 되돌릴 수 없습니다.')) return;
-    try { await API.del(p); state.user=null; state.entries={}; state.natal=null; state.rev=0; state.sync='off'; state.tab='today'; render(); }
+    try { await API.del(p); state.user=null; state.entries={}; state.natal=null; state.rev=0; state.sync='off'; state.tab='today'; invalidateFlowCache(); render(); }
     catch(e){ err('#derr', e.message); }
   };
 }
@@ -3347,7 +3815,7 @@ if (!__authListenerBound) {
     try {
       if (event === 'SIGNED_OUT') {
         state.user = null; state.rev = 0; state.sync = 'off';
-        state.entries = {}; state.natal = null; state.warnSet = new Set();
+        state.entries = {}; state.natal = null; invalidateFlowCache();
         render();
         return;
       }
