@@ -426,7 +426,7 @@ button:disabled{opacity:.5;cursor:default}
   display:flex;flex-direction:column}
 .hcell-t{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:var(--mute);
   line-height:1.25;letter-spacing:-.02em}
-#hsheet .sheet-hd .gz{display:flex;align-items:center;gap:8px}
+#hsheet .sheet-hd .gz{display:flex;align-items:center;gap:8px;flex-wrap:wrap;word-break:keep-all}
 #hsGz .e-목,#hsGz .e-화,#hsGz .e-토,#hsGz .e-금,#hsGz .e-수{font-size:19px}
 @media(max-width:520px){
   .hour-grid{grid-template-columns:repeat(4,1fr)}
@@ -1187,12 +1187,19 @@ function extractTags(natal, dayGz, ctx = {}) {
 // ============================================================
 // 통계 집계
 // ============================================================
+function tagsForSample(natal, e) {
+  if (e.scope === 'hour' && e.pillars?.year && e.pillars?.month && e.pillars?.day && e.pillars?.hour) {
+    return extractTimedTags(natal, e.pillars, e.ctx);
+  }
+  return extractTags(natal, e.ganji ?? dayGanji(new Date(e.date)), e.ctx);
+}
+
 function buildStats(natal, entries, opts = {}) {
   const MIN_N = opts.minSamples ?? 3;
   const scored = entries.map(e => ({
     ...e,
     score: composite(e),
-    tags: extractTags(natal, e.ganji ?? dayGanji(new Date(e.date)), e.ctx),
+    tags: tagsForSample(natal, e),
   }));
 
   // 개인 베이스라인
@@ -1235,7 +1242,7 @@ function buildStats(natal, entries, opts = {}) {
 
     // 일주 태그(60종)는 너무 특수해 표본이 절대 모이지 않음.
     // 통계에는 남기되 위험 승격 대상에서 제외 → 계열 태그로 일반화.
-    const tooSpecific = tag.startsWith('일주:');
+    const tooSpecific = tag.startsWith('일주:') || /^시운(?:연주|월주|일주|시주):/.test(tag);
 
     stats.push({
       tag, n, mean: m, delta, effect: d, confidence,
@@ -2253,30 +2260,76 @@ function viewCalendar() {
 // ============================================================
 // 시운별 일기 — 시(時)별 서브 일기
 // 날짜 하나에 12시진(자~해) 각각의 일기를 달 수 있다.
-// 시주의 천간+지지는 날짜(일간)에 따라 달라지므로 매번 계산한다.
+// 시운 기록은 시주 하나만 떼어 저장하지 않고, 선택한 날짜와 시간대를 합쳐
+// 연주·월주·일주·시주 전체 명식을 계산하여 함께 보관한다.
 // ============================================================
 
 // 12지지 순서 (자시 시작)
 const HOUR_BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
 
+// 날짜별 시운 기록에 사용할 대표 시각.
+// 각 구간의 시작 시각을 사용하되, 자시는 해당 양력 날짜 안의 00:30을 사용한다.
+// 예: 2026-07-19 축시 → 2026-07-19 01:30
+const HOUR_REFERENCE_TIMES = {
+  '자':[0,30],  '축':[1,30],  '인':[3,30],  '묘':[5,30],
+  '진':[7,30],  '사':[9,30],  '오':[11,30], '미':[13,30],
+  '신':[15,30], '유':[17,30], '술':[19,30], '해':[21,30],
+};
+
 /**
- * 특정 날짜의 특정 시진에 대한 시주 간지를 구한다.
- * 예: 2026-07-16(신묘일)의 오시 → 갑오시
- *     같은 오시라도 다른 날이면 천간이 바뀐다.
+ * 특정 날짜와 시진을 하나의 실제 KST 날짜·시간으로 합쳐 사주 네 기둥을 계산한다.
+ * 예: 2026-07-19 축시(01:30) → 병오년 을미월 갑오일 을축시
  * @param dateKey 'YYYY-MM-DD'
  * @param branch  '자'~'해'
  */
-function hourPillarFor(dateKey, branch) {
+function hourSajuFor(dateKey, branch) {
   const [y,m,d] = dateKey.split('-').map(Number);
-  // 자시(23:30~)는 일주가 다음날로 넘어가므로, 해당 시진의 대표 시각으로 계산한다.
-  const bi = HOUR_BRANCHES.indexOf(branch);
-  // 각 시진의 중앙 시각(대략) — 자시만 00:30, 나머지는 짝수시 30분
-  const centerH = bi === 0 ? 0 : (bi * 2 + 1);   // 자=0시, 축=3시, 인=5시…
-  const dt = fromKST(y, m-1, d, centerH, 0);
-  const dayShift = dayShiftForHour(centerH, 0);
-  const dayDate = dayShift ? new Date(dt.getTime() + 86400000) : dt;
-  const dayGz = dayGanji(dayDate);
-  return hourGanji(dayGz[0], centerH, 0);
+  const hm = HOUR_REFERENCE_TIMES[branch];
+  if (!y || !m || !d || !hm) throw new Error('유효하지 않은 시운 날짜 또는 시간대입니다.');
+
+  const [hour, minute] = hm;
+  const dt = fromKST(y, m-1, d, hour, minute);
+  const p = computeSaju(dt, hour, minute);
+  const clock = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+
+  return {
+    ...p,
+    dateKey,
+    branch,
+    refHour: hour,
+    refMinute: minute,
+    datetime: `${dateKey} ${clock}`,
+  };
+}
+
+// 기존 호출부 호환용: 전체 명식 중 시주만 반환한다.
+function hourPillarFor(dateKey, branch) {
+  return hourSajuFor(dateKey, branch).hour;
+}
+
+// 신규 데이터는 저장 당시 네 기둥을 보관하고, 구버전 데이터는 날짜·시간대로 재계산한다.
+function timedSajuFromRecord(dateKey, branch, he) {
+  const calculated = hourSajuFor(dateKey, branch);
+  const saved = he && he.saju;
+  const valid = saved && ['year','month','day','hour'].every(k => typeof saved[k] === 'string' && saved[k].length === 2);
+  return valid ? { ...calculated, ...saved } : calculated;
+}
+
+// 시운 통계는 그 시간의 일주를 날짜 흐름에 반영하고, 시주 관계 태그도 별도로 보존한다.
+function extractTimedTags(natal, p, ctx = {}) {
+  const dayTags = extractTags(natal, p.day, ctx);
+  const hourTags = extractTags(natal, p.hour, ctx)
+    .filter(t => !t.startsWith('일주:'))
+    .map(t => `시운:${t}`);
+
+  return [...new Set([
+    ...dayTags,
+    ...hourTags,
+    `시운연주:${p.year}`,
+    `시운월주:${p.month}`,
+    `시운일주:${p.day}`,
+    `시운시주:${p.hour}`,
+  ])];
 }
 
 /**
@@ -2306,15 +2359,22 @@ function collectSamples() {
     if (moodList(v).length || v.body != null) {
       out.push({ date, mood: v.mood, body: v.body, scope: 'day' });
     }
-    // 시별 기록
+    // 시별 기록: 날짜+시간을 합친 네 기둥 전체를 표본에 포함한다.
     const hrs = hourEntries(v);
     for (const [branch, he] of Object.entries(hrs)) {
       if (!hourHasContent(he)) continue;
+      const p = timedSajuFromRecord(date, branch, he);
       out.push({
-        date, branch,
+        date,
+        datetime: he.datetime || p.datetime,
+        branch,
         mood: he.mood, body: he.body,
         scope: 'hour',
-        ganji: hourPillarFor(date, branch),   // 시주 간지를 직접 지정
+        // 날짜 흐름 통계에는 해당 시간의 일주를 사용한다.
+        ganji: p.day,
+        // 시운 추천과 상세 분석에는 시주 및 네 기둥 전체를 사용한다.
+        hourGanji: p.hour,
+        pillars: { year:p.year, month:p.month, day:p.day, hour:p.hour },
       });
     }
   }
@@ -2359,7 +2419,8 @@ function bindBodyPicker(el, selObj) {
 function hourGridHTML(dateKey, hours) {
   return `<div class="hour-grid" id="hourGrid">
     ${HOUR_BRANCHES.map(b=>{
-      const gz = hourPillarFor(dateKey, b);
+      const p = hourSajuFor(dateKey, b);
+      const gz = p.hour;
       const hr = HOUR_RANGES.find(r=>r[0]===b);
       const he = hours[b] || {};
       const has = moodList(he).length>0 || he.body!=null || (he.memo&&he.memo.trim());
@@ -2410,7 +2471,7 @@ function openSheet(k) {
 
     <div class="f-lbl" style="margin-top:26px">시운별 일기 <span class="hint">시간대를 눌러 시(時)별로 기록</span></div>
     <div class="hour-lead" id="hourLead">시(時)를 선택해 그 시간대의 기분·몸상태를 따로 기록할 수 있어요.
-    시주 간지는 날짜에 따라 자동 계산됩니다.</div>
+    선택한 날짜와 시간대를 합쳐 연주·월주·일주·시주 전체를 자동 계산합니다.</div>
     ${hourGridHTML(k, __sheetDraft)}
 
     <button class="btn" id="save">기록 저장</button>
@@ -2449,23 +2510,27 @@ function openSheet(k) {
 
 // ---------- 시별 서브 시트 ----------
 function openHourSheet(dateKey, branch) {
-  const gz = hourPillarFor(dateKey, branch);
+  const p = hourSajuFor(dateKey, branch);
+  const gz = p.hour;
   const hr = HOUR_RANGES.find(r=>r[0]===branch);
   const he = __sheetDraft[branch] || { mood:[], body:null, memo:'' };
   const curMoods = moodList(he);
   let rel = '';
   if (state.natal) {
-    const tags = extractTags(natalObj(), gz);
-    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
+    const nat = natalObj();
+    const dayTags = extractTags(nat, p.day).filter(t=>!t.startsWith('일주:')).map(t=>`일진 ${t}`);
+    const hourTags = extractTags(nat, p.hour).filter(t=>!t.startsWith('일주:')).map(t=>`시운 ${t}`);
+    const bad = t => /(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
     const good = t => /육합|용희신|천을귀인/.test(t);
-    const shown = tags.filter(t=>!t.startsWith('일주:'));
-    if (shown.length) rel = `<div class="f-lbl">이 시주와 내 명식의 관계</div><div class="day-tags">
+    const shown = [...new Set([...dayTags, ...hourTags])];
+    if (shown.length) rel = `<div class="f-lbl">해당 날짜·시간과 내 명식의 관계</div><div class="day-tags">
       ${shown.map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}</div>`;
   }
 
-  $('#hsGz').innerHTML = `${branch}시 <span class="e-${elemOfStem(gz[0])}">${HS(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${HB(gz[1])}</span>`;
-  $('#hsRange').textContent = `${hr[1]} ~ ${hr[2]}`;
+  $('#hsGz').textContent = p.datetime;
+  $('#hsRange').textContent = `${p.year}년 ${p.month}월 ${p.day}일 ${p.hour}시 · ${hr[1]} ~ ${hr[2]}`;
   $('#hsBody').innerHTML = `
+    ${myeongsikHTML(p, true)}
     ${rel}
     <div class="f-lbl">기분 <span class="hint">여러 개 선택 가능</span></div>
     ${moodPickerHTML('hMoods', curMoods)}
@@ -2481,7 +2546,14 @@ function openHourSheet(dateKey, branch) {
   bindBodyPicker($('#hBodies'), hsel);
   $('#hSave').onclick = () => {
     const memo = $('#hMemo').value.trim();
-    __sheetDraft[branch] = { mood: hsel.mood, body: hsel.body, memo };
+    const savedP = hourSajuFor(dateKey, branch);
+    __sheetDraft[branch] = {
+      mood: hsel.mood,
+      body: hsel.body,
+      memo,
+      datetime: savedP.datetime,
+      saju: { year:savedP.year, month:savedP.month, day:savedP.day, hour:savedP.hour },
+    };
     refreshHourGrid(dateKey);
     closeHourSheet();
   };
@@ -3717,8 +3789,8 @@ function recommendHours(dateKey, purpose) {
 
   const scored = [];
   for (const b of HOUR_BRANCHES) {
-    let gz;
-    try { gz = hourPillarFor(dateKey, b); } catch(e) { continue; }
+    let timed, gz;
+    try { timed = hourSajuFor(dateKey, b); gz = timed.hour; } catch(e) { continue; }
     // 명식 관계: 그 시주 지지가 용희신 오행이면 +, 기구신이면 -
     const hourElem = BRANCH_ELEM[BRANCHES.indexOf(gz[1])];
     let sc = 0;
@@ -3730,9 +3802,12 @@ function recommendHours(dateKey, purpose) {
     if (isYukhap(gz[1], full.pillars.day[1])) sc += 1;
     if (isChung(gz[1], full.pillars.day[1])) sc -= 1;
 
-    // 시운 기록 패턴: 그 시(時)에 평소 컨디션이 좋았나
+    // 시운 기록 패턴: 같은 시주(날짜의 일간까지 반영)가 우선이며,
+    // 표본이 부족할 때만 같은 지지 시간대 기록으로 보완한다.
     if (hasHourData) {
-      const same = hourSamples.filter(s => s.branch === b);
+      const samePillar = hourSamples.filter(s => s.hourGanji === timed.hour);
+      const sameBranch = hourSamples.filter(s => s.branch === b);
+      const same = samePillar.length >= 2 ? samePillar : sameBranch;
       if (same.length >= 2) {
         const avg = same.reduce((a,s)=>a+composite(s),0)/same.length;
         sc += Math.max(-2, Math.min(2, avg));
