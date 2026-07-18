@@ -176,7 +176,27 @@ header h2{font-family:'Noto Serif KR',serif;font-weight:500;font-size:15px;lette
 .cell .n{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--paper-dim);line-height:1}
 .cell .gz{font-family:'Noto Serif KR',serif;font-size:13px;margin-top:3px;font-weight:500;line-height:1.15}
 .cell .dots{position:absolute;bottom:4px;display:flex;gap:2.5px}
+.cell.has-rec .dots{bottom:16px}
 .cell .dot{width:4px;height:4px;border-radius:50%}
+.cell .record-marks{
+  position:absolute;left:3px;right:3px;bottom:3px;display:flex;justify-content:center;
+  align-items:center;gap:3px;pointer-events:none;white-space:nowrap;
+}
+.cell .record-mark{
+  min-width:15px;height:11px;padding:0 3px;border-radius:2px;display:inline-flex;align-items:center;
+  justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:7px;line-height:1;letter-spacing:-.03em;
+  border:1px solid var(--line2);background:rgba(31,38,46,.92);color:var(--paper-dim);
+}
+.cell .record-mark.day{border-color:rgba(185,138,62,.55);color:var(--to)}
+.cell .record-mark.hour{border-color:rgba(74,111,165,.58);color:#8FB0D9}
+.cal-record-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px}
+.cal-record-stat{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);padding:9px 5px;text-align:center;
+}
+.cal-record-stat b{display:block;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:var(--paper)}
+.cal-record-stat span{display:block;margin-top:3px;font-size:9px;color:var(--mute);letter-spacing:.04em}
+.cal-record-stat.hour b{color:#8FB0D9}
+.cal-record-stat.day b{color:var(--to)}
 .cell .term{
   position:absolute;top:3px;right:3px;font-size:7.5px;color:var(--to);
   letter-spacing:.02em;
@@ -2172,6 +2192,18 @@ function monthSegments(y, m) {
   return segs;
 }
 
+// 월별 달력 표시용 기록 집계.
+// 날짜 전체 기록과 시간별 기록을 분리해, 시간 기록만 있는 날짜도 빈 칸처럼 보이지 않게 한다.
+function calendarRecordMeta(entry) {
+  if (!entry || typeof entry !== 'object') return { day:false, hours:0, any:false };
+  const day = moodList(entry).length > 0 || entry.body != null || !!(entry.memo && String(entry.memo).trim());
+  const hrs = (entry.hours && typeof entry.hours === 'object') ? entry.hours : {};
+  const hours = Object.values(hrs).filter(he => he && (
+    moodList(he).length > 0 || he.body != null || !!(he.memo && String(he.memo).trim())
+  )).length;
+  return { day, hours, any: day || hours > 0 };
+}
+
 // ---------- 뷰: 캘린더 ----------
 function viewCalendar() {
   const c = state.cal;
@@ -2185,10 +2217,17 @@ function viewCalendar() {
   for (const t of terms) { const kp = kstParts(t.date); if (kp.y===y && kp.m===m) termOn[kp.d] = t.name; }
 
   let cells = '';
+  let monthDayRecords = 0;
+  let monthHourRecords = 0;
+  let monthRecordedDates = 0;
   for (let i=0;i<pad;i++) cells += `<div class="cell pad"></div>`;
   for (let d=1; d<=last.getDate(); d++) {
     const dt = fromKST(y,m,d,12), k = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, gz = dayGanji(dt);
     const e = state.entries[k];
+    const rec = calendarRecordMeta(e);
+    if (rec.day) monthDayRecords++;
+    monthHourRecords += rec.hours;
+    if (rec.any) monthRecordedDates++;
     const isT = k === today;
     const warn = state.warnSet && state.warnSet.has(k);
     const lucky = state.luckSet && state.luckSet.has(k);
@@ -2206,12 +2245,17 @@ function viewCalendar() {
         ${e.memo?`<div class="dot" style="background:var(--mute)"></div>`:''}
       </div>`;
     }
-    cells += `<div class="cell ${isT?'today':''} ${state.sel===k?'sel':''} ${warn?'warn':''} ${lucky&&!mixed?'lucky':''} ${mixed?'mixed':''}" data-d="${k}">
+    const recordMarks = rec.any ? `<div class="record-marks">
+      ${rec.day?`<span class="record-mark day" title="날짜 전체 기록 있음">일</span>`:''}
+      ${rec.hours?`<span class="record-mark hour" title="시간별 기록 ${rec.hours}회">시 ${rec.hours}</span>`:''}
+    </div>` : '';
+    cells += `<div class="cell ${isT?'today':''} ${state.sel===k?'sel':''} ${warn?'warn':''} ${lucky&&!mixed?'lucky':''} ${mixed?'mixed':''} ${rec.any?'has-rec':''}" data-d="${k}">
       ${termOn[d]?`<div class="term">${termOn[d]}</div>`:''}
       ${(lucky||mixed)?`<div class="luck-mark"></div>`:''}
       <div class="n">${d}</div>
       <div class="gz"><span class="e-${elemOfStem(gz[0])}">${HS(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${HB(gz[1])}</span></div>
       ${dots}
+      ${recordMarks}
     </div>`;
   }
 
@@ -2258,9 +2302,15 @@ function viewCalendar() {
     그래서 한 양력 달에 두 개의 월주가 걸칩니다. 시각은 한국 표준시입니다.</div>
   </div>
   ${(y!==nowY||m!==nowKST().m)?'<div class="jump"><button id="tdy">오늘로</button></div>':''}
+  <div class="cal-record-summary" aria-label="이 달의 기록 현황">
+    <div class="cal-record-stat day"><b>${monthDayRecords}</b><span>날짜 기록</span></div>
+    <div class="cal-record-stat hour"><b>${monthHourRecords}</b><span>시간 기록</span></div>
+    <div class="cal-record-stat"><b>${monthRecordedDates}</b><span>기록한 날</span></div>
+  </div>
   <div class="dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
   <div class="grid" id="grid">${cells}</div>
-  <div class="note">날짜를 눌러 만세력 확인과 기록을 남기세요. 점은 기분·몸상태·메모 유무입니다.
+  <div class="note">날짜를 눌러 만세력 확인과 기록을 남기세요. 점은 날짜 전체 기록의 기분·몸상태·메모 유무입니다.<br>
+  하단의 <b style="color:var(--to)">일</b>은 날짜 전체 기록, <b style="color:#8FB0D9">시 숫자</b>는 해당 날짜에 남긴 시간별 기록 횟수입니다.
   ${(state.warnSet && state.warnSet.size)||(state.luckSet && state.luckSet.size) ? '<br>상단 <b style="color:var(--alert)">붉은 선</b>은 주의일, <b style="color:var(--ok)">녹색 선</b>과 모서리 점은 길일입니다. 반반 표시는 혼합 흐름입니다.' : ''}</div>`;
 }
 
