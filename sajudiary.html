@@ -1081,10 +1081,15 @@ function termIndexOf(date) {
 // ---------- 기분 → 점수 ----------
 const MOOD = {
   good:      { label:'기분 좋음',   icon:'😊', score:  2 },
+  energetic: { label:'활기넘침',    icon:'⚡', score:  3 },
+  motivated: { label:'의욕넘침',    icon:'🔥', score:  2 },
   neutral:   { label:'그냥 그럼',   icon:'😐', score:  0 },
+  anxious:   { label:'불안함',      icon:'😰', score: -2 },
   down:      { label:'우울함',      icon:'😞', score: -2 },
+  unmotivated:{ label:'의욕상실',    icon:'🫥', score: -2 },
   irritated: { label:'짜증남',      icon:'😤', score: -2 },
   angry:     { label:'히스테릭/화남',icon:'😡', score: -3 },
+  overwhelmed:{ label:'멘탈나감',   icon:'🤯', score: -3 },
   sensitive: { label:'예민함',      icon:'😖', score: -1 },
 };
 
