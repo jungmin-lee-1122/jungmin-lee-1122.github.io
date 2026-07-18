@@ -370,6 +370,40 @@ button:disabled{opacity:.5;cursor:default}
 .dob .pick::after{right:11px}
 .pick select[aria-label]{width:100%}
 
+
+/* ---------- 상세 풀이 ---------- */
+.interp .interp-sec{padding:16px 0;border-bottom:1px solid var(--line)}
+.interp .interp-sec:first-of-type{padding-top:4px}
+.interp-h{display:flex;align-items:center;gap:9px;font-family:'Noto Serif KR',serif;
+  font-size:14px;letter-spacing:.06em;margin-bottom:11px;color:var(--paper)}
+.interp-n{font-family:'Noto Serif KR',serif;font-size:13px;color:var(--to);
+  border:1px solid rgba(185,138,62,.5);border-radius:3px;width:22px;height:22px;
+  display:inline-flex;align-items:center;justify-content:center;flex:none}
+.interp-p{font-size:13px;line-height:1.95;color:var(--paper-dim);margin-bottom:9px}
+.interp-p:last-child{margin-bottom:0}
+.interp-p b{color:var(--paper)}
+.interp-tip{font-size:12px;line-height:1.8;color:var(--mute);
+  padding:10px 12px;background:var(--ink3);border-radius:var(--r);
+  border-left:2px solid var(--to);margin-top:4px}
+.shin-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px dotted var(--line)}
+.shin-row:last-of-type{border:none}
+.shin-name{font-family:'Noto Serif KR',serif;font-size:13px;color:var(--paper)}
+.shin-mean{font-size:11.5px;color:var(--mute);line-height:1.6}
+.tone{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 7px;border-radius:2px;
+  margin-right:7px;letter-spacing:.06em;vertical-align:middle}
+.tone-순풍{background:rgba(75,158,122,.16);color:#7FC4A4;border:1px solid rgba(75,158,122,.4)}
+.tone-역풍{background:rgba(196,81,75,.14);color:#E0938E;border:1px solid rgba(196,81,75,.4)}
+.tone-보통{background:var(--ink3);color:var(--mute);border:1px solid var(--line)}
+.interp-ai{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.interp-ai .btn{margin-top:0}
+.interp-note{font-size:11px;color:var(--mute);line-height:1.75;margin-top:10px}
+.ai-result{animation:fade .35s}
+.ai-badge{display:inline-block;font-family:'Noto Serif KR',serif;font-size:11px;
+  color:var(--to);border:1px solid rgba(185,138,62,.5);border-radius:2px;
+  padding:3px 9px;letter-spacing:.1em;margin-bottom:12px}
+.ai-p{font-size:13px;line-height:2;color:var(--paper-dim);margin-bottom:12px}
+.ai-p:last-of-type{margin-bottom:8px}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -2230,6 +2264,277 @@ function hourTableHTML(curH, curMi) {
 }
 
 // ---------- 뷰: 내 명식 ----------
+// ============================================================
+// 상세 풀이 — 규칙 기반 명식 해석 엔진
+// 명식의 계산 결과(일간, 오행, 용신, 신살, 대운/세운)를 문장으로 풀어낸다.
+// LLM 없이 즉시 동작하며, "AI 심화" 버튼으로 서버 해석을 덧붙일 수 있다.
+// ============================================================
+
+// 십성별 성격 키워드 (일간 대비 오행 관계)
+const DAYMASTER_TRAITS = {
+  목: { nature:'나무', keyword:'성장과 확장', pos:'추진력이 있고 곧으며 미래를 향해 뻗어가는 기질', neg:'고집이 세고 융통성이 부족해질 수 있는 면', tip:'방향이 막히면 부러지기 쉬우니 유연함을 함께 기르면 좋습니다.' },
+  화: { nature:'불', keyword:'표현과 확산', pos:'밝고 열정적이며 사람을 끌어당기는 기질', neg:'감정 기복이 크고 성급해질 수 있는 면', tip:'타오른 뒤 꺼지지 않도록 꾸준함을 더하면 힘이 오래갑니다.' },
+  토: { nature:'흙', keyword:'포용과 중재', pos:'믿음직하고 두루 품으며 중심을 잡는 기질', neg:'변화를 꺼리고 답답하게 느껴질 수 있는 면', tip:'너무 머무르지 말고 때로 흐름에 몸을 맡기면 좋습니다.' },
+  금: { nature:'쇠', keyword:'결단과 정리', pos:'분명하고 원칙이 서 있으며 마무리가 야무진 기질', neg:'날카롭고 차갑게 비칠 수 있는 면', tip:'단단함이 지나치면 부러지니 부드러움을 덧대면 좋습니다.' },
+  수: { nature:'물', keyword:'지혜와 유연', pos:'총명하고 임기응변에 능하며 상황에 잘 스며드는 기질', neg:'속을 알기 어렵고 마음이 흔들리기 쉬운 면', tip:'흐름에 휩쓸리지 않도록 중심을 잡아두면 좋습니다.' },
+};
+
+const ELEM_ROLE_LABEL = {
+  same:'비겁(같은 기운, 자기 세력)',
+  gen:'인성(나를 돕는 기운)',
+  drain:'식상(내가 표현하는 기운)',
+  ctrl:'재성(내가 다루는 기운)',
+  ovr:'관성(나를 다스리는 기운)',
+};
+
+function elemRole(me, e) {
+  if (e === me) return 'same';
+  if (e === GEN_OF[me]) return 'gen';
+  if (e === DRAIN[me]) return 'drain';
+  if (e === CTRL[me]) return 'ctrl';
+  if (e === OVR_OF[me]) return 'ovr';
+  return null;
+}
+
+// 신살별 짧은 의미
+const SHINSAL_MEANING = {
+  천을귀인:'하늘이 돕는 귀인. 어려울 때 뜻밖의 도움을 받는 복.',
+  도화:'사람을 끄는 매력. 인기와 이성 인연이 따르나 구설도 함께.',
+  역마:'움직임과 이동의 기운. 여행·이주·변동이 잦고 활동적.',
+  화개:'예술과 종교, 고독의 별. 깊이 파고드는 재능이 있음.',
+  양인:'강한 칼의 기운. 결단력과 추진력이 크나 과하면 다툼.',
+  백호:'격렬한 기운. 강렬한 추진력이나 사고·충돌을 조심.',
+  괴강:'우두머리의 기상. 카리스마가 크나 극단으로 치우치기 쉬움.',
+};
+
+/**
+ * 명식 전체를 구조화된 풀이 데이터로 변환.
+ * viewNatal이 이미 계산한 p, ys, du를 받아서 재사용한다.
+ */
+function buildInterpretation(p, ys, du, natal) {
+  const me = ys.me;
+  const dt = DAYMASTER_TRAITS[me];
+  const total = ys.total || Object.values(ys.count).reduce((a,b)=>a+b,0);
+
+  // --- 1. 일간·성격 기질 ---
+  const neutral = !ys.extreme && ys.score >= 1.8 && ys.score < 2.8;
+  const strengthWord = ys.extreme === 'super_strong' ? '매우 강한'
+    : ys.extreme === 'super_weak' ? '매우 약한'
+    : neutral ? '강약이 엇비슷한(중화에 가까운)'
+    : ys.strong ? '강한' : '약한';
+  const daymaster = {
+    stem: p.day[0],
+    elem: me,
+    title: `${p.day[0]}(${me}) 일간 — ${dt.nature}의 기질`,
+    body: `당신은 ${dt.nature}에 비유되는 ${me} 일간입니다. ${dt.keyword}을(를) 본질로 하며, ${dt.pos}이 있습니다. `
+      + `사주 안에서 일간의 힘은 ${strengthWord} 편입니다(득령 ${ys.deukryeong?'○':'×'}·득지 ${ys.deukji?'○':'×'}·득세 ${ys.deukse?'○':'×'}, ${ys.score.toFixed(1)}/4). `
+      + (neutral
+          ? `강하지도 약하지도 않은 균형에 가까워, 상황에 따라 유연하게 대응하는 힘이 있습니다. 어느 한쪽으로 치우친 운이 올 때 그 영향을 특히 잘 탑니다.`
+          : ys.strong
+          ? `기운이 넉넉하니 밖으로 펼치고 나눠주는 쪽이 잘 맞습니다. 다만 ${dt.neg}은 주의가 필요합니다.`
+          : `기운이 여유롭지 않으니 무리하기보다 돕는 환경과 사람을 곁에 두는 편이 좋습니다. ${dt.neg}이 드러날 수 있어 스스로를 돌보는 습관이 중요합니다.`),
+    tip: dt.tip,
+  };
+
+  // --- 2. 오행 균형과 보완법 ---
+  const sorted = Object.entries(ys.count).sort((a,b)=>b[1]-a[1]);
+  const strongest = sorted[0], weakest = sorted[sorted.length-1];
+  const missing = Object.entries(ys.count).filter(([,v])=>v < total*0.08).map(([e])=>e);
+  const balance = {
+    title: '오행의 균형',
+    strongest: strongest[0], weakest: weakest[0],
+    missing,
+    body: `오행 중 <b class="e-${strongest[0]}">${strongest[0]}</b>이(가) 가장 강하고(${strongest[1].toFixed(1)}), `
+      + `<b class="e-${weakest[0]}">${weakest[0]}</b>이(가) 가장 약합니다(${weakest[1].toFixed(1)}). `
+      + (missing.length
+          ? `특히 ${missing.map(e=>`<b class="e-${e}">${e}</b>`).join('·')} 기운이 거의 없어, 그 오행이 상징하는 영역(${missing.map(e=>ELEM_ROLE_LABEL[elemRole(me,e)]||e).join(', ')})에서 아쉬움이 생기기 쉽습니다.`
+          : `오행이 비교적 고루 갖춰져 큰 결핍은 없습니다.`),
+    remedy: `부족한 <b class="e-${weakest[0]}">${weakest[0]}</b>을(를) 보완하려면, 색·방위·생활 습관에서 그 기운을 가까이 하면 도움이 됩니다. `
+      + `(${weakest[0]}: ${ELEM_ADVICE[weakest[0]]})`,
+  };
+
+  // --- 3. 용신 활용 조언 ---
+  const yong = ys.yongsin[0];
+  const yongRole = yong ? ELEM_ROLE_LABEL[elemRole(me, yong)] : '';
+  const useful = {
+    title: '용신 활용법',
+    yongsin: ys.yongsin, huisin: ys.huisin, gisin: ys.gisin, gusin: ys.gusin,
+    body: yong
+      ? `당신에게 가장 이로운 기운(용신)은 <b class="e-${yong}">${yong}</b>입니다. ${ys.primary}을(를) 기준으로 정해졌습니다. `
+        + `${yong}은(는) 당신에게 ${yongRole} 역할을 하며, 이 기운이 살아날 때 일이 풀리고 컨디션이 좋아집니다. `
+        + (ys.huisin.length?`이를 돕는 희신 <b class="e-${ys.huisin[0]}">${ys.huisin[0]}</b>도 함께 챙기면 좋습니다. `:'')
+        + `반대로 기신 <b class="e-${ys.gisin[0]}">${ys.gisin[0]}</b>이(가) 강해지는 때·환경은 피하는 편이 유리합니다.`
+      : '용신이 뚜렷하게 잡히지 않는 구조입니다. 특정 기운에 기대기보다 전체 균형을 살피는 편이 좋습니다.',
+    advice: yong ? `실천 팁 — ${ELEM_ADVICE[yong]} 이런 것들이 ${yong} 기운을 북돋웁니다.` : '',
+  };
+
+  // --- 4. 신살·대운·세운 해석 ---
+  const shinList = [];
+  for (const [nm,gz] of [['년',p.year],['월',p.month],['일',p.day],['시',p.hour]]) {
+    if(!gz) continue;
+    for (const s of shinsal(p.day[0], p.day[1], gz[1], gz))
+      shinList.push({ pos:nm, name:s, meaning: SHINSAL_MEANING[s] || '' });
+  }
+  const nowY = nowKST().y;
+  const age = nowY - natal.y + 1;
+  const curDae = [...du.list].reverse().find(x => age >= x.age) || du.list[0];
+  const seun = yearGanjiRaw(nowY);
+  const daeElem = elemOfStem(curDae.gz[0]);
+  const seElem = elemOfStem(seun[0]);
+  const daeGood = ys.yongsin.includes(daeElem) || ys.huisin.includes(daeElem);
+  const daeBad = ys.gisin.includes(daeElem) || ys.gusin.includes(daeElem);
+  const seGood = ys.yongsin.includes(seElem) || ys.huisin.includes(seElem);
+  const seBad = ys.gisin.includes(seElem) || ys.gusin.includes(seElem);
+
+  const fortune = {
+    title: '신살 · 대운 · 세운',
+    shinsal: shinList,
+    daeun: {
+      gz: curDae.gz, age: curDae.age, elem: daeElem,
+      tone: daeGood?'순풍':daeBad?'역풍':'보통',
+      body: `지금은 ${curDae.age}세부터 시작된 <b>${curDae.gz}</b> 대운 안에 있습니다. `
+        + `대운의 천간 ${curDae.gz[0]}(${daeElem})은(는) `
+        + (daeGood?`당신의 용희신에 해당해, 이 10년은 흐름을 타기 좋은 시기입니다. 하고 싶은 일을 펼쳐볼 만합니다.`
+           :daeBad?`당신의 기구신에 해당해, 이 10년은 다소 버거울 수 있습니다. 무리한 확장보다 내실을 다지는 편이 좋습니다.`
+           :`용신도 기신도 아니라, 큰 굴곡 없이 흘러가는 무난한 시기입니다.`),
+    },
+    seun: {
+      gz: seun, year: nowY, elem: seElem,
+      tone: seGood?'순풍':seBad?'역풍':'보통',
+      body: `올해(${nowY}년)는 <b>${seun}</b> 세운입니다. 세운 천간 ${seun[0]}(${seElem})은(는) `
+        + (seGood?`용희신에 들어, 새로운 시도나 결정에 힘이 실리는 해입니다.`
+           :seBad?`기구신에 들어, 조심스럽게 움직이는 편이 좋은 해입니다. 건강과 관계를 특히 살피세요.`
+           :`무난한 흐름의 해입니다.`),
+    },
+  };
+
+  return { daymaster, balance, useful, fortune };
+}
+
+// 오행별 보완 조언 (색·방위·생활)
+const ELEM_ADVICE = {
+  목:'초록색, 동쪽 방위, 나무·식물, 산책과 새벽 활동',
+  화:'붉은색, 남쪽 방위, 햇빛과 밝은 조명, 사람들과의 활발한 교류',
+  토:'노란색·황토색, 중앙, 흙과 도자기, 규칙적인 생활과 안정된 공간',
+  금:'흰색·금속색, 서쪽 방위, 금속 소품, 정리정돈과 마무리 습관',
+  수:'검정·남색, 북쪽 방위, 물과 가까운 곳, 충분한 수면과 사색',
+};
+
+
+// ============================================================
+// 상세 풀이 렌더 + AI 심화
+// ============================================================
+function interpretationHTML(p, ys, du, natal) {
+  const I = buildInterpretation(p, ys, du, natal);
+
+  const section = (num, title, inner) => `
+    <div class="interp-sec">
+      <div class="interp-h"><span class="interp-n">${num}</span>${title}</div>
+      ${inner}
+    </div>`;
+
+  const shinHTML = I.fortune.shinsal.length
+    ? I.fortune.shinsal.map(s=>`<div class="shin-row">
+        <span class="shin-name">${s.pos}지 ${s.name}</span>
+        <span class="shin-mean">${s.meaning}</span></div>`).join('')
+    : '<div class="interp-p" style="color:var(--mute)">특별히 잡히는 신살이 없습니다. 무난한 구성입니다.</div>';
+
+  return `<div class="card interp">
+    <h3>상세 풀이</h3>
+
+    ${section('一', I.daymaster.title, `
+      <div class="interp-p">${I.daymaster.body}</div>
+      <div class="interp-tip">${I.daymaster.tip}</div>`)}
+
+    ${section('二', I.balance.title, `
+      <div class="interp-p">${I.balance.body}</div>
+      <div class="interp-tip">${I.balance.remedy}</div>`)}
+
+    ${section('三', I.useful.title, `
+      <div class="interp-p">${I.useful.body}</div>
+      ${I.useful.advice?`<div class="interp-tip">${I.useful.advice}</div>`:''}`)}
+
+    ${section('四', I.fortune.title, `
+      ${shinHTML}
+      <div class="interp-p" style="margin-top:12px">
+        <span class="tone tone-${I.fortune.daeun.tone}">${I.fortune.daeun.tone}</span>
+        ${I.fortune.daeun.body}</div>
+      <div class="interp-p">
+        <span class="tone tone-${I.fortune.seun.tone}">${I.fortune.seun.tone}</span>
+        ${I.fortune.seun.body}</div>`)}
+
+    <div class="interp-ai" id="aiZone">
+      <button class="btn ghost" id="aiGo">AI로 더 깊이 풀어보기</button>
+      <div class="interp-note">위 풀이는 명식 데이터로 자동 생성한 기본 해석입니다.
+      버튼을 누르면 AI가 네 기둥의 상호작용까지 엮어 더 자세히 풀어줍니다.</div>
+    </div>
+
+    <div class="note" style="margin-top:14px">이 풀이는 참고용입니다. 명리는 해석이 갈리는 분야이며,
+    같은 명식도 보는 사람에 따라 달리 읽힐 수 있습니다.</div>
+  </div>`;
+}
+
+// AI 심화 — Supabase Edge Function 호출 (없으면 안내)
+async function requestAIInterpretation(p, ys, du, natal) {
+  const zone = document.querySelector('#aiZone');
+  const btn = document.querySelector('#aiGo');
+  if (btn) { btn.disabled = true; btn.textContent = 'AI가 풀이 중…'; }
+
+  // 명식을 구조화해 서버로 넘긴다 (원문 그대로가 아니라 계산 결과만)
+  const payload = {
+    pillars: { year:p.year, month:p.month, day:p.day, hour:p.hour },
+    dayMaster: ys.me,
+    strength: { score: ys.score, strong: ys.strong, extreme: ys.extreme,
+      deukryeong: ys.deukryeong, deukji: ys.deukji, deukse: ys.deukse },
+    elements: ys.count,
+    yongsin: ys.yongsin, huisin: ys.huisin, gisin: ys.gisin, gusin: ys.gusin,
+    primary: ys.primary,
+    daeun: du.list.map(x=>({ age:x.age, gz:x.gz })),
+    currentYear: nowKST().y,
+    birth: { y:natal.y, m:natal.m, d:natal.d, h:natal.h, gender:natal.gender },
+  };
+
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/interpret`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || SUPABASE_KEY}`,
+        'apikey': SUPABASE_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const msg = res.status === 404
+        ? 'AI 풀이 기능이 아직 서버에 준비되지 않았습니다. (interpret 함수 미배포)'
+        : `AI 풀이를 불러오지 못했습니다. (오류 ${res.status})`;
+      throw new Error(msg);
+    }
+
+    const out = await res.json();
+    const text = out.text || out.interpretation || '';
+    if (!text) throw new Error('AI가 빈 응답을 보냈습니다.');
+
+    // 문단 단위로 안전하게 렌더 (HTML 주입 방지)
+    const paras = text.split(/\n{2,}/).map(pr =>
+      `<p class="ai-p">${esc(pr).replace(/\n/g,'<br>')}</p>`).join('');
+    zone.innerHTML = `<div class="ai-result">
+      <div class="ai-badge">AI 심화 풀이</div>
+      ${paras}
+      <div class="interp-note">AI가 생성한 해석입니다. 참고용으로만 봐주세요.</div>
+    </div>`;
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'AI로 더 깊이 풀어보기'; }
+    const warn = document.createElement('div');
+    warn.className = 'err';
+    warn.textContent = e.message;
+    zone.appendChild(warn);
+  }
+}
+
+
 function viewNatal() {
   if (!state.natal) return natalForm();
   const n = state.natal;
@@ -2278,6 +2583,7 @@ function viewNatal() {
       return `<div class="luck-i ${yy===nowY?'now':''}"><div class="age">${yy}</div>
       <div class="g"><span class="e-${elemOfStem(g[0])}">${H(g[0])}</span><br><span class="e-${elemOfBranch(g[1])}">${H(g[1])}</span></div></div>`;}).join('')}</div>
   </div>
+  ${interpretationHTML(p, ys, du, n)}
   <button class="btn ghost" id="reset">명식 다시 입력</button>`;
 }
 
@@ -2670,6 +2976,11 @@ function render() {
       state.natal={y,m,d,h,mi,gender:$('#ig').value}; recomputeWarn(); queueSave(); render();
     };
     if ($('#reset')) $('#reset').onclick = ()=>{ state.natal=null; state.warnSet=new Set(); queueSave(); render(); };
+    if ($('#aiGo')) $('#aiGo').onclick = () => {
+      const nn = state.natal;
+      const bp = computeSaju(fromKST(nn.y, nn.m-1, nn.d, nn.h ?? 12, nn.mi ?? 0), nn.h, nn.mi);
+      requestAIInterpretation(bp, analyzeYongsinFull(bp), computeDaeun(bp, fromKST(nn.y, nn.m-1, nn.d, nn.h ?? 12, nn.mi ?? 0), nn.gender), nn);
+    };
   }
   if (state.tab==='acct') bindAccount();
 }
