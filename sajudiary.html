@@ -436,6 +436,17 @@ button:disabled{opacity:.5;cursor:default}
 .hcell:hover{border-color:var(--line2)}
 .hcell:focus-visible{outline:2px solid var(--to);outline-offset:2px}
 .hcell.has{border-color:var(--to);background:rgba(185,138,62,.1)}
+.hcell.current{
+  border-color:#E7B85C;background:linear-gradient(180deg,rgba(231,184,92,.2),rgba(185,138,62,.08));
+  box-shadow:0 0 0 1px rgba(231,184,92,.45),0 0 16px rgba(231,184,92,.16);
+}
+.hcell.current .hcell-nm{color:#F4D28E;font-weight:700}
+.hcell-now{
+  position:absolute;top:-7px;left:50%;transform:translateX(-50%);z-index:1;
+  padding:2px 6px;border-radius:8px;background:#E7B85C;color:var(--ink);
+  font-family:'Gowun Batang',serif;font-size:8px;font-weight:700;line-height:1.2;
+  letter-spacing:.05em;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.32);
+}
 .hcell-chk{
   position:absolute;top:4px;right:5px;width:13px;height:13px;border-radius:2px;
   border:1px solid var(--line2);font-size:9px;line-height:12px;color:var(--ink);
@@ -2523,6 +2534,9 @@ function bindBodyPicker(el, selObj) {
 
 // 시운별 그리드 (스크린샷 참고: 체크박스 + 간지 + 시각범위)
 function hourGridHTML(dateKey, hours) {
+  const now = nowKST();
+  const todayKey = `${now.y}-${String(now.m+1).padStart(2,'0')}-${String(now.d).padStart(2,'0')}`;
+  const currentBranch = dateKey === todayKey ? hourBranchName(now.h, now.mi) : null;
   return `<div class="hour-grid" id="hourGrid">
     ${HOUR_BRANCHES.map(b=>{
       const p = hourSajuFor(dateKey, b);
@@ -2530,7 +2544,10 @@ function hourGridHTML(dateKey, hours) {
       const hr = HOUR_RANGES.find(r=>r[0]===b);
       const he = hours[b] || {};
       const has = moodList(he).length>0 || he.body!=null || (he.memo&&he.memo.trim());
-      return `<div class="hcell ${has?'has':''}" data-b="${b}" role="button" tabindex="0" aria-pressed="${has}">
+      const isCurrent = b === currentBranch;
+      return `<div class="hcell ${has?'has':''} ${isCurrent?'current':''}" data-b="${b}" role="button" tabindex="0"
+        aria-pressed="${has}" aria-label="${b}시 ${hr[1]}~${hr[2]}${isCurrent?', 현재 시간대':''}">
+        ${isCurrent?'<div class="hcell-now">현재</div>':''}
         <div class="hcell-chk">${has?'✓':''}</div>
         <div class="hcell-nm">${b}시</div>
         <div class="hcell-gz">
