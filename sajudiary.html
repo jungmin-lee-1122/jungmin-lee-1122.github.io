@@ -3305,16 +3305,16 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
     if (natalFullObj.yongsin.includes(sElem)) {
       raw += 22 * bg.factor;
-      positiveReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 용신 배경을 만듭니다.`, weight:bg.factor });
+      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 용신 배경을 만듭니다.`, weight:bg.factor });
     } else if (natalFullObj.huisin.includes(sElem)) {
       raw += 12 * bg.factor;
-      positiveReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 희신으로 보조합니다.`, weight:bg.factor*0.7 });
+      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 희신으로 보조합니다.`, weight:bg.factor*0.7 });
     } else if (natalFullObj.gisin.includes(sElem)) {
       raw -= 22 * bg.factor;
-      negativeReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 기신 배경을 강화합니다.`, weight:bg.factor });
+      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 기신 배경을 강화합니다.`, weight:bg.factor });
     } else if (natalFullObj.gusin.includes(sElem)) {
       raw -= 12 * bg.factor;
-      negativeReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
+      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
     }
 
     if (natalFullObj.yongsin.includes(bElem)) raw += 8 * bg.factor;
@@ -3348,7 +3348,7 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
     if (rel) {
       raw += relScore * factor;
-      const text = `그날 ${aName} ${aGz}와 ${bName} ${bGz}가 ${rel} 관계`;
+      const text = `${aName} ${aGz}와 ${bName} ${bGz}가 ${rel} 관계`;
       if (relScore < 0) negativeReasons.push({ src:'명식', text:`${text}라 날짜 내부 흐름이 부딪힙니다.`, weight:Math.abs(relScore/8)*factor });
       else positiveReasons.push({ src:'명식', text:`${text}로 날짜 내부 흐름이 이어집니다.`, weight:(relScore/8)*factor });
     }
@@ -3968,11 +3968,13 @@ function buildReasonLines(r, mode) {
   const lines = [];
   const seen = new Set();
   const add = (src, text) => {
-    const fam = text.replace(/[0-9.]/g,'').slice(0,10);
+    // 사유 생성부나 과거 데이터에 "그날"이 남아 있어도 화면에는 노출하지 않는다.
+    const cleanText = String(text).replace(/^\s*그날\s*/, '');
+    const fam = cleanText.replace(/[0-9.]/g,'').slice(0,10);
     if (seen.has(fam)) return;
     seen.add(fam);
     const cls = src==='내 기록'?'src-emp':src==='대운·세운'?'src-luck':'src-natal';
-    lines.push(`<div class="reason"><span class="src ${cls}">${src}</span>${esc(text)}</div>`);
+    lines.push(`<div class="reason"><span class="src ${cls}">${src}</span>${esc(cleanText)}</div>`);
   };
 
   // 개인 기록 이유
