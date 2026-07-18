@@ -1,0 +1,3379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>만세력 일기</title>
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="apple-touch-icon" href="./favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1114; --ink2:#161B21; --ink3:#1F262E;
+  --line:#2C353F; --line2:#3A4552;
+  --paper:#E8E2D4; --paper-dim:#A9A294; --mute:#6B7683;
+  --mok:#4B9E7A; --hwa:#C4514B; --to:#B98A3E; --geum:#C9C6BE; --su:#4A6FA5;
+  --alert:#C4514B; --ok:#4B9E7A;
+  --r:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--ink);color:var(--paper);
+  font-family:'Gowun Batang',serif;
+  min-height:100vh;overflow-x:hidden;
+}
+#app{display:flex;min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40}
+#scrim.on{opacity:1;pointer-events:auto}
+aside{
+  position:fixed;top:0;left:0;bottom:0;width:270px;background:var(--ink2);
+  border-right:1px solid var(--line);z-index:50;
+  transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;padding:22px 0;
+}
+aside.on{transform:none}
+.brand{padding:0 22px 20px;border-bottom:1px solid var(--line)}
+.brand h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:19px;letter-spacing:.14em}
+.brand p{font-size:11px;color:var(--mute);margin-top:5px;letter-spacing:.08em}
+nav{padding:14px 0;flex:1}
+.nav-i{
+  display:flex;align-items:center;gap:12px;padding:13px 22px;cursor:pointer;
+  border-left:2px solid transparent;color:var(--paper-dim);font-size:14px;transition:.15s;
+}
+.nav-i:hover{background:var(--ink3);color:var(--paper)}
+.nav-i.on{border-left-color:var(--to);color:var(--paper);background:var(--ink3)}
+.nav-i .gz{font-family:'Noto Serif KR',serif;font-size:15px;color:var(--to);width:18px;text-align:center}
+.nav-i.on .gz{color:var(--to)}
+.nav-note{padding:14px 22px;border-top:1px solid var(--line);font-size:10.5px;color:var(--mute);line-height:1.7}
+
+/* ---------- Main ---------- */
+main{flex:1;min-width:0;padding:0 0 60px}
+header{
+  position:sticky;top:0;z-index:30;background:rgba(14,17,20,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:14px 20px;
+}
+.burger{width:24px;height:16px;position:relative;cursor:pointer;flex:none}
+.burger i{position:absolute;left:0;right:0;height:1.5px;background:var(--paper);transition:.25s}
+.burger i:nth-child(1){top:0}.burger i:nth-child(2){top:7px}.burger i:nth-child(3){top:14px}
+header h2{font-family:'Noto Serif KR',serif;font-weight:500;font-size:15px;letter-spacing:.1em}
+.view{padding:26px 20px;max-width:940px;margin:0 auto;animation:fade .35s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
+/* ---------- 명식판 (signature) ---------- */
+.myeongsik{display:flex;gap:8px;justify-content:center;margin:0 auto}
+.pillar{flex:1;max-width:112px;min-width:0}
+.pillar-cap{
+  text-align:center;font-size:10.5px;color:var(--mute);letter-spacing:.22em;
+  padding-bottom:9px;border-bottom:1px solid var(--line);margin-bottom:10px;
+}
+.gzbox{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);
+  padding:14px 6px;text-align:center;position:relative;overflow:hidden;
+}
+.gzbox+.gzbox{margin-top:6px}
+.gzbox .ch{
+  font-family:'Noto Serif KR',serif;font-weight:700;
+  font-size:clamp(30px,8.4vw,42px);line-height:1.05;display:block;
+}
+.gzbox .ko{font-size:10.5px;color:var(--paper-dim);margin-top:5px;letter-spacing:.1em}
+.gzbox .tg{font-size:9.5px;color:var(--mute);margin-top:2px}
+.e-목{color:var(--mok)}.e-화{color:var(--hwa)}.e-토{color:var(--to)}
+.e-금{color:var(--geum)}.e-수{color:var(--su)}
+.b-목{border-color:rgba(75,158,122,.4)}.b-화{border-color:rgba(196,81,75,.4)}
+.b-토{border-color:rgba(185,138,62,.4)}.b-금{border-color:rgba(201,198,190,.32)}
+.b-수{border-color:rgba(74,111,165,.4)}
+.hidden-row{
+  margin-top:6px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--ink2);padding:9px 5px;text-align:center;
+}
+.hidden-row .lbl{font-size:9px;color:var(--mute);letter-spacing:.14em;margin-bottom:5px}
+.hidden-row .hg{font-family:'Noto Serif KR',serif;font-size:13px;line-height:1.6}
+.hidden-row .hg small{font-size:8.5px;color:var(--mute);margin-left:1px}
+
+/* ---------- 오늘 ---------- */
+.today-date{text-align:center;margin-bottom:22px}
+.today-date .d{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mute);letter-spacing:.16em}
+.today-date .big{font-family:'Noto Serif KR',serif;font-size:26px;font-weight:500;margin-top:7px;letter-spacing:.05em}
+.term-strip{
+  display:flex;justify-content:center;gap:8px;margin-top:12px;font-size:10.5px;color:var(--mute);
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;flex-wrap:wrap;
+}
+.term-strip b{color:var(--to);font-weight:500}
+
+/* ---------- 캘린더 ---------- */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav button{
+  background:var(--ink2);border:1px solid var(--line);color:var(--paper);
+  width:34px;height:34px;border-radius:var(--r);cursor:pointer;font-size:15px;
+}
+.cal-nav button:hover{border-color:var(--line2)}
+.cal-nav .t{font-family:'Noto Serif KR',serif;font-size:16px;letter-spacing:.08em;
+  display:flex;flex-direction:column;align-items:center;gap:3px}
+.cal-nav .t small{color:var(--to);font-size:11.5px;letter-spacing:.14em}
+.picks{display:flex;align-items:center;gap:6px}
+.pick{position:relative}
+.pick select{
+  appearance:none;-webkit-appearance:none;
+  background:transparent;border:1px solid transparent;border-radius:var(--r);
+  color:var(--paper);font-family:'Noto Serif KR',serif;font-size:16px;
+  letter-spacing:.06em;padding:3px 19px 3px 7px;cursor:pointer;
+  transition:.14s;text-align:center;
+}
+.pick select:hover{border-color:var(--line2);background:var(--ink2)}
+.pick select:focus{outline:none;border-color:var(--to);background:var(--ink2)}
+.pick::after{
+  content:'';position:absolute;right:7px;top:50%;margin-top:-1.5px;
+  width:5px;height:5px;border-right:1.5px solid var(--mute);border-bottom:1.5px solid var(--mute);
+  transform:rotate(45deg) translateY(-2px);pointer-events:none;
+}
+.pick select option{background:var(--ink2);color:var(--paper);font-size:14px}
+.gzline{display:flex;align-items:center;gap:6px;justify-content:center}
+.info{
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--line2);
+  background:none;color:var(--mute);font-family:'IBM Plex Mono',monospace;
+  font-size:9px;line-height:1;cursor:pointer;padding:0;transition:.14s;
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+}
+.info:hover,.info.on{border-color:var(--to);color:var(--to)}
+.info:focus-visible{outline:2px solid var(--to);outline-offset:2px}
+.pop{
+  max-width:400px;margin:10px auto 16px;background:var(--ink2);
+  border:1px solid var(--line2);border-radius:var(--r);padding:14px;
+  animation:pop .18s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+.pop-hd{font-size:10px;color:var(--mute);letter-spacing:.16em;margin-bottom:11px}
+.seg{padding:9px 0;border-bottom:1px solid var(--line)}
+.seg:last-of-type{border:none}
+.seg-gz{font-family:'Noto Serif KR',serif;font-size:17px;letter-spacing:.04em;display:flex;align-items:baseline;gap:8px}
+.seg-ko{font-size:11px;color:var(--paper-dim);letter-spacing:.06em}
+.seg-range{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--paper);margin-top:5px;letter-spacing:.02em}
+.seg-term{font-size:10.5px;color:var(--to);margin-top:3px;letter-spacing:.03em}
+.pop-note{font-size:10px;color:var(--mute);line-height:1.75;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+.jump{display:flex;justify-content:center;margin:-6px 0 14px}
+.jump button{
+  background:none;border:1px solid var(--line);color:var(--mute);
+  border-radius:var(--r);padding:5px 13px;font-family:'Gowun Batang',serif;
+  font-size:11px;letter-spacing:.1em;cursor:pointer;transition:.14s;
+}
+.jump button:hover{border-color:var(--to);color:var(--to)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:5px}
+.dow div{text-align:center;font-size:10px;color:var(--mute);letter-spacing:.1em;padding:5px 0}
+.dow div:first-child{color:var(--hwa)}.dow div:last-child{color:var(--su)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cell{
+  aspect-ratio:1/1.16;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--ink2);padding:5px 3px 3px;cursor:pointer;position:relative;
+  display:flex;flex-direction:column;align-items:center;transition:.12s;
+}
+.cell:hover{border-color:var(--line2);background:var(--ink3)}
+.cell.pad{opacity:.22;pointer-events:none}
+.cell.today{border-color:var(--to);box-shadow:0 0 0 1px rgba(185,138,62,.28)}
+.cell.sel{background:var(--ink3);border-color:var(--paper-dim)}
+.cell .n{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--paper-dim);line-height:1}
+.cell .gz{font-family:'Noto Serif KR',serif;font-size:13px;margin-top:3px;font-weight:500;line-height:1.15}
+.cell .dots{position:absolute;bottom:4px;display:flex;gap:2.5px}
+.cell .dot{width:4px;height:4px;border-radius:50%}
+.cell .term{
+  position:absolute;top:3px;right:3px;font-size:7.5px;color:var(--to);
+  letter-spacing:.02em;
+}
+.cell.warn::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--alert);
+  border-radius:var(--r) var(--r) 0 0;
+}
+
+/* ---------- 기록 패널 ---------- */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:60;opacity:0;pointer-events:none;transition:.25s}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--ink2);
+  border-top:1px solid var(--line2);border-radius:12px 12px 0 0;
+  max-height:88vh;overflow-y:auto;transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 0 30px;
+}
+.sheet.on{transform:none}
+.sheet-hd{
+  position:sticky;top:0;background:var(--ink2);padding:16px 20px 13px;
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;
+}
+.sheet-hd .dt{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mute);letter-spacing:.1em}
+.sheet-hd .gz{font-family:'Noto Serif KR',serif;font-size:17px;margin-top:4px;letter-spacing:.08em}
+.sheet-hd button{background:none;border:none;color:var(--mute);font-size:22px;cursor:pointer;line-height:1}
+.sheet-body{padding:20px}
+.grab{width:34px;height:3px;background:var(--line2);border-radius:2px;margin:8px auto 0}
+.f-lbl{font-size:11px;color:var(--mute);letter-spacing:.16em;margin:22px 0 11px}
+.f-lbl:first-child{margin-top:0}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.mood{
+  border:1px solid var(--line);background:var(--ink3);border-radius:var(--r);
+  padding:12px 4px;text-align:center;cursor:pointer;transition:.14s;position:relative;
+}
+.mood:hover{border-color:var(--line2)}
+.mood.on{border-color:var(--to);background:rgba(185,138,62,.11)}
+.mood:focus-visible{outline:2px solid var(--to);outline-offset:2px}
+.mood::after{
+  content:'';position:absolute;top:5px;right:5px;width:11px;height:11px;
+  border:1px solid var(--line2);border-radius:2px;opacity:0;transition:.14s;
+}
+.mood.on::after{
+  opacity:1;border-color:var(--to);background:var(--to);
+  background-image:linear-gradient(45deg,transparent 46%,var(--ink) 46%,var(--ink) 54%,transparent 54%),
+    linear-gradient(-45deg,transparent 46%,var(--ink) 46%,var(--ink) 54%,transparent 54%);
+}
+.mood:hover::after{opacity:1}
+.hint{color:var(--mute);font-size:10px;letter-spacing:.02em;margin-left:6px}
+.mood .em{font-size:23px;display:block;line-height:1}
+.mood .nm{font-size:10px;color:var(--paper-dim);margin-top:6px;display:block}
+.mood.on .nm{color:var(--paper)}
+.bodies{display:flex;gap:7px}
+.bd{
+  flex:1;border:1px solid var(--line);background:var(--ink3);border-radius:var(--r);
+  padding:13px 0;text-align:center;cursor:pointer;font-family:'IBM Plex Mono',monospace;
+  font-size:16px;color:var(--paper-dim);transition:.14s;
+}
+.bd:hover{border-color:var(--line2)}
+.bd.on{border-color:var(--to);background:rgba(185,138,62,.11);color:var(--paper)}
+.bd small{display:block;font-size:8.5px;color:var(--mute);margin-top:4px;font-family:'Gowun Batang',serif}
+textarea{
+  width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--paper);padding:12px;font-family:'Gowun Batang',serif;font-size:14px;
+  resize:vertical;min-height:92px;line-height:1.65;
+}
+textarea:focus{outline:none;border-color:var(--line2)}
+.btn{
+  width:100%;background:var(--paper);color:var(--ink);border:none;border-radius:var(--r);
+  padding:14px;font-family:'Noto Serif KR',serif;font-weight:500;font-size:14px;
+  cursor:pointer;margin-top:22px;letter-spacing:.1em;
+}
+.btn:hover{opacity:.9}
+.btn.ghost{background:none;border:1px solid var(--line2);color:var(--paper-dim);margin-top:8px}
+.day-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.tag{
+  font-size:10px;padding:4px 8px;border-radius:2px;background:var(--ink3);
+  border:1px solid var(--line);color:var(--paper-dim);letter-spacing:.04em;
+}
+.tag.bad{border-color:rgba(196,81,75,.5);color:#E0938E}
+.tag.good{border-color:rgba(75,158,122,.5);color:#7FC4A4}
+
+/* ---------- 입력 폼 ---------- */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+input,select{
+  width:100%;background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--paper);padding:11px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+}
+input:focus,select:focus{outline:none;border-color:var(--line2)}
+label.fl{display:block;font-size:10.5px;color:var(--mute);margin-bottom:5px;letter-spacing:.1em}
+
+/* ---------- 카드/표 ---------- */
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);padding:16px;margin-top:14px}
+.card h3{font-family:'Noto Serif KR',serif;font-size:13px;font-weight:500;letter-spacing:.14em;margin-bottom:12px;color:var(--paper-dim)}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv:last-child{border:none}
+.kv .k{color:var(--mute);font-size:12px}
+.luck{display:flex;gap:5px;overflow-x:auto;padding-bottom:6px}
+.luck-i{
+  flex:none;width:56px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--ink3);padding:9px 3px;text-align:center;
+}
+.luck-i.now{border-color:var(--to);background:rgba(185,138,62,.1)}
+.luck-i .age{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--mute)}
+.luck-i .g{font-family:'Noto Serif KR',serif;font-size:15px;margin-top:4px;line-height:1.2}
+.empty{text-align:center;padding:56px 20px;color:var(--mute)}
+.empty .ic{font-size:34px;opacity:.3;margin-bottom:14px;font-family:'Noto Serif KR',serif}
+.empty p{font-size:13px;line-height:1.9}
+.warn-i{
+  border:1px solid var(--line);border-left:2px solid var(--alert);border-radius:var(--r);
+  background:var(--ink2);padding:14px;margin-bottom:9px;
+}
+.warn-i .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.warn-i .dt{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+.warn-i .gz{font-family:'Noto Serif KR',serif;font-size:15px;margin-left:8px}
+.warn-i .cf{font-size:10px;color:var(--mute);letter-spacing:.06em}
+.bar{height:2px;background:var(--ink3);border-radius:1px;overflow:hidden;margin:9px 0 8px}
+.bar i{display:block;height:100%;background:var(--alert)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.stat-row:last-child{border:none}
+.stat-row .n{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mute)}
+.delta{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.delta.neg{color:#E0938E}.delta.pos{color:#7FC4A4}
+.note{font-size:11px;color:var(--mute);line-height:1.85;margin-top:14px;padding:12px;background:var(--ink2);border-radius:var(--r);border:1px solid var(--line)}
+.lead{font-size:12.5px;color:var(--paper-dim);line-height:1.8}
+.err{font-size:11.5px;color:#E0938E;margin-top:10px;min-height:1px;line-height:1.6}
+.err.ok{color:#7FC4A4}
+.bk{display:flex;gap:8px;margin-top:14px}
+.bk .btn{margin-top:0}
+.card.danger{border-color:rgba(196,81,75,.3)}
+.card.danger h3{color:#E0938E}
+.danger-btn{border-color:rgba(196,81,75,.45);color:#E0938E}
+.danger-btn:hover{background:rgba(196,81,75,.1)}
+.sync{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
+  color:var(--mute);margin-left:10px;font-weight:400;
+}
+.sync.saving{color:var(--to)}
+.sync.saved{color:var(--ok)}
+.sync.error{color:var(--alert)}
+button:disabled{opacity:.5;cursor:default}
+
+/* ---------- 용희신 (전왕·조후·통관·격국·억부) ---------- */
+.ys-main{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:16px 0 4px}
+.ys-box{border:1px solid var(--line);border-radius:var(--r);background:var(--ink3);padding:11px 4px;text-align:center}
+.ys-box.good{border-color:rgba(75,158,122,.35)}
+.ys-box.bad{border-color:rgba(196,81,75,.3)}
+.ys-lbl{font-size:9.5px;color:var(--mute);letter-spacing:.16em;margin-bottom:6px}
+.ys-el{font-family:'Noto Serif KR',serif;font-size:15px;letter-spacing:.08em}
+.ys-why{
+  font-size:12px;color:var(--paper-dim);line-height:1.8;margin-top:14px;
+  padding:11px 12px;background:var(--ink3);border-radius:var(--r);border:1px solid var(--line);
+}
+.ys-why b{color:var(--to)}
+.ys-conf{display:block;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mute);letter-spacing:.06em}
+.mth{border:1px solid var(--line);border-radius:var(--r);background:var(--ink2);padding:11px 12px;margin-bottom:6px}
+.mth.primary{border-color:rgba(185,138,62,.45);background:rgba(185,138,62,.06)}
+.mth.off{opacity:.5}
+.mth-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.mth-nm{font-family:'Noto Serif KR',serif;font-size:12.5px;letter-spacing:.1em}
+.mth-nm em{
+  font-style:normal;font-size:9px;color:var(--to);border:1px solid rgba(185,138,62,.5);
+  border-radius:2px;padding:1px 4px;margin-left:6px;letter-spacing:.08em;
+}
+.mth-w{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--mute)}
+.mth-y{font-size:12px;margin-bottom:4px;letter-spacing:.04em}
+.mth-r{font-size:11px;color:var(--mute);line-height:1.7}
+.hrs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.hr{display:flex;align-items:center;gap:5px;background:var(--ink3);border:1px solid var(--line);border-radius:2px;padding:5px 6px}
+.hr.on{border-color:var(--to);background:rgba(185,138,62,.12)}
+.hr-b{font-family:'Noto Serif KR',serif;font-size:12px;flex:none}
+.hr-t{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--paper-dim);letter-spacing:-.02em}
+
+@media(min-width:900px){
+  aside{transform:none;position:sticky;height:100vh}
+  #scrim{display:none} .burger{display:none}
+  main{margin-left:0}
+}
+@media(max-width:520px){
+  .ys-main{grid-template-columns:repeat(2,1fr)}
+  .hrs{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ---------- 구글 로그인 버튼 ---------- */
+.google-btn{display:flex;align-items:center;justify-content:center;gap:9px}
+.google-icon{width:17px;height:17px;flex:none}
+/* ---------- 생년월일 드롭다운 ---------- */
+.dob{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:9px}
+.dob .pick select{width:100%;padding:11px 26px 11px 11px;border:1px solid var(--line);
+  background:var(--ink3);font-family:'IBM Plex Mono',monospace;font-size:13px}
+.dob .pick::after{right:11px}
+.pick select[aria-label]{width:100%}
+
+
+/* ---------- 상세 풀이 ---------- */
+.interp .interp-sec{padding:16px 0;border-bottom:1px solid var(--line)}
+.interp .interp-sec:first-of-type{padding-top:4px}
+.interp-h{display:flex;align-items:center;gap:9px;font-family:'Noto Serif KR',serif;
+  font-size:14px;letter-spacing:.06em;margin-bottom:11px;color:var(--paper)}
+.interp-n{font-family:'Noto Serif KR',serif;font-size:13px;color:var(--to);
+  border:1px solid rgba(185,138,62,.5);border-radius:3px;width:22px;height:22px;
+  display:inline-flex;align-items:center;justify-content:center;flex:none}
+.interp-p{font-size:13px;line-height:1.95;color:var(--paper-dim);margin-bottom:9px}
+.interp-p:last-child{margin-bottom:0}
+.interp-p b{color:var(--paper)}
+.interp-tip{font-size:12px;line-height:1.8;color:var(--mute);
+  padding:10px 12px;background:var(--ink3);border-radius:var(--r);
+  border-left:2px solid var(--to);margin-top:4px}
+.shin-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-bottom:1px dotted var(--line)}
+.shin-row:last-of-type{border:none}
+.shin-name{font-family:'Noto Serif KR',serif;font-size:13px;color:var(--paper)}
+.shin-mean{font-size:11.5px;color:var(--mute);line-height:1.6}
+.tone{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 7px;border-radius:2px;
+  margin-right:7px;letter-spacing:.06em;vertical-align:middle}
+.tone-순풍{background:rgba(75,158,122,.16);color:#7FC4A4;border:1px solid rgba(75,158,122,.4)}
+.tone-역풍{background:rgba(196,81,75,.14);color:#E0938E;border:1px solid rgba(196,81,75,.4)}
+.tone-보통{background:var(--ink3);color:var(--mute);border:1px solid var(--line)}
+.interp-ai{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.interp-ai .btn{margin-top:0}
+.interp-note{font-size:11px;color:var(--mute);line-height:1.75;margin-top:10px}
+.ai-result{animation:fade .35s}
+.ai-badge{display:inline-block;font-family:'Noto Serif KR',serif;font-size:11px;
+  color:var(--to);border:1px solid rgba(185,138,62,.5);border-radius:2px;
+  padding:3px 9px;letter-spacing:.1em;margin-bottom:12px}
+.ai-p{font-size:13px;line-height:2;color:var(--paper-dim);margin-bottom:12px}
+.ai-p:last-of-type{margin-bottom:8px}
+
+
+/* ---------- 시운별 일기 그리드 ---------- */
+.hour-lead{font-size:11.5px;color:var(--mute);line-height:1.75;margin-bottom:12px}
+.hour-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.hcell{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--ink3);
+  padding:8px 3px 7px;text-align:center;cursor:pointer;position:relative;transition:.14s;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.hcell:hover{border-color:var(--line2)}
+.hcell:focus-visible{outline:2px solid var(--to);outline-offset:2px}
+.hcell.has{border-color:var(--to);background:rgba(185,138,62,.1)}
+.hcell-chk{
+  position:absolute;top:4px;right:5px;width:13px;height:13px;border-radius:2px;
+  border:1px solid var(--line2);font-size:9px;line-height:12px;color:var(--ink);
+}
+.hcell.has .hcell-chk{background:var(--to);border-color:var(--to)}
+.hcell-nm{font-size:10px;color:var(--paper-dim);letter-spacing:.04em;margin-top:2px}
+.hcell-gz{font-family:'Noto Serif KR',serif;font-size:15px;line-height:1.1;
+  display:flex;flex-direction:column}
+.hcell-t{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:var(--mute);
+  line-height:1.25;letter-spacing:-.02em}
+#hsheet .sheet-hd .gz{display:flex;align-items:center;gap:8px}
+#hsGz .e-목,#hsGz .e-화,#hsGz .e-토,#hsGz .e-금,#hsGz .e-수{font-size:19px}
+@media(max-width:520px){
+  .hour-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:360px){
+  .hour-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="scrim"></div>
+<div id="app">
+<aside id="side">
+  <div class="brand"><h1>萬歲曆 日記</h1><p>만세력 일기</p></div>
+  <nav id="nav"></nav>
+  <div class="nav-note">기록은 이 브라우저 세션에만 유지됩니다.</div>
+</aside>
+<main>
+  <header>
+    <div class="burger" id="bg"><i></i><i></i><i></i></div>
+    <h2 id="ttl">오늘의 만세력</h2>
+  </header>
+  <div class="view" id="view"></div>
+</main>
+</div>
+<div class="sheet-bg" id="sbg"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="sheet-hd">
+    <div><div class="dt" id="shDt"></div><div class="gz" id="shGz"></div></div>
+    <button id="shX">&times;</button>
+  </div>
+  <div class="sheet-body" id="shBody"></div>
+</div>
+
+<div class="sheet-bg" id="hsbg"></div>
+<div class="sheet" id="hsheet">
+  <div class="grab"></div>
+  <div class="sheet-hd">
+    <div><div class="gz" id="hsGz"></div><div class="dt" id="hsRange"></div></div>
+    <button id="hsX">&times;</button>
+  </div>
+  <div class="sheet-body" id="hsBody"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ===== src/engine/core.js =====
+// ============================================================
+// 만세력 코어 엔진
+// ============================================================
+
+const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+
+const STEM_ELEM = ['목','목','화','화','토','토','금','금','수','수'];
+const STEM_YIN  = [false,true,false,true,false,true,false,true,false,true];
+
+const BRANCH_ELEM = ['수','토','목','목','토','화','화','토','금','금','토','수'];
+const BRANCH_YIN  = [false,true,false,true,false,true,false,true,false,true,false,true];
+
+// 지장간: [여기, 중기, 정기] — 일수 배분 포함
+const HIDDEN = {
+  '자': [['임',10],['계',20]],
+  '축': [['계',9],['신',3],['기',18]],
+  '인': [['무',7],['병',7],['갑',16]],
+  '묘': [['갑',10],['을',20]],
+  '진': [['을',9],['계',3],['무',18]],
+  '사': [['무',7],['경',7],['병',16]],
+  '오': [['병',10],['기',9],['정',11]],
+  '미': [['정',9],['을',3],['기',18]],
+  '신': [['무',7],['임',7],['경',16]],
+  '유': [['경',10],['신',20]],
+  '술': [['신',9],['정',3],['무',18]],
+  '해': [['무',7],['갑',7],['임',16]],
+};
+
+// ---------- 오행 생극 ----------
+const GEN = { '목':'화','화':'토','토':'금','금':'수','수':'목' };  // 생
+const OVR = { '목':'토','토':'수','수':'화','화':'금','금':'목' };  // 극
+
+const generates = (a,b) => GEN[a] === b;
+const overcomes = (a,b) => OVR[a] === b;
+
+// ---------- 십성 ----------
+function tenGod(dayStem, targetStem) {
+  const di = STEMS.indexOf(dayStem), ti = STEMS.indexOf(targetStem);
+  if (di < 0 || ti < 0) return null;
+  const de = STEM_ELEM[di], te = STEM_ELEM[ti];
+  const same = STEM_YIN[di] === STEM_YIN[ti];
+
+  if (de === te)            return same ? '비견' : '겁재';
+  if (generates(de, te))    return same ? '식신' : '상관';
+  if (overcomes(de, te))    return same ? '편재' : '정재';
+  if (overcomes(te, de))    return same ? '편관' : '정관';
+  if (generates(te, de))    return same ? '편인' : '정인';
+  return null;
+}
+
+// 지지의 십성은 정기(마지막 지장간) 기준
+function tenGodBranch(dayStem, branch) {
+  const h = HIDDEN[branch];
+  return tenGod(dayStem, h[h.length - 1][0]);
+}
+
+// ---------- 지지 관계 ----------
+const bi = b => BRANCHES.indexOf(b);
+
+const isChung   = (a,b) => (bi(a) - bi(b) + 12) % 12 === 6;           // 충
+const isYukhap  = (a,b) => (bi(a) + bi(b)) % 12 === 1 && a !== b;      // 육합
+const isWonjin  = (a,b) => WONJIN[a] === b;                            // 원진
+const isHae     = (a,b) => HAE[a] === b;                               // 해
+const isPa      = (a,b) => PA[a] === b;                                // 파
+
+const pairMap = pairs => {
+  const m = {};
+  for (const [x,y] of pairs) { m[x]=y; m[y]=x; }
+  return m;
+};
+
+const WONJIN = pairMap([['자','미'],['축','오'],['인','유'],['묘','신'],['진','해'],['사','술']]);
+const HAE    = pairMap([['자','미'],['축','오'],['인','사'],['묘','진'],['신','해'],['유','술']]);
+const PA     = pairMap([['자','유'],['축','진'],['인','해'],['묘','오'],['사','신'],['미','술']]);
+
+// 형 (삼형 / 상형 / 자형)
+const SAMHYUNG = [['인','사','신'], ['축','술','미']];
+const SANGHYUNG = [['자','묘']];
+const JAHYUNG = ['진','오','유','해'];
+
+function isHyung(a, b) {
+  if (a === b) return JAHYUNG.includes(a);
+  for (const g of SAMHYUNG) if (g.includes(a) && g.includes(b)) return true;
+  for (const g of SANGHYUNG) if (g.includes(a) && g.includes(b)) return true;
+  return false;
+}
+
+// 삼합 / 방합
+const SAMHAP = [
+  { members:['신','자','진'], elem:'수' },
+  { members:['해','묘','미'], elem:'목' },
+  { members:['인','오','술'], elem:'화' },
+  { members:['사','유','축'], elem:'금' },
+];
+const BANGHAP = [
+  { members:['인','묘','진'], elem:'목' },
+  { members:['사','오','미'], elem:'화' },
+  { members:['신','유','술'], elem:'금' },
+  { members:['해','자','축'], elem:'수' },
+];
+
+// ---------- 신살 ----------
+// 천을귀인 (일간 기준)
+const CHEONEUL = {
+  '갑':['축','미'], '무':['축','미'], '경':['축','미'],
+  '을':['자','신'], '기':['자','신'],
+  '병':['해','유'], '정':['해','유'],
+  '신':['인','오'],
+  '임':['묘','사'], '계':['묘','사'],
+};
+
+// 도화(연살) / 역마 / 화개 — 삼합국 기준
+const SAMHAP_GROUP = {
+  '신':'수','자':'수','진':'수',
+  '해':'목','묘':'목','미':'목',
+  '인':'화','오':'화','술':'화',
+  '사':'금','유':'금','축':'금',
+};
+const DOHWA = { '수':'유', '목':'자', '화':'묘', '금':'오' };
+const YEOKMA = { '수':'인', '목':'사', '화':'신', '금':'해' };
+const HWAGAE = { '수':'진', '목':'미', '화':'술', '금':'축' };
+
+// 양인 (일간 기준)
+const YANGIN = { '갑':'묘','병':'오','무':'오','경':'유','임':'자' };
+
+// 백호대살
+const BAEKHO = ['갑진','을미','병술','정축','무진','임술','계축'];
+// 괴강
+const GWEGANG = ['경진','경술','임진','임술','무술'];
+
+function shinsal(dayStem, dayBranch, targetBranch, targetPillar) {
+  const tags = [];
+  if ((CHEONEUL[dayStem]||[]).includes(targetBranch)) tags.push('천을귀인');
+  const g = SAMHAP_GROUP[dayBranch];
+  if (DOHWA[g]  === targetBranch) tags.push('도화');
+  if (YEOKMA[g] === targetBranch) tags.push('역마');
+  if (HWAGAE[g] === targetBranch) tags.push('화개');
+  if (YANGIN[dayStem] === targetBranch) tags.push('양인');
+  if (targetPillar && BAEKHO.includes(targetPillar))  tags.push('백호');
+  if (targetPillar && GWEGANG.includes(targetPillar)) tags.push('괴강');
+  return tags;
+}
+
+// ---------- 60갑자 ----------
+function ganjiFromIndex(i) {
+  i = ((i % 60) + 60) % 60;
+  return STEMS[i % 10] + BRANCHES[i % 12];
+}
+
+function ganjiIndex(gz) {
+  const s = STEMS.indexOf(gz[0]), b = BRANCHES.indexOf(gz[1]);
+  for (let i = 0; i < 60; i++) if (i % 10 === s && i % 12 === b) return i;
+  return -1;
+}
+
+// ---------- 일주 계산 ----------
+// 기준: 1900-01-01 = 갑술일 (index 10)
+// 검증: 2026-07-16 → 신묘 (KASI/만세력 대조 확인)
+const EPOCH = Date.UTC(1900, 0, 1);
+const EPOCH_IDX = 10;
+
+// 일주는 KST 기준 날짜로 판정한다. 기기 시간대에 따라 일진이 달라지면 안 된다.
+const KST_MS = 9 * 3600000;
+function dayGanji(date) {
+  const k = new Date(date.getTime() + KST_MS);
+  const utc = Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate());
+  const days = Math.round((utc - EPOCH) / 86400000);
+  return ganjiFromIndex(EPOCH_IDX + days);
+}
+
+// ============================================================
+// ---------- 시주 계산 ----------
+//
+// 한국 표준시(UTC+9)는 동경 135도 기준이지만 서울은 동경 약 127도다.
+// 경도 1도당 태양시가 4분씩 늦으므로 (135-127)*4 ≈ 32분, 관례로 30분을 보정한다.
+// 그래서 자시가 23:00이 아니라 23:30에 시작한다.
+//
+//   자시 23:30~01:29 / 축시 01:30~03:29 / 인시 03:30~05:29
+//   묘시 05:30~07:29 / 진시 07:30~09:29 / 사시 09:30~11:29
+//   오시 11:30~13:29 / 미시 13:30~15:29 / 신시 15:30~17:29
+//   유시 17:30~19:29 / 술시 19:30~21:29 / 해시 21:30~23:29
+// ============================================================
+
+/** 시지별 시각 범위 (표시용) */
+const HOUR_RANGES = [
+  ['자','23:30','01:29'], ['축','01:30','03:29'], ['인','03:30','05:29'],
+  ['묘','05:30','07:29'], ['진','07:30','09:29'], ['사','09:30','11:29'],
+  ['오','11:30','13:29'], ['미','13:30','15:29'], ['신','15:30','17:29'],
+  ['유','17:30','19:29'], ['술','19:30','21:29'], ['해','21:30','23:29'],
+];
+
+/**
+ * 보정된 시각으로 시지 인덱스를 구한다.
+ * @param lonCorrection 경도 보정(분). 서울 기준 30. 끄려면 0.
+ */
+function hourBranchIndex(hour, minute, lonCorrection) {
+  const t = hour * 60 + minute - lonCorrection;
+  const m = ((t % 1440) + 1440) % 1440;
+  // 보정 후 기준으로는 23:00~00:59가 자시
+  if (m >= 23 * 60 || m < 60) return 0;
+  return Math.floor((m + 60) / 120) % 12;
+}
+
+/**
+ * 시주 간지.
+ * @param opts.lonCorrection 경도 보정(분). 기본 30 (서울).
+ *        다른 지역은 (135 - 현지경도) * 4. 부산(129°)이면 24.
+ * @param opts.nightJa 야자시 처리:
+ *        'same'(기본) — 23:30 이후도 당일 일간 기준 (야자시설)
+ *        'next'       — 다음날 일간 기준 (조자시설)
+ */
+function hourGanji(dayStemChar, hour, minute = 0, opts = {}) {
+  const lon = (opts && opts.lonCorrection != null) ? opts.lonCorrection : 30;
+  const bIdx = hourBranchIndex(hour, minute, lon);
+
+  let stemBase = dayStemChar;
+  if (opts && opts.nightJa === 'next' && bIdx === 0 &&
+      (hour * 60 + minute - lon) >= 23 * 60) {
+    const i = STEMS.indexOf(dayStemChar);
+    stemBase = STEMS[(i + 1) % 10];
+  }
+
+  const dIdx = STEMS.indexOf(stemBase);
+  const startStem = (dIdx % 5) * 2;
+  return STEMS[(startStem + bIdx) % 10] + BRANCHES[bIdx];
+}
+
+/**
+ * 일주 경계.
+ * 사주의 하루는 자정이 아니라 자시에 시작한다.
+ * 보정 시각 23:30 이후면 일주가 다음날로 넘어간다.
+ */
+function dayShiftForHour(hour, minute = 0, opts = {}) {
+  const lon = (opts && opts.lonCorrection != null) ? opts.lonCorrection : 30;
+  return (hour * 60 + minute - lon) >= 23 * 60 ? 1 : 0;
+}
+
+/** 시지 이름 (표시용) */
+function hourBranchName(hour, minute = 0, opts = {}) {
+  const lon = (opts && opts.lonCorrection != null) ? opts.lonCorrection : 30;
+  return BRANCHES[hourBranchIndex(hour, minute, lon)];
+}
+
+// ---------- 연주 (입춘 기준) ----------
+// 사주의 연주는 1월 1일이 아니라 입춘에 바뀐다.
+// 예: 2000-01-01은 아직 기묘년, 2000-02-04(입춘) 이후부터 경진년.
+// 1984 = 갑자년 (index 0)
+function yearGanjiRaw(solarYear) {
+  return ganjiFromIndex(solarYear - 1984);
+}
+
+// date 기준으로 입춘 경계를 반영한 연주.
+// getIpchun(year) -> Date (해당 연도 입춘 시각). 절기 테이블 주입 필요.
+function yearGanji(date, getIpchun) {
+  if (typeof date === 'number') {
+    // 레거시 호출(연도만) — 입춘 무시. 경고성 raw 반환.
+    return yearGanjiRaw(date);
+  }
+  const y = new Date(date.getTime() + KST_MS).getUTCFullYear();
+  const ipchun = getIpchun ? getIpchun(y) : new Date(y, 1, 4);
+  return yearGanjiRaw(date < ipchun ? y - 1 : y);
+}
+
+// ---------- 월주 (절입 기준) ----------
+// termIndex: 0=입춘(인월) … 11=소한(축월)
+function monthGanji(yearStemChar, termIndex) {
+  const bIdx = (termIndex + 2) % 12;  // 인 = 2
+  const yi = STEMS.indexOf(yearStemChar);
+  const startStem = ((yi % 5) * 2 + 2) % 10;  // 갑/기년 → 병인월
+  return STEMS[(startStem + termIndex) % 10] + BRANCHES[bIdx];
+}
+// ===== src/engine/solarterm.js =====
+// ============================================================
+// 24절기 계산 (태양황경 기준)
+// 사주 월주는 절입 시각에 바뀌므로 정밀 계산 필요.
+// 정확도: 실제 절입 시각 대비 대략 ±2분 이내 (1900~2100)
+// ============================================================
+
+const RAD = Math.PI / 180;
+
+// 12절(節) — 월주 경계. 중기(中氣)는 월주와 무관.
+// termIndex 0=입춘(인월) … 11=소한(축월)
+const MONTH_TERMS = [
+  { name:'입춘', lon: 315, branch:'인' },
+  { name:'경칩', lon: 345, branch:'묘' },
+  { name:'청명', lon:  15, branch:'진' },
+  { name:'입하', lon:  45, branch:'사' },
+  { name:'망종', lon:  75, branch:'오' },
+  { name:'소서', lon: 105, branch:'미' },
+  { name:'입추', lon: 135, branch:'신' },
+  { name:'백로', lon: 165, branch:'유' },
+  { name:'한로', lon: 195, branch:'술' },
+  { name:'입동', lon: 225, branch:'해' },
+  { name:'대설', lon: 255, branch:'자' },
+  { name:'소한', lon: 285, branch:'축' },
+];
+
+// ---------- 율리우스일 ----------
+function toJD(date) { return date.getTime() / 86400000 + 2440587.5; }
+function fromJD(jd) { return new Date((jd - 2440587.5) * 86400000); }
+
+// ---------- 태양 겉보기황경 (도) ----------
+// VSOP87D 지구 황경 주요항 → 태양 황경 = 지구황경 + 180
+// 약식 Meeus 공식은 절입 시각에서 최대 -23분 오차가 나므로
+// (검증: 2026 소서 계산 10:48 vs KASI 11:12) 주기항을 보강함.
+// 정확도: 1900~2100 구간 실측 대비 약 ±1분.
+
+// [진폭, 위상, 각속도] — VSOP87D Earth L0/L1/L2 상위항
+const L0_TERMS = [
+  [175347046, 0, 0], [3341656, 4.6692568, 6283.0758500], [34894, 4.62610, 12566.15170],
+  [3497, 2.7441, 5753.3849], [3418, 2.8289, 3.5231], [3136, 3.6277, 77713.7715],
+  [2676, 4.4181, 7860.4194], [2343, 6.1352, 3930.2097], [1324, 0.7425, 11506.7698],
+  [1273, 2.0371, 529.6910], [1199, 1.1096, 1577.3435], [990, 5.233, 5884.927],
+  [902, 2.045, 26.298], [857, 3.508, 398.149], [780, 1.179, 5223.694],
+  [753, 2.533, 5507.553], [505, 4.583, 18849.228], [492, 4.205, 775.523],
+  [357, 2.920, 0.067], [317, 5.849, 11790.629], [284, 1.899, 796.298],
+  [271, 0.315, 10977.079], [243, 0.345, 5486.778], [206, 4.806, 2544.314],
+  [205, 1.869, 5573.143], [202, 2.458, 6069.777], [156, 0.833, 213.299],
+  [132, 3.411, 2942.463], [126, 1.083, 20.775], [115, 0.645, 0.980],
+  [103, 0.636, 4694.003], [102, 0.976, 15720.839], [102, 4.267, 7.114],
+  [99, 6.21, 2146.17], [98, 0.68, 155.42], [86, 5.98, 161000.69],
+  [85, 1.30, 6275.96], [85, 3.67, 71430.70], [80, 1.81, 17260.15],
+  [79, 3.04, 12036.46], [75, 1.76, 5088.63], [74, 3.50, 3154.69],
+  [74, 4.68, 801.82], [70, 0.83, 9437.76], [62, 3.98, 8827.39],
+  [61, 1.82, 7084.90], [57, 2.78, 6286.60], [56, 4.39, 14143.50],
+  [56, 3.47, 6279.55], [52, 0.19, 12139.55], [52, 1.33, 1748.02],
+  [51, 0.28, 5856.48], [49, 0.49, 1194.45], [41, 5.37, 8429.24],
+  [41, 2.40, 19651.05], [39, 6.17, 10447.39], [37, 6.04, 10213.29],
+  [37, 2.57, 1059.38], [36, 1.71, 2352.87], [36, 1.78, 6812.77],
+  [33, 0.59, 17789.85], [30, 0.44, 83996.85], [30, 2.74, 1349.87],
+  [25, 3.16, 4690.48],
+];
+const L1_TERMS = [
+  [628331966747, 0, 0], [206059, 2.678235, 6283.075850], [4303, 2.6351, 12566.1517],
+  [425, 1.590, 3.523], [119, 5.796, 26.298], [109, 2.966, 1577.344],
+  [93, 2.59, 18849.23], [72, 1.14, 529.69], [68, 1.87, 398.15],
+  [67, 4.41, 5507.55], [59, 2.89, 5223.69], [56, 2.17, 155.42],
+  [45, 0.40, 796.30], [36, 0.47, 775.52], [29, 2.65, 7.11],
+  [21, 5.34, 0.98], [19, 1.85, 5486.78], [19, 4.97, 213.30],
+  [17, 2.99, 6275.96], [16, 0.03, 2544.31],
+];
+const L2_TERMS = [
+  [52919, 0, 0], [8720, 1.0721, 6283.0758], [309, 0.867, 12566.152],
+  [27, 0.05, 3.52], [16, 5.19, 26.30], [16, 3.68, 155.42],
+  [10, 0.76, 18849.23], [9, 2.06, 77713.77], [7, 0.83, 775.52],
+  [5, 4.66, 1577.34],
+];
+const L3_TERMS = [[289, 5.844, 6283.076], [35, 0, 0], [17, 5.49, 12566.15]];
+const L4_TERMS = [[114, 3.142, 0]];
+
+// 지구 궤도반경 벡터 R (AU) — VSOP87 R0/R1/R2 상위항
+const R0_TERMS = [
+  [100013989, 0, 0], [1670700, 3.0984635, 6283.0758500], [13956, 3.05525, 12566.15170],
+  [3084, 5.1985, 77713.7715], [1628, 1.1739, 5753.3849], [1576, 2.8469, 7860.4194],
+  [925, 5.453, 11506.770], [542, 4.564, 3930.210], [472, 3.661, 5884.927],
+  [346, 0.964, 5507.553], [329, 5.900, 5223.694], [307, 0.299, 5573.143],
+  [243, 4.273, 11790.629], [212, 5.847, 1577.344], [186, 5.022, 10977.079],
+  [175, 3.012, 18849.228], [110, 5.055, 5486.778], [98, 0.89, 6069.78],
+  [86, 5.69, 15720.84], [86, 1.27, 161000.69], [65, 0.27, 17260.15],
+  [63, 0.92, 529.69], [57, 2.01, 83996.85], [56, 5.24, 71430.70],
+  [49, 3.25, 2544.31], [47, 2.58, 775.52], [45, 5.54, 9437.76],
+  [43, 6.01, 6275.96], [39, 5.36, 4694.00], [38, 2.39, 8827.39],
+  [37, 0.83, 19651.05], [37, 4.90, 12139.55], [36, 1.67, 12036.46],
+  [35, 1.84, 2942.46], [33, 0.24, 7084.90], [32, 0.18, 5088.63],
+  [32, 1.78, 398.15], [28, 1.21, 6286.60], [28, 1.90, 6279.55],
+  [26, 4.59, 10447.39],
+];
+const R1_TERMS = [
+  [103019, 1.107490, 6283.075850], [1721, 1.0644, 12566.1517], [702, 3.142, 0],
+  [32, 1.02, 18849.23], [31, 2.84, 5507.55], [25, 1.32, 5223.69],
+  [18, 1.42, 1577.34], [10, 5.91, 10977.08], [9, 1.42, 6275.96],
+  [9, 0.27, 5486.78],
+];
+const R2_TERMS = [
+  [4359, 5.7846, 6283.0758], [124, 5.579, 12566.152], [12, 3.14, 0],
+  [9, 3.63, 77713.77], [6, 1.87, 5573.14], [3, 5.47, 18849.23],
+];
+
+const sumSeries = (terms, t) =>
+  terms.reduce((s, [a, b, c]) => s + a * Math.cos(b + c * t), 0);
+
+function earthRadiusVector(t) {
+  return (sumSeries(R0_TERMS, t)
+    + sumSeries(R1_TERMS, t) * t
+    + sumSeries(R2_TERMS, t) * t * t) / 1e8;
+}
+
+function solarLongitude(jd) {
+  const T = (jd - 2451545.0) / 36525;
+  const t = T / 10;  // VSOP87은 천년 단위
+
+  // 지구 황경 (라디안)
+  const L = (sumSeries(L0_TERMS, t)
+    + sumSeries(L1_TERMS, t) * t
+    + sumSeries(L2_TERMS, t) * t * t
+    + sumSeries(L3_TERMS, t) * t ** 3
+    + sumSeries(L4_TERMS, t) * t ** 4) / 1e8;
+
+  // 태양 황경 = 지구 황경 + 180°
+  let lon = (L / RAD) + 180;
+
+  // VSOP87 동역학 황도 → FK5 보정 (황경 상수항만; 위도항은 무시 가능)
+  lon += -0.09033 / 3600;
+
+  // 장동 (황경)
+  const omega = 125.04452 - 1934.136261 * T;
+  const Lsun = 280.4665 + 36000.7698 * T;
+  const Lmoon = 218.3165 + 481267.8813 * T;
+  const dPsi = (-17.20 * Math.sin(omega * RAD)
+    - 1.32 * Math.sin(2 * Lsun * RAD)
+    - 0.23 * Math.sin(2 * Lmoon * RAD)
+    + 0.21 * Math.sin(2 * omega * RAD)) / 3600;
+  lon += dPsi;
+
+  // 광행차: 지구-태양 실제 거리(R)에 반비례. 상수로 두면 원일점/근일점에서
+  // 최대 ±0.3" 오차 → 절입 시각 오차의 주원인이었음.
+  const R = earthRadiusVector(t);
+  lon -= (20.4898 / 3600) / R;
+
+  return ((lon % 360) + 360) % 360;
+}
+
+// ---------- 지구 자전 지연(ΔT) 근사 ----------
+// 태양황경은 TT 기준, 우리는 UT 필요 → ΔT 보정
+function deltaT(year) {
+  // Espenak & Meeus 다항식 (1900~2150 구간)
+  let t;
+  if (year >= 2005 && year < 2050) { t = year - 2000; return 62.92 + 0.32217*t + 0.005589*t*t; }
+  if (year >= 1900 && year < 1920) { t = year - 1900; return -2.79 + 1.494119*t - 0.0598939*t*t + 0.0061966*t*t*t - 0.000197*t*t*t*t; }
+  if (year >= 1920 && year < 1941) { t = year - 1920; return 21.20 + 0.84493*t - 0.076100*t*t + 0.0020936*t*t*t; }
+  if (year >= 1941 && year < 1961) { t = year - 1950; return 29.07 + 0.407*t - t*t/233 + t*t*t/2547; }
+  if (year >= 1961 && year < 1986) { t = year - 1975; return 45.45 + 1.067*t - t*t/260 - t*t*t/718; }
+  if (year >= 1986 && year < 2005) { t = year - 2000; return 63.86 + 0.3345*t - 0.060374*t*t + 0.0017275*t*t*t + 0.000651814*t*t*t*t + 0.00002373599*t*t*t*t*t; }
+  if (year >= 2050 && year <= 2150) { return -20 + 32*Math.pow((year-1820)/100, 2) - 0.5628*(2150-year); }
+  return 64;
+}
+
+// ---------- 특정 황경에 도달하는 시각 (이분법+뉴턴) ----------
+function solveTerm(year, targetLon) {
+  // 근사 시작일: 황경 315(입춘)≈2/4 … 각 절기 대략 위치
+  let guess = 315 <= targetLon || targetLon < 15
+    ? new Date(Date.UTC(targetLon >= 315 ? year : year, targetLon >= 315 ? 1 : 3, 4))
+    : new Date(Date.UTC(year, Math.floor(((targetLon + 45) % 360) / 30), 6));
+
+  let jd = toJD(guess);
+
+  // 뉴턴법: dλ/dt ≈ 0.9856 도/일
+  for (let i = 0; i < 30; i++) {
+    const lon = solarLongitude(jd);
+    let diff = targetLon - lon;
+    // 각도 wrap 처리
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    if (Math.abs(diff) < 1e-7) break;
+    jd += diff / 0.98564736;
+  }
+
+  // TT → UT 보정
+  jd -= deltaT(year) / 86400;
+  return fromJD(jd);
+}
+
+// ---------- 캐시 ----------
+const cache = new Map();
+
+/** 해당 연도의 12절 절입 시각 (KST Date 배열, termIndex 순) */
+function monthTerms(year) {
+  if (cache.has(year)) return cache.get(year);
+  const out = MONTH_TERMS.map((t, i) => {
+    // 소한(285)은 해당 연도 1월, 입춘(315)은 2월 → 같은 해
+    const d = solveTerm(year, t.lon);
+    return { ...t, index: i, date: d };
+  });
+  cache.set(year, out);
+  return out;
+}
+
+/** 입춘 시각 */
+function getIpchun(year) {
+  return monthTerms(year).find(t => t.name === '입춘').date;
+}
+
+/**
+ * 날짜가 속한 월지 termIndex와 사주 연도 반환.
+ * 입춘 전이면 전년도로 귀속.
+ */
+function termIndexOf(date) {
+  const y = new Date(date.getTime() + 9 * 3600000).getUTCFullYear();
+  const terms = monthTerms(y);
+  const ipchun = terms[0].date;
+
+  if (date < ipchun) {
+    // 입춘 전 → 전년도 소한(축월) 또는 그 이전
+    const prev = monthTerms(y - 1);
+    for (let i = prev.length - 1; i >= 0; i--) {
+      if (date >= prev[i].date) return { termIndex: i, sajuYear: y - 1 };
+    }
+    return { termIndex: 11, sajuYear: y - 2 };
+  }
+
+  for (let i = terms.length - 1; i >= 0; i--) {
+    if (date >= terms[i].date) {
+      // 소한(i=11)은 다음해 입춘까지 → sajuYear는 y
+      return { termIndex: i, sajuYear: y };
+    }
+  }
+  return { termIndex: 0, sajuYear: y };
+}
+// ===== src/engine/analysis.js =====
+// ============================================================
+// 주의 날짜 분석 엔진
+// ============================================================
+
+// ---------- 기분 → 점수 ----------
+const MOOD = {
+  good:      { label:'기분 좋음',   icon:'😊', score:  2 },
+  neutral:   { label:'그냥 그럼',   icon:'😐', score:  0 },
+  down:      { label:'우울함',      icon:'😞', score: -2 },
+  irritated: { label:'짜증남',      icon:'😤', score: -2 },
+  angry:     { label:'히스테릭/화남',icon:'😡', score: -3 },
+  sensitive: { label:'예민함',      icon:'😖', score: -1 },
+};
+
+// 기록의 기분을 배열로 정규화 (구버전 단일 문자열도 허용)
+function moodList(entry) {
+  const m = entry?.mood;
+  if (!m) return [];
+  const arr = Array.isArray(m) ? m : [m];
+  return arr.filter(x => MOOD[x]);
+}
+
+/**
+ * 여러 기분이 동시에 선택된 날의 점수.
+ * 평균을 쓰면 안 된다: "짜증남(-2) + 예민함(-1)"의 평균은 -1.5로,
+ * 짜증남 단독(-2)보다 좋아져 버린다. 실제로는 더 나쁜 날이다.
+ * → 가장 나쁜 기분을 기준으로 잡고, 추가 부정 감정은 체감 가산한다.
+ */
+function moodScore(entry) {
+  const list = moodList(entry);
+  if (!list.length) return null;
+  const scores = list.map(k => MOOD[k].score);
+
+  // 긍정만 선택된 경우: 최고값 사용
+  const negs = scores.filter(s => s < 0).sort((a, b) => a - b);
+  if (!negs.length) return Math.max(...scores);
+
+  // 부정이 하나라도 있으면 긍정은 상쇄 효과만 (완전히 지우지 않음)
+  let s = negs[0];                       // 최악값이 기준
+  for (let i = 1; i < negs.length; i++) {
+    s += negs[i] * 0.35 * Math.pow(0.7, i - 1);   // 추가 부정 감정 체감 가산
+  }
+  const posMax = Math.max(0, ...scores.filter(x => x > 0));
+  s += posMax * 0.3;                     // 양가감정 소폭 완화
+
+  return Math.max(-4, s);
+}
+
+// 종합 점수: 기분 + 몸상태(1~5 → -2~+2)
+function composite(entry) {
+  const m = moodScore(entry) ?? 0;
+  const b = (entry.body ?? 3) - 3;
+  return m * 0.6 + b * 0.4 * 1.5;
+}
+
+// ============================================================
+// 태그 추출: 하루의 일진 × 내 명식 → 관계 태그 배열
+// ============================================================
+function extractTags(natal, dayGz, ctx = {}) {
+  const tags = [];
+  const dStem = dayGz[0], dBranch = dayGz[1];
+  const me = natal.day[0];  // 일간
+
+  const pillars = [
+    ['년', natal.year], ['월', natal.month],
+    ['일', natal.day],  ['시', natal.hour],
+  ].filter(([, v]) => v);
+
+  // --- 지지 관계 ---
+  for (const [name, gz] of pillars) {
+    const b = gz[1];
+    if (isChung(dBranch, b))  tags.push(`충:${name}지`);
+    if (isWonjin(dBranch, b)) tags.push(`원진:${name}지`);
+    if (isHyung(dBranch, b))  tags.push(`형:${name}지`);
+    if (isHae(dBranch, b))    tags.push(`해:${name}지`);
+    if (isPa(dBranch, b))     tags.push(`파:${name}지`);
+    if (isYukhap(dBranch, b)) tags.push(`육합:${name}지`);
+  }
+
+  // --- 십성 (일간 대비 일진 천간) ---
+  const tg = tenGod(me, dStem);
+  if (tg) tags.push(`일진십성:${tg}`);
+
+  const tgb = tenGodBranch(me, dBranch);
+  if (tgb) tags.push(`일진지지십성:${tgb}`);
+
+  // --- 흉신 투출 ---
+  if (tg === '편관') tags.push('편관투출');
+  if (tg === '상관') tags.push('상관투출');
+  if (tg === '겁재') tags.push('겁재투출');
+
+  // --- 오행 ---
+  tags.push(`오행:${STEM_ELEM[STEMS.indexOf(dStem)]}`);
+  tags.push(`지지오행:${BRANCH_ELEM[BRANCHES.indexOf(dBranch)]}`);
+
+  // --- 신살 ---
+  for (const s of shinsal(me, natal.day[1], dBranch, dayGz)) {
+    tags.push(`신살:${s}`);
+  }
+
+  // --- 삼합/방합 성립 (원국 지지 + 일진) ---
+  const natalBranches = pillars.map(([, gz]) => gz[1]);
+  for (const { members, elem } of SAMHAP) {
+    if (!members.includes(dBranch)) continue;
+    const hit = members.filter(m => m !== dBranch && natalBranches.includes(m));
+    if (hit.length >= 2) tags.push(`삼합:${elem}`);
+    else if (hit.length === 1) tags.push(`반합:${elem}`);
+  }
+  for (const { members, elem } of BANGHAP) {
+    if (!members.includes(dBranch)) continue;
+    const hit = members.filter(m => m !== dBranch && natalBranches.includes(m));
+    if (hit.length >= 2) tags.push(`방합:${elem}`);
+  }
+
+  // --- 세운/대운 동조 ---
+  if (ctx.daeun && isChung(dBranch, ctx.daeun[1])) tags.push('충:대운지');
+  if (ctx.seun  && isChung(dBranch, ctx.seun[1]))  tags.push('충:세운지');
+
+  // --- 용신/기신 운 ---
+  if (natal.yongsin) {
+    const de = STEM_ELEM[STEMS.indexOf(dStem)];
+    if (natal.yongsin.includes(de)) tags.push('용희신운');
+    if (natal.gisin?.includes(de))  tags.push('구기신운');
+  }
+
+  // --- 일주 자체 ---
+  tags.push(`일주:${dayGz}`);
+
+  return [...new Set(tags)];
+}
+
+// ============================================================
+// 통계 집계
+// ============================================================
+function buildStats(natal, entries, opts = {}) {
+  const MIN_N = opts.minSamples ?? 3;
+  const scored = entries.map(e => ({
+    ...e,
+    score: composite(e),
+    tags: extractTags(natal, e.ganji ?? dayGanji(new Date(e.date)), e.ctx),
+  }));
+
+  // 개인 베이스라인
+  const all = scored.map(s => s.score);
+  const baseline = mean(all);
+  const sd = stddev(all, baseline);
+
+  // 태그별 집계
+  const byTag = new Map();
+  for (const s of scored) {
+    for (const t of s.tags) {
+      if (!byTag.has(t)) byTag.set(t, []);
+      byTag.get(t).push(s.score);
+    }
+  }
+
+  const stats = [];
+  for (const [tag, scores] of byTag) {
+    const n = scores.length;
+    if (n < MIN_N) continue;
+
+    const m = mean(scores);
+
+    // 대조군 = 이 태그가 없는 날들. 전체 평균과 비교하면 해당 태그의
+    // 나쁜 날이 베이스라인 자체를 끌어내려 Δ가 과소평가됨.
+    const without = scored.filter(s => !s.tags.includes(tag)).map(s => s.score);
+    const ctrl = without.length >= 2 ? mean(without) : baseline;
+    const delta = m - ctrl;
+
+    // 효과크기: 대조군 표준편차 기준
+    const ctrlSd = without.length >= 2 ? stddev(without, ctrl) : sd;
+    const useSd = ctrlSd > 0.001 ? ctrlSd : sd;
+    const d = useSd > 0.001 ? delta / useSd : 0;
+
+    // 표본 보정: n이 작을수록 강하게 감쇠 (n=3 → 0.27, n=10 → 0.56, n=30 → 0.79)
+    const shrink = n / (n + 8);
+
+    // 신뢰도 상한 0.9 — 어떤 표본으로도 확실성을 주장하지 않음
+    const confidence = Math.min(0.9, Math.abs(d) * shrink);
+
+    // 일주 태그(60종)는 너무 특수해 표본이 절대 모이지 않음.
+    // 통계에는 남기되 위험 승격 대상에서 제외 → 계열 태그로 일반화.
+    const tooSpecific = tag.startsWith('일주:');
+
+    stats.push({
+      tag, n, mean: m, delta, effect: d, confidence,
+      level: confidence >= 0.5 ? '높음' : confidence >= 0.25 ? '중간' : '낮음',
+      risk: delta < -0.4 && confidence >= 0.25 && n >= MIN_N && !tooSpecific,
+    });
+  }
+
+  stats.sort((a, b) => a.delta - b.delta);
+  return { baseline, sd, total: scored.length, stats, scored };
+}
+
+const mean = a => a.length ? a.reduce((x,y)=>x+y,0) / a.length : 0;
+const stddev = (a, m) => a.length < 2 ? 0 :
+  Math.sqrt(a.reduce((s,x)=>s+(x-m)**2, 0) / (a.length - 1));
+
+// ============================================================
+// 태그 상관 처리
+// 하나의 일진이 여러 태그를 동시에 발화시킴 (예: 유일 → 충:일지 + 원진:월지
+// + 파:년지 …). 이들은 독립 증거가 아니라 같은 사건의 다른 이름이므로
+// 신뢰도를 곱셈 결합하면 과대평가됨. 계열(family)로 묶어 대표 1개만 사용.
+// ============================================================
+function tagFamily(tag) {
+  const [kind] = tag.split(':');
+  if (['충','원진','형','해','파','육합'].includes(kind)) return 'branch-rel';
+  if (kind === '일진십성' || kind === '일진지지십성') return 'tengod';
+  if (kind === '오행' || kind === '지지오행') return 'element';
+  if (kind === '삼합' || kind === '반합' || kind === '방합') return 'hap';
+  if (kind === '신살') return 'shinsal';
+  return kind;
+}
+
+// 계열별 최강 태그만 남김 (|delta| 기준)
+function collapseByFamily(hits) {
+  const best = new Map();
+  for (const h of hits) {
+    const f = tagFamily(h.tag);
+    const cur = best.get(f);
+    if (!cur || Math.abs(h.delta) > Math.abs(cur.delta)) best.set(f, h);
+  }
+  return [...best.values()];
+}
+
+// 통계적으로 동률일 때 어떤 이름으로 부를지 결정하는 명리 우선순위.
+// (충/형은 1차 관계, 원진/파/해는 파생적 표현으로 본다)
+const KIND_PRIORITY = {
+  '충':0, '형':1, '원진':2, '해':3, '파':4, '육합':5,
+  '일진십성':6, '일진지지십성':7, '신살':8, '삼합':9, '반합':10, '방합':11,
+  '오행':12, '지지오행':13,
+};
+const kindRank = tag => {
+  const k = tag.split(':')[0];
+  return KIND_PRIORITY[k] ?? 20;
+};
+
+/**
+ * 계열이 달라도 같은 날에 늘 함께 발화하는 태그들이 있다.
+ * 예: 일지 진(辰) 명식에서 술(戌)일은 반드시 충:일지 + 원진:월지 + 파:시지 동시 발생.
+ * 이들은 독립 증거가 아니라 한 사건의 다른 이름이므로 대표 하나만 남긴다.
+ */
+function dropSubsumed(riskStats, scored) {
+  const dayCount = new Map();
+  for (const s of scored) for (const t of new Set(s.tags))
+    dayCount.set(t, (dayCount.get(t) || 0) + 1);
+
+  const coCount = new Map();
+  for (const s of scored) {
+    const ts = [...new Set(s.tags)];
+    for (const a of ts) for (const b of ts) {
+      if (a === b) continue;
+      const k = a + '\u0000' + b;
+      coCount.set(k, (coCount.get(k) || 0) + 1);
+    }
+  }
+
+  // 효과 큰 순 → 표본 많은 순 → 명리 우선순위 → 이름순
+  const rank = (a, b) =>
+    Math.abs(b.delta) - Math.abs(a.delta)
+    || b.n - a.n
+    || kindRank(a.tag) - kindRank(b.tag)
+    || a.tag.localeCompare(b.tag);
+  const ordered = [...riskStats].sort(rank);
+
+  const keep = [];
+  for (const h of ordered) {
+    let host = null;
+    for (const other of keep) {
+      const co = coCount.get(h.tag + '\u0000' + other.tag) || 0;
+      const nh = dayCount.get(h.tag) || 1;
+      if (co / nh >= 0.9) { host = other; break; }
+    }
+    if (host) (host.aliases ||= []).push(h.tag);
+    else keep.push({ ...h, aliases: [] });
+  }
+  return keep;
+}
+
+// ============================================================
+// 미래 예측
+// ============================================================
+function forecast(natal, entries, { days = 365, from = new Date(), minSamples = 3 } = {}) {
+  const { stats, baseline, scored } = buildStats(natal, entries, { minSamples });
+
+  // 위험 태그 중 다른 태그에 종속된 것(항상 함께 뜨고 더 약한 것)을 제거
+  const independent = dropSubsumed(stats.filter(s => s.risk), scored);
+  const riskTags = new Map(independent.map(s => [s.tag, s]));
+  if (!riskTags.size) return { days: [], riskTags: [], baseline };
+
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(from);
+    d.setDate(d.getDate() + i);
+    const gz = dayGanji(d);
+    const tags = extractTags(natal, gz);
+    const raw = tags.map(t => riskTags.get(t)).filter(Boolean);
+    if (!raw.length) continue;
+
+    // 같은 계열의 태그는 같은 사건의 중복 표현 → 대표 1개로 축약
+    const hits = collapseByFamily(raw);
+
+    // 예상 편차 = 신뢰도 가중 평균
+    const wSum = hits.reduce((s,h) => s + h.confidence, 0);
+    const predicted = hits.reduce((s,h) => s + h.delta * h.confidence, 0) / wSum;
+
+    // 축약 후에도 계열 간에는 상관이 남을 수 있으므로 보수적 결합:
+    // 최강 신뢰도를 기준으로, 추가 계열은 체감 가산
+    const sorted = [...hits].sort((a,b) => b.confidence - a.confidence);
+    let conf = sorted[0].confidence;
+    for (let k = 1; k < sorted.length; k++) {
+      conf += sorted[k].confidence * (1 - conf) * 0.5;  // 감쇠 가산
+    }
+    conf = Math.min(0.9, conf);   // 확실성 상한 (태그 단위 상한과 동일)
+
+    out.push({
+      date: d.toISOString().slice(0,10),
+      ganji: gz,
+      predicted,
+      confidence: conf,
+      level: conf >= 0.6 ? '높음' : conf >= 0.35 ? '중간' : '낮음',
+      reasons: hits.map(h => ({ tag: h.tag, n: h.n, delta: h.delta })),
+      allTags: raw.map(h => h.tag),
+    });
+  }
+
+  out.sort((a,b) => a.predicted - b.predicted);
+  return { days: out, riskTags: independent, baseline };
+}
+
+// ============================================================
+// 블라인드 기간: 확증편향 방지
+// 예측일 중 일부를 무작위로 숨겨 대조군 확보
+// ============================================================
+function applyBlinding(forecastDays, { holdout = 0.3, seed = 42 } = {}) {
+  let s = seed;
+  const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  return forecastDays.map(d => ({ ...d, blinded: rnd() < holdout }));
+}
+// ===== 용희신 종합 판정 (월지·일주 중심 / 엄격 우선순위) =====
+// ============================================================
+// 판정 순서: 전왕 → 조후 → 통관 → 격국 → 억부
+// 핵심 원칙:
+// 1) 월지(월령)를 계절과 격국의 중심으로 본다.
+// 2) 일주, 특히 일지의 통근·생극 관계를 먼저 확인한다.
+// 3) 특수 구조가 성립하면 뒤 단계의 억부 계산으로 결론을 뒤집지 않는다.
+// ============================================================
+
+const ELEMS = ['목','화','토','금','수'];
+const GEN_OF  = { 목:'수', 화:'목', 토:'화', 금:'토', 수:'금' }; // 나를 생함
+const DRAIN   = { 목:'화', 화:'토', 토:'금', 금:'수', 수:'목' }; // 내가 생함
+const CTRL    = { 목:'토', 화:'금', 토:'수', 금:'목', 수:'화' }; // 내가 극함
+const OVR_OF  = { 목:'금', 화:'수', 토:'목', 금:'화', 수:'토' }; // 나를 극함
+
+// ===== 기신·구신 자동 산출 보정 =====
+// 문서 요구사항: 기신 = 용신을 극하는 오행, 구신 = 기신을 생하는 오행.
+// 어떤 판정법이 무엇을 반환하든, 최종 용신이 정해지면 아래 표로 확정한다.
+//   용신 목 → 기신 금 · 구신 토 / 용신 화 → 기신 수 · 구신 금
+//   용신 토 → 기신 목 · 구신 수 / 용신 금 → 기신 화 · 구신 목
+//   용신 수 → 기신 토 · 구신 화
+const YONG_TO_GISIN = { 목:'금', 화:'수', 토:'목', 금:'화', 수:'토' }; // 용신을 극하는 오행
+const GISIN_TO_GUSIN = { 목:'수', 화:'목', 토:'화', 금:'토', 수:'금' }; // 기신을 생하는 오행(=GEN_OF)
+
+const SEASON = {
+  '인':'봄','묘':'봄','진':'봄','사':'여름','오':'여름','미':'여름',
+  '신':'가을','유':'가을','술':'가을','해':'겨울','자':'겨울','축':'겨울',
+};
+const TEMP_IDX = {'자':-2,'축':-2,'인':-1,'묘':0,'진':0,'사':1,'오':2,'미':2,'신':1,'유':0,'술':0,'해':-1};
+const WET_IDX  = {'자':-2,'축':-2,'인':0,'묘':0,'진':-1,'사':1,'오':2,'미':2,'신':0,'유':1,'술':1,'해':-1};
+
+const _ysStem = s => STEM_ELEM[STEMS.indexOf(s)];
+const _ysBranch = b => BRANCH_ELEM[BRANCHES.indexOf(b)];
+
+function elementPower(p) {
+  const c = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  const pillars = [p.year,p.month,p.day,p.hour].filter(Boolean);
+  pillars.forEach((gz, i) => {
+    const isMonth = i === 1;
+    const stemW = isMonth ? 1.35 : 1;
+    const branchW = isMonth ? 2.4 : (i === 2 ? 1.55 : 1.15);
+    c[_ysStem(gz[0])] += stemW;
+    c[_ysBranch(gz[1])] += branchW;
+    for (const [hs, days] of HIDDEN[gz[1]]) {
+      c[_ysStem(hs)] += branchW * (days / 30) * 0.55;
+    }
+  });
+  return c;
+}
+
+function supportRatio(me, branch) {
+  let support = 0, total = 0;
+  for (const [hs, days] of HIDDEN[branch]) {
+    const e = _ysStem(hs); total += days;
+    if (e === me) support += days;
+    else if (e === GEN_OF[me]) support += days * 0.8;
+  }
+  return total ? support / total : 0;
+}
+
+function relationLabel(me, target) {
+  if (target === me) return '비겁으로 일간과 같은 기운';
+  if (target === GEN_OF[me]) return '인성으로 일간을 생조';
+  if (target === DRAIN[me]) return '식상으로 일간의 기운을 설기';
+  if (target === CTRL[me]) return '재성으로 일간이 극하고 소모';
+  if (target === OVR_OF[me]) return '관살로 일간을 제어';
+  return '';
+}
+
+function coreRelation(p) {
+  const me = _ysStem(p.day[0]);
+  const mb = p.month[1], db = p.day[1];
+  const monthElem = _ysBranch(mb), dayElem = _ysBranch(db);
+  const monthRatio = supportRatio(me, mb), dayRatio = supportRatio(me, db);
+  const monthToDay = monthElem === dayElem ? '동기' : generates(monthElem, dayElem) ? '월지가 일지를 생함' : generates(dayElem, monthElem) ? '일지가 월지를 생함' : overcomes(monthElem, dayElem) ? '월지가 일지를 극함' : overcomes(dayElem, monthElem) ? '일지가 월지를 극함' : '직접 생극 없음';
+  return {
+    me, monthBranch:mb, dayBranch:db, monthElem, dayElem,
+    monthRatio, dayRatio, monthToDay,
+    text:`월지 ${mb}(${monthElem})는 ${relationLabel(me, monthElem)}하고, 일지 ${db}(${dayElem})는 ${relationLabel(me, dayElem)}합니다. 월지와 일지는 ${monthToDay} 관계입니다.`
+  };
+}
+
+function strength(p, core = coreRelation(p)) {
+  const me = core.me, c = elementPower(p);
+  const total = Object.values(c).reduce((a,b)=>a+b,0);
+  const support = c[me] + c[GEN_OF[me]];
+  const oppose = total - support;
+  const deukryeong = core.monthRatio >= 0.5 || core.monthElem === me || core.monthElem === GEN_OF[me];
+  const deukji = core.dayRatio >= 0.5 || core.dayElem === me || core.dayElem === GEN_OF[me];
+  const deukse = support >= oppose;
+  const score = (deukryeong?2:0) + (deukji?1:0) + (deukse?1:0);
+  return { me,count:c,total,support,oppose,ratio:support/total,deukryeong,deukji,deukse,score,strong:score>=2.5,core };
+}
+
+function directElementCounts(p) {
+  const c = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  [p.year,p.month,p.day,p.hour].filter(Boolean).forEach(gz => {
+    c[_ysStem(gz[0])]++;
+    c[_ysBranch(gz[1])]++;
+  });
+  return c;
+}
+
+// 1순위: 전왕
+function jeonwang(p, st) {
+  const d = directElementCounts(p);
+  let best = null;
+  for (const base of ELEMS) {
+    const following = new Set([base, DRAIN[base]]); // 같은 세력 또는 상생하여 흘러가는 구조
+    const n = ELEMS.reduce((s,e)=>s+(following.has(e)?d[e]:0),0);
+    const monthIncluded = following.has(st.core.monthElem);
+    const dayIncluded = following.has(st.core.dayElem) || following.has(st.me);
+    const opposing = ELEMS.reduce((s,e)=>s+(!following.has(e)?d[e]:0),0);
+    if (n >= 5 && monthIncluded && dayIncluded && opposing <= 3) {
+      if (!best || n > best.n) best = { base, n, opposing, following:[...following] };
+    }
+  }
+  if (!best) return {method:'전왕',active:false,weight:0,yong:[],gi:[],reason:'월지를 포함해 5글자 이상이 한 세력 또는 순생 구조로 몰린 전왕 조건이 성립하지 않음.'};
+
+  const yong = best.following;
+  const gi = ELEMS.filter(e=>!yong.includes(e) && (OVR_OF[best.base]===e || CTRL[best.base]===e));
+  return {method:'전왕',active:true,weight:1,yong,gi,special:`${best.base} 전왕`,
+    reason:`월지 ${st.core.monthBranch}를 포함한 8글자 중 ${best.n}글자가 ${best.following.join('→')} 세력에 속합니다. 억부로 거스르지 않고 왕한 흐름에 순응합니다.`};
+}
+
+// 2순위: 조후
+function johu(p, st) {
+  const mb=st.core.monthBranch, temp=TEMP_IDX[mb], wet=WET_IDX[mb], c=st.count;
+  const yong=[], notes=[]; let urgency=0;
+  if (['해','자','축'].includes(mb)) {
+    if (c.화 < 2.2) { yong.push('화'); urgency=2; notes.push(`${mb}월의 한랭함을 화로 덥혀야 함`); }
+    if (wet<=-1 && c.토<1.5) { yong.push('토'); notes.push('한습을 거두고 수기를 제방할 토가 보조로 필요'); }
+  }
+  if (['사','오','미'].includes(mb)) {
+    if (c.수 < 2.2) { yong.push('수'); urgency=2; notes.push(`${mb}월의 조열함을 수로 식히고 적셔야 함`); }
+    if (wet>=1 && c.금<1.2) { yong.push('금'); notes.push('수원을 돕는 금이 보조로 필요'); }
+  }
+  // 계절 외에도 실제 화·수 편중이 극단이면 조후 인정
+  if (!yong.length && c.화/Math.max(c.수,.1)>=4 && c.화>=4) { yong.push('수'); urgency=2; notes.push('원국의 화기가 수기보다 지나치게 강해 조열함'); }
+  if (!yong.length && c.수/Math.max(c.화,.1)>=4 && c.수>=4) { yong.push('화'); urgency=2; notes.push('원국의 수기가 화기보다 지나치게 강해 한습함'); }
+  if (!yong.length) return {method:'조후',active:false,weight:0,yong:[],gi:[],urgency:0,reason:`${SEASON[mb]} ${mb}월이나 생존 조건을 좌우할 정도의 한난조습 편중은 확인되지 않음.`};
+  const uniq=[...new Set(yong)], gi=uniq.includes('수')?['화']:uniq.includes('화')?['수']:[];
+  return {method:'조후',active:true,weight:1,yong:uniq,gi,urgency,reason:notes.join('. ')+'.'};
+}
+
+// 3순위: 통관
+function tonggwan(p, st) {
+  const c=st.count; let best=null;
+  for (const a of ELEMS) {
+    const b=CTRL[a], pa=c[a], pb=c[b];
+    if (pa<2 || pb<2) continue;
+    const balance=Math.min(pa,pb)/Math.max(pa,pb);
+    if (balance<0.72) continue;
+    const bridge=DRAIN[a];
+    if (DRAIN[bridge]!==b || c[bridge]>=1.4) continue;
+    const power=(pa+pb)*balance;
+    if (!best || power>best.power) best={a,b,bridge,pa,pb,balance,power};
+  }
+  if (!best) return {method:'통관',active:false,weight:0,yong:[],gi:[],reason:'서로 극하는 두 세력이 대등하게 충돌하면서 중간 오행이 비어 있는 구조가 아님.'};
+  return {method:'통관',active:true,weight:1,yong:[best.bridge],gi:[],reason:`${best.a}(${best.pa.toFixed(1)})와 ${best.b}(${best.pb.toFixed(1)})가 대등하게 충돌합니다. ${best.a}→${best.bridge}→${best.b}로 흐름을 잇는 ${best.bridge}을 통관용신으로 삼습니다.`};
+}
+
+function monthHiddenOrder(branch) {
+  return [...HIDDEN[branch]].sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+}
+
+// 4순위 전반: 격국
+function gyeokguk(p, st) {
+  const dayStem=p.day[0], monthBranch=p.month[1];
+  const hidden=monthHiddenOrder(monthBranch);
+  const visible=[p.year?.[0],p.month?.[0],p.hour?.[0]].filter(Boolean);
+  const projected=hidden.find(h=>visible.includes(h));
+  const standard=projected || hidden[0];
+  const god=tenGod(dayStem, standard);
+  const elem=_ysStem(standard);
+  const nameMap={비견:'건록격',겁재:'월겁격',식신:'식신격',상관:'상관격',편재:'편재격',정재:'정재격',편관:'편관격',정관:'정관격',편인:'편인격',정인:'정인격'};
+  return {method:'격국',active:true,weight:1,yong:[],gi:[],gyeok:nameMap[god]||`${god||'월령'}격`,standard,standardElem:elem,projected:!!projected,
+    reason:`월지 ${monthBranch}의 지장간 ${hidden.join('·')} 중 ${projected?`${standard}이 천간에 투출`:`투출이 없어 정기 ${standard}을 기준`}하여 ${nameMap[god]||god}으로 봅니다.`};
+}
+
+// 4순위 후반: 억부. 격국이 확립된 일반 명식에서만 사용
+function eokbu(p, st, gyeok) {
+  const me=st.me, c=st.count;
+  let yong=[],gi=[],reason='';
+  if (st.strong) {
+    const candidates=[DRAIN[me],CTRL[me],OVR_OF[me]];
+    // 격국을 살리면서 월령의 병목을 해소하는 순서
+    candidates.sort((a,b)=>c[a]-c[b]);
+    yong=[candidates[0]];
+    const helper=GEN_OF[yong[0]];
+    if (helper!==me && !yong.includes(helper)) yong.push(helper);
+    gi=[me,GEN_OF[me]];
+    reason=`월지·일지 관계와 득령·득지·득세를 종합하면 일간이 강합니다. ${gyeok.gyeok}의 흐름을 해치지 않으면서 ${yong[0]}로 설기·제어합니다.`;
+  } else {
+    yong=[GEN_OF[me],me];
+    gi=[OVR_OF[me],DRAIN[me]];
+    reason=`월지·일지 관계와 득령·득지·득세를 종합하면 일간이 약합니다. ${gyeok.gyeok}을 감당하도록 ${GEN_OF[me]} 인성과 ${me} 비겁으로 생조합니다.`;
+  }
+  return {method:'억부',active:true,weight:1,yong:[...new Set(yong)],gi:[...new Set(gi)],reason};
+}
+
+// ===== 기신·구신 자동 산출 보정 =====
+// 최종 용신(주용신)에서 기신·구신을 공식으로 확정한다.
+// 판정법이 무엇을 반환했든, 여기서 반드시 상극 공식으로 덮어써서
+// 기신·구신이 공란이 되는 일이 없도록 한다.
+function deriveFour(primary, st) {
+  const yongsin = primary.yong.slice(0,1);        // 주용신 (단일)
+  let huisin = primary.yong.slice(1,2);           // 부용신 후보
+  // 희신은 '용신을 생조하는 오행'. 부용신이 없으면 인성(GEN_OF[용신])으로 채운다.
+  if (yongsin.length) {
+    const helper = GEN_OF[yongsin[0]];            // 용신을 생하는 오행
+    if (!huisin.length && helper !== yongsin[0]) huisin = [helper];
+    // 희신이 용신과 같으면 제거
+    huisin = huisin.filter(e => e !== yongsin[0]);
+  }
+
+  // 주용신 기준으로 기신·구신을 공식으로 확정 (절대 공란 금지)
+  let gisin = [], gusin = [], gisinWhy = '', gusinWhy = '';
+  if (yongsin.length) {
+    const y = yongsin[0];
+    const gi = YONG_TO_GISIN[y];                  // 용신을 극하는 오행
+    const gu = GISIN_TO_GUSIN[gi];                // 기신을 생하는 오행
+    gisin = [gi];
+    gusin = [gu];
+    gisinWhy = `${gi}은(는) 용신 ${y}을(를) 직접 극합니다.`;
+    gusinWhy = `${gu}은(는) 기신 ${gi}을(를) 생하여 용신 ${y}을(를) 간접적으로 약화시킵니다.`;
+
+    // 복수 용신(부용신 포함)이면 각 용신의 기신·구신을 합쳐 중복 제거.
+    // 단, 주용신 기준값을 대표로 앞에 둔다.
+    for (const e of primary.yong.slice(1)) {
+      const gi2 = YONG_TO_GISIN[e], gu2 = GISIN_TO_GUSIN[gi2];
+      if (!gisin.includes(gi2)) gisin.push(gi2);
+      if (!gusin.includes(gu2)) gusin.push(gu2);
+    }
+    // 용신/희신과 기신/구신이 겹치면(모순) 주용신 기준을 우선하고 겹치는 부용신발 값은 제거
+    gisin = gisin.filter(e => !yongsin.includes(e) && !huisin.includes(e));
+    gusin = gusin.filter(e => !yongsin.includes(e) && !huisin.includes(e));
+    // 필터로 비어버리면 주용신 공식값을 복원 (공란 방지)
+    if (!gisin.length) gisin = [gi];
+    if (!gusin.length) gusin = [gu];
+  }
+
+  return {
+    yongsin, huisin,
+    gisin: gisin.slice(0,2),
+    gusin: gusin.slice(0,2),
+    gisinWhy, gusinWhy,
+  };
+}
+
+function analyzeYongsinFull(p) {
+  const core=coreRelation(p), st=strength(p,core);
+  const A=jeonwang(p,st);
+  const B=johu(p,st);
+  const C=tonggwan(p,st);
+  const D=gyeokguk(p,st);
+  const E=eokbu(p,st,D);
+
+  let primary, rationale;
+  if (A.active) { primary=A; rationale='전왕 조건이 성립하므로 뒤 단계의 조후·통관·격국·억부가 결론을 뒤집지 않습니다.'; }
+  else if (B.active) { primary=B; rationale='월령의 한난조습이 생존 조건을 좌우하므로 조후를 억부보다 우선합니다.'; }
+  else if (C.active) { primary=C; rationale='대등한 두 세력의 충돌이 핵심 병목이므로 통관을 우선합니다.'; }
+  else { primary=E; rationale=`특수 구조가 아니므로 월지에서 ${D.gyeok}을 세운 뒤 일주의 강약을 보조적으로 적용합니다.`; }
+
+  const four=deriveFour(primary,st);
+  const passed=[A,B,C].filter(x=>x.active).length;
+  const confidence=A.active?0.82:B.active?0.78:C.active?0.76:0.72;
+
+  return {
+    ...st, ...four, core,
+    methods:{jeonwang:A,johu:B,tonggwan:C,gyeokguk:D,eokbu:E},
+    primary:primary.method,
+    rationale,
+    confidence:Math.min(.9,confidence+(passed>1?.04:0)),
+    filterLines:[
+      `전왕: ${A.active?'해당':'비해당'} — ${A.reason}`,
+      `조후: ${B.active?'해당':'비해당'} — ${B.reason}`,
+      `통관: ${C.active?'해당':'비해당'} — ${C.reason}`,
+    ],
+    finalReason:`${core.text} ${primary.reason}`,
+    yongsin_legacy:[...four.yongsin,...four.huisin],
+  };
+}
+
+function analyzeYongsin(p) {
+  const r=analyzeYongsinFull(p);
+  return {count:r.count,me:r.me,strong:r.strong,ratio:r.ratio,yongsin:[...r.yongsin,...r.huisin],gisin:r.gisin,full:r};
+}
+// ===== app =====
+// ============================================================
+// 앱 로직
+// ============================================================
+// ============================================================
+// 시간대 — 만세력은 한국 표준시(KST, UTC+9) 기준으로 정의된다.
+// 사용자가 어느 나라에 있든 절입 시각과 날짜 경계는 KST로 판정해야
+// 같은 날의 일진이 기기마다 달라지지 않는다.
+// (Date 객체 내부는 항상 UTC 절대시각이고, 아래 헬퍼로만 KST를 읽는다.)
+// ============================================================
+const KST_OFFSET = 9 * 60 * 60 * 1000;
+
+/** UTC 절대시각 → KST 벽시계 값을 읽기 위한 shifted Date */
+const toKST = d => new Date(d.getTime() + KST_OFFSET);
+
+/** KST 벽시계 기준 년/월/일/시/분 */
+const kstParts = d => {
+  const k = toKST(d);
+  return {
+    y: k.getUTCFullYear(), m: k.getUTCMonth(), d: k.getUTCDate(),
+    h: k.getUTCHours(), mi: k.getUTCMinutes(), dow: k.getUTCDay(),
+  };
+};
+
+/** KST 벽시계 년/월/일/시/분 → UTC 절대시각 Date */
+const fromKST = (y, m, d, h = 0, mi = 0) =>
+  new Date(Date.UTC(y, m, d, h, mi) - KST_OFFSET);
+
+/** 지금 이 순간의 KST 날짜 */
+const nowKST = () => kstParts(new Date());
+
+/** KST 기준 YYYY-MM-DD */
+const isoKST = d => {
+  const p = kstParts(d);
+  return `${p.y}-${String(p.m+1).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`;
+};
+
+const fmtKST = d => {
+  const p = kstParts(d);
+  return `${p.m+1}월 ${p.d}일 ${String(p.h).padStart(2,'0')}:${String(p.mi).padStart(2,'0')}`;
+};
+
+const HANJA_S = {'갑':'甲','을':'乙','병':'丙','정':'丁','무':'戊','기':'己','경':'庚','신':'辛','임':'壬','계':'癸'};
+const HANJA_B = {'자':'子','축':'丑','인':'寅','묘':'卯','진':'辰','사':'巳','오':'午','미':'未','신':'申','유':'酉','술':'戌','해':'亥'};
+const H = c => HANJA_S[c] || HANJA_B[c] || c;
+const elemOfStem  = c => STEM_ELEM[STEMS.indexOf(c)];
+const elemOfBranch= c => BRANCH_ELEM[BRANCHES.indexOf(c)];
+const $ = s => document.querySelector(s);
+
+// 서버 위에서 돌고 있는지 확인. 파일로 직접 열었으면 로컬 전용 모드로 동작한다.
+let SERVER_MODE = true;
+
+const state = {
+  tab: 'today',
+  entries: {},          // { 'YYYY-MM-DD': {mood, body, memo} }
+  natal: null,          // {y,m,d,h, gender, pillars}
+  cal: new Date(),
+  sel: null,
+  user: null,           // 로그인한 아이디
+  rev: 0,               // 서버 데이터 버전
+  sync: 'off',          // off | idle | saving | saved | error | offline
+};
+
+// ============================================================
+// 서버 연동 (Supabase)
+// ============================================================
+const SUPABASE_URL =
+'https://rjzzleyydxhmnwcqbzlt.supabase.co';
+
+const SUPABASE_KEY =
+  'sb_publishable_z-geOXJNmk1Y52TtC1bq6Q_Zjm84JV1';
+
+// ===== Supabase 로그인 세션 유지 =====
+// storage를 localStorage로 명시해 새로고침·재방문 시 세션이 복구되도록 한다.
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage,
+    },
+  }
+);
+
+async function loginWithGoogle() {
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://jungmin-lee-1122.github.io/sajudiary.html',
+    },
+  });
+
+  if (error) {
+    console.error(error);
+    alert('Google 로그인에 실패했습니다.');
+  }
+}
+
+const API = {
+  async getUser() {
+    const {
+      data: { user },
+      error,
+    } = await supabaseClient.auth.getUser();
+
+    if (error) throw error;
+    return user;
+  },
+
+  async me() {
+    const user = await API.getUser();
+
+    if (!user) {
+      return {
+        user: null,
+        data: null,
+        rev: 0,
+      };
+    }
+
+    const { data, error } = await supabaseClient
+      .from('user_data')
+      .select('data, rev, updated_at')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+      data: data?.data ?? {},
+      rev: data?.rev ?? 0,
+      updatedAt: data?.updated_at ?? null,
+    };
+  },
+
+  async signup(email, password) {
+    const { data, error } =
+      await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo:
+            'https://jungmin-lee-1122.github.io/sajudiary/',
+        },
+      });
+
+    if (error) throw error;
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  },
+
+  async login(email, password) {
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+    if (error) throw error;
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  },
+
+  async logout() {
+    const { error } =
+      await supabaseClient.auth.signOut();
+
+    if (error) throw error;
+
+    return { ok: true };
+  },
+
+  async put(newData, expectedRev) {
+    const user = await API.getUser();
+
+    if (!user) {
+      throw new Error('로그인이 필요합니다.');
+    }
+
+    const { data: current, error: readError } =
+      await supabaseClient
+        .from('user_data')
+        .select('rev, data')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+    if (readError) throw readError;
+
+    const currentRev = current?.rev ?? 0;
+
+    if (currentRev !== expectedRev) {
+      const conflict = new Error(
+        '다른 기기에서 기록이 변경되었습니다.'
+      );
+
+      conflict.status = 409;
+      // 병합에 쓰도록 서버 데이터도 함께 전달한다
+      conflict.body = {
+        currentRev,
+        serverRev: currentRev,
+        serverData: current?.data ?? { natal: null, entries: {} },
+      };
+
+      throw conflict;
+    }
+
+    const nextRev = currentRev + 1;
+
+    const { data, error } =
+      await supabaseClient
+        .from('user_data')
+        .upsert(
+          {
+            user_id: user.id,
+            data: newData,
+            rev: nextRev,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'user_id',
+          }
+        )
+        .select('data, rev, updated_at')
+        .single();
+
+    if (error) throw error;
+
+    return data;
+  },
+
+  async passwd(currentPassword, nextPassword) {
+    const user = await API.getUser();
+
+    if (!user?.email) {
+      throw new Error('로그인이 필요합니다.');
+    }
+
+    const { error: verifyError } =
+      await supabaseClient.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+
+    if (verifyError) {
+      throw new Error('현재 비밀번호가 올바르지 않습니다.');
+    }
+
+    const { error } =
+      await supabaseClient.auth.updateUser({
+        password: nextPassword,
+      });
+
+    if (error) throw error;
+
+    return { ok: true };
+  },
+
+  async imp(dump, mode = 'merge') {
+    const current = await API.me();
+
+    let nextData;
+
+    if (mode === 'replace') {
+      nextData = dump;
+    } else {
+      nextData = {
+        ...(dump ?? {}),
+        ...(current.data ?? {}),
+      };
+    }
+
+    return API.put(nextData, current.rev);
+  },
+
+  async del(password) {
+    throw new Error(
+      '브라우저에서 계정 삭제는 바로 구현할 수 없습니다. ' +
+      '우선 데이터 삭제와 로그아웃만 제공하는 방식으로 바꿔야 합니다.'
+    );
+  },
+};
+
+let saveTimer = null;
+function setSync(s) { state.sync = s; const el = $('#sync'); if (el) el.outerHTML = syncHTML(); }
+
+/** 변경 후 디바운스 저장 — 타이핑마다 요청을 보내지 않는다 */
+function queueSave() {
+  if (!state.user) return;
+  clearTimeout(saveTimer);
+  setSync('saving');
+  saveTimer = setTimeout(pushNow, 800);
+}
+
+async function pushNow() {
+  if (!state.user) return;
+  try {
+    const r = await API.put({ natal: state.natal, entries: state.entries }, state.rev);
+    state.rev = r.rev;
+    setSync('saved');
+    setTimeout(()=>{ if(state.sync==='saved') setSync('idle'); }, 2000);
+  } catch (e) {
+    if (e.status === 409) {
+      // 다른 기기가 먼저 저장함 → 병합 후 재시도
+      const sd = e.body.serverData || { entries:{}, natal:null };
+      state.entries = { ...sd.entries, ...state.entries };
+      state.natal = state.natal || sd.natal;
+      state.rev = e.body.serverRev;
+      return pushNow();
+    }
+    setSync(e.status === 401 ? 'off' : 'error');
+    if (e.status === 401) { state.user = null; render(); }
+  }
+}
+
+// ---------- 사주 산출 ----------
+// 사주의 하루는 자정이 아니라 자시(보정 후 23:30)에 시작한다.
+// 23:30 이후 출생이면 일주가 다음날로 넘어간다.
+function computeSaju(date, hour, minute) {
+  const shift = (hour == null) ? 0 : dayShiftForHour(hour, minute || 0);
+  const dayDate = shift ? new Date(date.getTime() + 86400000) : date;
+
+  const { termIndex, sajuYear } = termIndexOf(date);
+  const yGz = yearGanjiRaw(sajuYear);
+  const mGz = monthGanji(yGz[0], termIndex);
+  const dGz = dayGanji(dayDate);
+  const hGz = (hour === null || hour === undefined)
+    ? null : hourGanji(dGz[0], hour, minute || 0);
+  return { year: yGz, month: mGz, day: dGz, hour: hGz, termIndex, sajuYear, dayShift: shift };
+}
+
+// ---------- 대운 ----------
+function computeDaeun(p, birth, gender) {
+  const yinYear = STEM_YIN[STEMS.indexOf(p.year[0])];
+  const forward = (gender === 'M') !== yinYear;   // 양남음녀 순행
+  const by = kstParts(birth).y;
+  const all = [...monthTerms(by-1), ...monthTerms(by), ...monthTerms(by+1)]
+    .map(t=>t.date).sort((a,b)=>a-b);
+  let prev = null, next = null;
+  for (const t of all) { if (t <= birth) prev = t; else if (!next) next = t; }
+  const days = forward ? (next - birth)/86400000 : (birth - prev)/86400000;
+  const startAge = Math.max(1, Math.round(days / 3 * 10) / 10);
+
+  const mi = ganjiIndex(p.month);
+  const out = [];
+  for (let i = 1; i <= 9; i++) {
+    out.push({ age: Math.floor(startAge + (i-1)*10), gz: ganjiFromIndex(mi + (forward ? i : -i)) });
+  }
+  return { startAge, forward, list: out };
+}
+
+// ---------- 렌더: 명식판 ----------
+function pillarHTML(cap, gz, dayStem) {
+  if (!gz) return `<div class="pillar"><div class="pillar-cap">${cap}</div>
+    <div class="gzbox" style="opacity:.3"><span class="ch">?</span><span class="ko">미상</span></div>
+    <div class="gzbox" style="opacity:.3"><span class="ch">?</span><span class="ko">미상</span></div></div>`;
+  const s = gz[0], b = gz[1];
+  const se = elemOfStem(s), be = elemOfBranch(b);
+  const tgS = dayStem ? (s === dayStem && cap === '일주' ? '일간' : tenGod(dayStem, s)) : '';
+  const tgB = dayStem ? tenGodBranch(dayStem, b) : '';
+  const hid = HIDDEN[b].map(([c]) =>
+    `<span class="e-${elemOfStem(c)}">${H(c)}<small>${dayStem?tenGod(dayStem,c)||'':''}</small></span>`).join(' ');
+  return `<div class="pillar">
+    <div class="pillar-cap">${cap}</div>
+    <div class="gzbox b-${se}"><span class="ch e-${se}">${H(s)}</span><span class="ko">${s}</span><span class="tg">${tgS||''}</span></div>
+    <div class="gzbox b-${be}"><span class="ch e-${be}">${H(b)}</span><span class="ko">${b}</span><span class="tg">${tgB||''}</span></div>
+    <div class="hidden-row"><div class="lbl">지장간</div><div class="hg">${hid}</div></div>
+  </div>`;
+}
+
+function myeongsikHTML(p, withHour = true) {
+  const ds = p.day[0];
+  return `<div class="myeongsik">
+    ${pillarHTML('시주', withHour?p.hour:null, ds)}
+    ${pillarHTML('일주', p.day, ds)}
+    ${pillarHTML('월주', p.month, ds)}
+    ${pillarHTML('년주', p.year, ds)}
+  </div>`;
+}
+
+// ---------- 뷰: 오늘 ----------
+function viewToday() {
+  const now = new Date();
+  const k = nowKST();
+  const p = computeSaju(now, k.h, k.mi);
+  const terms = monthTerms(k.y);
+  const nextTerm = terms.find(t => t.date > now) || monthTerms(k.y+1)[0];
+  const dd = Math.ceil((nextTerm.date - now)/86400000);
+  const wk = ['일','월','화','수','목','금','토'][k.dow];
+  const hb = hourBranchName(k.h, k.mi);
+  const hr = HOUR_RANGES.find(r => r[0] === hb);
+
+  return `<div class="today-date">
+    <div class="d">${isoKST(now)} ${wk}요일</div>
+    <div class="big">${p.year}년 ${p.month}월 ${p.day}일 ${p.hour}시</div>
+    <div class="term-strip">
+      <span>절기 <b>${MONTH_TERMS[p.termIndex].name}</b> 중</span>
+      <span>· 다음 <b>${nextTerm.name}</b> ${dd}일 후 (${fmtKST(nextTerm.date)})</span>
+    </div>
+    <div class="term-strip">
+      <span><b>${hb}시</b> ${hr[1]}~${hr[2]}</span>
+      ${p.dayShift?'<span>· 자시 이후라 일주는 다음날 기준</span>':''}
+    </div>
+  </div>
+  ${myeongsikHTML(p)}
+  <div class="note">천간·지지 아래는 일간 기준 십성입니다. 하단은 지지 속 지장간.<br>
+  절입 시각 기준으로 년·월주가 바뀝니다 (양력 1일 아님).
+  시주는 동경 135도 보정을 적용해 자시가 23:30에 시작합니다.</div>`;
+}
+
+/**
+ * 달력에 보이는 양력 달이 걸쳐 있는 모든 월주 구간을 구한다.
+ * 양력 1일이 아니라 절입 시각에 월주가 바뀌므로, 한 양력 달에
+ * 보통 두 개의 월주가 걸린다. (예: 2026년 7월 = 을미월 + 병신월)
+ */
+function monthSegments(y, m) {
+  const last  = new Date(y, m + 1, 0);
+  const segs = [];
+  let cur = null;
+
+  for (let d = 1; d <= last.getDate(); d++) {
+    const dt = fromKST(y, m, d, 12);
+    const { termIndex, sajuYear } = termIndexOf(dt);
+    const gz = monthGanji(yearGanjiRaw(sajuYear)[0], termIndex);
+    const yGz = yearGanjiRaw(sajuYear);
+    if (!cur || cur.gz !== gz) {
+      cur = { gz, yearGz: yGz, termIndex, from: d, to: d,
+              termName: MONTH_TERMS[termIndex].name };
+      segs.push(cur);
+    } else cur.to = d;
+  }
+
+  // 각 구간의 정확한 절입 시각 (구간 시작이 이 달 안에 있을 때만)
+  for (const s of segs) {
+    const terms = [...monthTerms(y - 1), ...monthTerms(y), ...monthTerms(y + 1)];
+    const t = terms.find(t => { const kp = kstParts(t.date);
+      return t.name === s.termName && kp.y === y && kp.m === m; });
+    s.enterAt = t ? t.date : null;
+  }
+  return segs;
+}
+
+// ---------- 뷰: 캘린더 ----------
+function viewCalendar() {
+  const c = state.cal;
+  const y = c.getFullYear(), m = c.getMonth();
+  const first = new Date(y, m, 1), last = new Date(y, m+1, 0);
+  const pad = first.getDay();
+  const today = isoKST(new Date());
+
+  const terms = [...monthTerms(y), ...monthTerms(y-1), ...monthTerms(y+1)];
+  const termOn = {};
+  for (const t of terms) { const kp = kstParts(t.date); if (kp.y===y && kp.m===m) termOn[kp.d] = t.name; }
+
+  let cells = '';
+  for (let i=0;i<pad;i++) cells += `<div class="cell pad"></div>`;
+  for (let d=1; d<=last.getDate(); d++) {
+    const dt = fromKST(y,m,d,12), k = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, gz = dayGanji(dt);
+    const e = state.entries[k];
+    const isT = k === today;
+    const warn = state.warnSet && state.warnSet.has(k);
+    let dots = '';
+    if (e) {
+      const ms = moodList(e);
+      // 다중 선택이므로 개별 기분이 아니라 그날 종합 점수로 색을 정한다
+      const sc = ms.length ? composite({ mood: ms, body: 3 }) : null;
+      const moodColor = sc === null ? null
+        : sc > 0.4 ? 'var(--ok)' : sc < -0.4 ? 'var(--alert)' : 'var(--to)';
+      dots = `<div class="dots">
+        ${moodColor?`<div class="dot" style="background:${moodColor}"></div>`:''}
+        ${e.body?`<div class="dot" style="background:${e.body>=4?'var(--ok)':e.body<=2?'var(--alert)':'var(--to)'}"></div>`:''}
+        ${e.memo?`<div class="dot" style="background:var(--mute)"></div>`:''}
+      </div>`;
+    }
+    cells += `<div class="cell ${isT?'today':''} ${state.sel===k?'sel':''} ${warn?'warn':''}" data-d="${k}">
+      ${termOn[d]?`<div class="term">${termOn[d]}</div>`:''}
+      <div class="n">${d}</div>
+      <div class="gz"><span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span></div>
+      ${dots}
+    </div>`;
+  }
+
+  const nowY = nowKST().y;
+  const years = [];
+  for (let yy = nowY - 80; yy <= nowY + 20; yy++) years.push(yy);
+
+  const segs = monthSegments(y, m);
+  const segLabel = segs.map(s => `${s.gz}월`).join(' · ');
+
+  return `<div class="cal-nav">
+    <button id="pm" aria-label="이전 달">‹</button>
+    <div class="t">
+      <div class="picks">
+        <div class="pick">
+          <select id="sy" aria-label="연도 선택">
+            ${years.map(yy=>`<option value="${yy}" ${yy===y?'selected':''}>${yy}년</option>`).join('')}
+          </select>
+        </div>
+        <div class="pick">
+          <select id="sm" aria-label="월 선택">
+            ${Array.from({length:12},(_,i)=>`<option value="${i}" ${i===m?'selected':''}>${i+1}월</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <small class="gzline">
+        ${segs[0].yearGz} · ${segLabel}
+        <button class="info" id="segI" aria-label="절기 구간 보기" aria-expanded="false">i</button>
+      </small>
+    </div>
+    <button id="nm" aria-label="다음 달">›</button>
+  </div>
+  <div class="pop" id="segPop" hidden>
+    <div class="pop-hd">이 달의 월주 구간</div>
+    ${segs.map(s=>`<div class="seg">
+      <div class="seg-gz"><span class="e-${elemOfStem(s.gz[0])}">${H(s.gz[0])}</span><span class="e-${elemOfBranch(s.gz[1])}">${H(s.gz[1])}</span>
+        <span class="seg-ko">${s.yearGz}년 ${s.gz}월</span></div>
+      <div class="seg-range">${m+1}월 ${s.from}일 ~ ${m+1}월 ${s.to}일</div>
+      <div class="seg-term">${s.enterAt
+        ? `${s.termName} 절입 · ${fmtKST(s.enterAt)}부터`
+        : `${s.termName} 절기 중 · 지난달부터 이어짐`}</div>
+    </div>`).join('')}
+    <div class="pop-note">월주는 양력 1일이 아니라 <b>절입 시각</b>에 바뀝니다.
+    그래서 한 양력 달에 두 개의 월주가 걸칩니다. 시각은 한국 표준시입니다.</div>
+  </div>
+  ${(y!==nowY||m!==nowKST().m)?'<div class="jump"><button id="tdy">오늘로</button></div>':''}
+  <div class="dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+  <div class="grid" id="grid">${cells}</div>
+  <div class="note">날짜를 눌러 만세력 확인과 기록을 남기세요. 점은 기분·몸상태·메모 유무입니다.
+  ${state.warnSet && state.warnSet.size ? '<br>상단 붉은 선은 “주의 날짜” 예측일입니다.' : ''}</div>`;
+}
+
+// ---------- 기록 시트 ----------
+// ============================================================
+// 시운별 일기 — 시(時)별 서브 일기
+// 날짜 하나에 12시진(자~해) 각각의 일기를 달 수 있다.
+// 시주의 천간+지지는 날짜(일간)에 따라 달라지므로 매번 계산한다.
+// ============================================================
+
+// 12지지 순서 (자시 시작)
+const HOUR_BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+
+/**
+ * 특정 날짜의 특정 시진에 대한 시주 간지를 구한다.
+ * 예: 2026-07-16(신묘일)의 오시 → 갑오시
+ *     같은 오시라도 다른 날이면 천간이 바뀐다.
+ * @param dateKey 'YYYY-MM-DD'
+ * @param branch  '자'~'해'
+ */
+function hourPillarFor(dateKey, branch) {
+  const [y,m,d] = dateKey.split('-').map(Number);
+  // 자시(23:30~)는 일주가 다음날로 넘어가므로, 해당 시진의 대표 시각으로 계산한다.
+  const bi = HOUR_BRANCHES.indexOf(branch);
+  // 각 시진의 중앙 시각(대략) — 자시만 00:30, 나머지는 짝수시 30분
+  const centerH = bi === 0 ? 0 : (bi * 2 + 1);   // 자=0시, 축=3시, 인=5시…
+  const dt = fromKST(y, m-1, d, centerH, 0);
+  const dayShift = dayShiftForHour(centerH, 0);
+  const dayDate = dayShift ? new Date(dt.getTime() + 86400000) : dt;
+  const dayGz = dayGanji(dayDate);
+  return hourGanji(dayGz[0], centerH, 0);
+}
+
+/**
+ * 저장된 entry에서 시별 일기 맵을 꺼낸다 (없으면 빈 객체).
+ * 구버전 데이터(hours 없음)도 안전하게 처리.
+ */
+function hourEntries(entry) {
+  return (entry && typeof entry.hours === 'object' && entry.hours) ? entry.hours : {};
+}
+
+/** 시별 일기가 실제 기록(기분/몸상태)을 담고 있는지 */
+function hourHasContent(he) {
+  return moodList(he).length > 0 || he.body != null;
+}
+
+/**
+ * 분석용 표본 수집.
+ * 날짜 전체 기록과 시별 기록을 모두 하나의 표본 배열로 펼친다.
+ * - 날짜 표본:  ganji = 그날의 일진(일주)
+ * - 시별 표본:  ganji = 그 날·그 시의 시주
+ * 시별 표본은 scope:'hour'로 표시해 필요 시 구분할 수 있다.
+ */
+function collectSamples() {
+  const out = [];
+  for (const [date, v] of Object.entries(state.entries)) {
+    // 날짜 전체 기록
+    if (moodList(v).length || v.body != null) {
+      out.push({ date, mood: v.mood, body: v.body, scope: 'day' });
+    }
+    // 시별 기록
+    const hrs = hourEntries(v);
+    for (const [branch, he] of Object.entries(hrs)) {
+      if (!hourHasContent(he)) continue;
+      out.push({
+        date, branch,
+        mood: he.mood, body: he.body,
+        scope: 'hour',
+        ganji: hourPillarFor(date, branch),   // 시주 간지를 직접 지정
+      });
+    }
+  }
+  return out;
+}
+
+/** 기록이 있는 표본 개수 (날짜+시별 합산) */
+function sampleCount() {
+  return collectSamples().length;
+}
+
+
+// 시별 일기 편집 중인 임시 상태 (openSheet 내부에서 갱신)
+let __sheetDraft = null;
+
+function moodPickerHTML(id, cur) {
+  return `<div class="moods" id="${id}">
+    ${Object.entries(MOOD).map(([k2,v])=>`<div class="mood ${cur.includes(k2)?'on':''}" data-m="${k2}" role="checkbox" aria-checked="${cur.includes(k2)}" tabindex="0">
+      <span class="em">${v.icon}</span><span class="nm">${v.label}</span></div>`).join('')}
+  </div>`;
+}
+function bodyPickerHTML(id, cur) {
+  return `<div class="bodies" id="${id}">
+    ${[1,2,3,4,5].map(n=>`<div class="bd ${cur===n?'on':''}" data-b="${n}">${n}
+      <small>${['매우 낮음','낮음','보통','좋음','아주 좋음'][n-1]}</small></div>`).join('')}
+  </div>`;
+}
+function bindMoodPicker(el, selObj) {
+  el.onclick = ev => { const t=ev.target.closest('.mood'); if(!t)return;
+    const k2=t.dataset.m; const i=selObj.mood.indexOf(k2);
+    if(i>=0) selObj.mood.splice(i,1); else selObj.mood.push(k2);
+    t.classList.toggle('on', i<0); t.setAttribute('aria-checked', i<0);
+  };
+  el.onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ev.preventDefault();ev.target.closest('.mood')?.click();} };
+}
+function bindBodyPicker(el, selObj) {
+  el.onclick = ev => { const t=ev.target.closest('.bd'); if(!t)return;
+    [...el.children].forEach(x=>x.classList.remove('on')); t.classList.add('on'); selObj.body=+t.dataset.b; };
+}
+
+// 시운별 그리드 (스크린샷 참고: 체크박스 + 간지 + 시각범위)
+function hourGridHTML(dateKey, hours) {
+  return `<div class="hour-grid" id="hourGrid">
+    ${HOUR_BRANCHES.map(b=>{
+      const gz = hourPillarFor(dateKey, b);
+      const hr = HOUR_RANGES.find(r=>r[0]===b);
+      const he = hours[b] || {};
+      const has = moodList(he).length>0 || he.body!=null || (he.memo&&he.memo.trim());
+      return `<div class="hcell ${has?'has':''}" data-b="${b}" role="button" tabindex="0" aria-pressed="${has}">
+        <div class="hcell-chk">${has?'✓':''}</div>
+        <div class="hcell-nm">${b}시</div>
+        <div class="hcell-gz">
+          <span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span>
+          <span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span>
+        </div>
+        <div class="hcell-t">${hr[1]}<br>${hr[2]}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function openSheet(k) {
+  state.sel = k;
+  const [ky,km,kd] = k.split('-').map(Number);
+  const dt = fromKST(ky, km-1, kd, 12);
+  const p = computeSaju(dt, 12);
+  const e = state.entries[k] || {};
+  const curMoods = moodList(e);
+  // 시별 일기는 편집 중 초안으로 복사 (저장 눌러야 반영)
+  __sheetDraft = JSON.parse(JSON.stringify(hourEntries(e)));
+  $('#shDt').textContent = k + ' ' + ['일','월','화','수','목','금','토'][kstParts(dt).dow] + '요일';
+  $('#shGz').textContent = `${p.year}년 ${p.month}월 ${p.day}일`;
+
+  let rel = '';
+  if (state.natal) {
+    const tags = extractTags(natalObj(), p.day);
+    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
+    const good = t => /육합|용희신|천을귀인/.test(t);
+    rel = `<div class="f-lbl">내 명식과의 관계</div><div class="day-tags">
+      ${tags.filter(t=>!t.startsWith('일주:')).map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}
+    </div>`;
+  }
+
+  $('#shBody').innerHTML = `
+    ${myeongsikHTML({...p, hour:null}, false)}
+    ${rel}
+    <div class="f-lbl">기분 <span class="hint">여러 개 선택할 수 있어요</span></div>
+    ${moodPickerHTML('moods', curMoods)}
+    <div class="f-lbl">몸상태 (5 = 가장 좋음)</div>
+    ${bodyPickerHTML('bodies', e.body)}
+    <div class="f-lbl">메모</div>
+    <textarea id="memo" placeholder="오늘 어땠나요">${e.memo||''}</textarea>
+
+    <div class="f-lbl" style="margin-top:26px">시운별 일기 <span class="hint">시간대를 눌러 시(時)별로 기록</span></div>
+    <div class="hour-lead" id="hourLead">시(時)를 선택해 그 시간대의 기분·몸상태를 따로 기록할 수 있어요.
+    시주 간지는 날짜에 따라 자동 계산됩니다.</div>
+    ${hourGridHTML(k, __sheetDraft)}
+
+    <button class="btn" id="save">기록 저장</button>
+    ${state.entries[k]?'<button class="btn ghost" id="del">이 기록 지우기</button>':''}
+  `;
+
+  let sel = { mood: [...curMoods], body: e.body };
+  bindMoodPicker($('#moods'), sel);
+  bindBodyPicker($('#bodies'), sel);
+
+  // 시운 그리드 클릭 → 시별 서브시트 열기
+  const grid = $('#hourGrid');
+  grid.onclick = ev => { const c=ev.target.closest('.hcell'); if(!c)return; openHourSheet(k, c.dataset.b); };
+  grid.onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ev.preventDefault(); const c=ev.target.closest('.hcell'); if(c)openHourSheet(k,c.dataset.b);} };
+
+  $('#save').onclick = () => {
+    const memo = $('#memo').value.trim();
+    // 내용이 담긴 시별 일기만 남긴다
+    const hours = {};
+    for (const [b,he] of Object.entries(__sheetDraft)) {
+      if (moodList(he).length || he.body!=null || (he.memo&&he.memo.trim())) hours[b]=he;
+    }
+    const hasHours = Object.keys(hours).length>0;
+    if (!sel.mood.length && !sel.body && !memo && !hasHours) {
+      // 아무것도 없으면 기존 기록 삭제
+      if (state.entries[k]) { delete state.entries[k]; recomputeWarn(); queueSave(); }
+      closeSheet(); render(); return;
+    }
+    state.entries[k] = { mood: sel.mood, body:sel.body, memo, ...(hasHours?{hours}:{}) };
+    recomputeWarn(); queueSave(); closeSheet(); render();
+  };
+  if ($('#del')) $('#del').onclick = () => { delete state.entries[k]; recomputeWarn(); queueSave(); closeSheet(); render(); };
+
+  $('#sheet').classList.add('on'); $('#sbg').classList.add('on');
+}
+
+// ---------- 시별 서브 시트 ----------
+function openHourSheet(dateKey, branch) {
+  const gz = hourPillarFor(dateKey, branch);
+  const hr = HOUR_RANGES.find(r=>r[0]===branch);
+  const he = __sheetDraft[branch] || { mood:[], body:null, memo:'' };
+  const curMoods = moodList(he);
+  let rel = '';
+  if (state.natal) {
+    const tags = extractTags(natalObj(), gz);
+    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
+    const good = t => /육합|용희신|천을귀인/.test(t);
+    const shown = tags.filter(t=>!t.startsWith('일주:'));
+    if (shown.length) rel = `<div class="f-lbl">이 시주와 내 명식의 관계</div><div class="day-tags">
+      ${shown.map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}</div>`;
+  }
+
+  $('#hsGz').innerHTML = `${branch}시 <span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span>`;
+  $('#hsRange').textContent = `${hr[1]} ~ ${hr[2]}`;
+  $('#hsBody').innerHTML = `
+    ${rel}
+    <div class="f-lbl">기분 <span class="hint">여러 개 선택 가능</span></div>
+    ${moodPickerHTML('hMoods', curMoods)}
+    <div class="f-lbl">몸상태</div>
+    ${bodyPickerHTML('hBodies', he.body)}
+    <div class="f-lbl">메모</div>
+    <textarea id="hMemo" placeholder="이 시간대는 어땠나요">${he.memo||''}</textarea>
+    <button class="btn" id="hSave">이 시간대 기록</button>
+    ${(curMoods.length||he.body!=null||he.memo)?'<button class="btn ghost" id="hClear">이 시간대 기록 지우기</button>':''}
+  `;
+  const hsel = { mood:[...curMoods], body: he.body };
+  bindMoodPicker($('#hMoods'), hsel);
+  bindBodyPicker($('#hBodies'), hsel);
+  $('#hSave').onclick = () => {
+    const memo = $('#hMemo').value.trim();
+    __sheetDraft[branch] = { mood: hsel.mood, body: hsel.body, memo };
+    refreshHourGrid(dateKey);
+    closeHourSheet();
+  };
+  if ($('#hClear')) $('#hClear').onclick = () => {
+    delete __sheetDraft[branch]; refreshHourGrid(dateKey); closeHourSheet();
+  };
+  $('#hsheet').classList.add('on'); $('#hsbg').classList.add('on');
+}
+function closeHourSheet(){ $('#hsheet').classList.remove('on'); $('#hsbg').classList.remove('on'); }
+function refreshHourGrid(dateKey){
+  const g = $('#hourGrid');
+  if (!g) return;
+  g.outerHTML = hourGridHTML(dateKey, __sheetDraft);
+  const ng = $('#hourGrid');
+  ng.onclick = ev => { const c=ev.target.closest('.hcell'); if(!c)return; openHourSheet(dateKey, c.dataset.b); };
+  ng.onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ev.preventDefault(); const c=ev.target.closest('.hcell'); if(c)openHourSheet(dateKey,c.dataset.b);} };
+}
+const closeSheet = () => { $('#sheet').classList.remove('on'); $('#sbg').classList.remove('on'); state.sel=null; };
+
+// ============================================================
+// 용희신 카드 — 네 가지 판정법 표시
+// ============================================================
+function yongsinCardHTML(ys, p) {
+  const chip = e => `<span class="e-${e}">${e}</span>`;
+  const M = ys.methods;
+
+  const methodRow = (m, isPrimary) => {
+    const active = m.weight > 0;
+    return `<div class="mth ${isPrimary?'primary':''} ${active?'':'off'}">
+      <div class="mth-hd">
+        <span class="mth-nm">${m.method}${isPrimary?'<em>주법</em>':''}</span>
+        <span class="mth-w">${active?`가중 ${m.weight.toFixed(2)}`:'해당 없음'}</span>
+      </div>
+      ${active&&m.yong.length?`<div class="mth-y">용신 ${m.yong.map(chip).join(' · ')}${
+        m.gi&&m.gi.length?` &nbsp;/&nbsp; 기신 ${m.gi.map(chip).join(' · ')}`:''}</div>`:''}
+      <div class="mth-r">${m.reason}</div>
+    </div>`;
+  };
+
+  return `<div class="card"><h3>용희신 / 구기신</h3>
+    <div class="kv"><span class="k">일간</span>
+      <span><span class="e-${ys.me}">${H(p.day[0])} ${p.day[0]}</span> (${ys.me})</span></div>
+    <div class="kv"><span class="k">강약</span>
+      <span>${ys.strong?'신강':'신약'} ${ys.extreme?`<b style="color:var(--to)">· ${ys.extreme==='super_strong'?'종왕':'종약'}격</b>`:''}
+      <span style="color:var(--mute);font-size:11px">${ys.score.toFixed(1)}/4
+      (령${ys.deukryeong?'○':'×'} 지${ys.deukji?'○':'×'} 세${ys.deukse?'○':'×'})</span></span></div>
+
+    <div class="ys-main">
+      <div class="ys-box good">
+        <div class="ys-lbl">용신</div>
+        <div class="ys-el">${ys.yongsin.map(chip).join(' ')}</div>
+      </div>
+      <div class="ys-box good">
+        <div class="ys-lbl">희신</div>
+        <div class="ys-el">${ys.huisin.length?ys.huisin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
+      </div>
+      <div class="ys-box bad">
+        <div class="ys-lbl">기신</div>
+        <div class="ys-el">${ys.gisin.length?ys.gisin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
+      </div>
+      <div class="ys-box bad">
+        <div class="ys-lbl">구신</div>
+        <div class="ys-el">${ys.gusin.length?ys.gusin.map(chip).join(' '):'<span style="color:var(--mute)">-</span>'}</div>
+      </div>
+    </div>
+
+    <div class="ys-why">
+      <b>${ys.primary}</b>을(를) 주법으로 봅니다. ${ys.rationale}
+      ${ys.gisinWhy?`<br><span style="color:var(--mute)">기신 근거 — ${ys.gisinWhy}</span>`:''}
+      ${ys.gusinWhy?`<br><span style="color:var(--mute)">구신 근거 — ${ys.gusinWhy}</span>`:''}
+      <span class="ys-conf">판정 신뢰도 ${(ys.confidence*100).toFixed(0)}%</span>
+    </div>
+
+    <div class="f-lbl" style="margin:18px 0 9px">판정 순서 (전왕 → 조후 → 통관 → 격국·억부)</div>
+    ${methodRow(M.jeonwang,  ys.primary==='전왕')}
+    ${methodRow(M.johu,      ys.primary==='조후')}
+    ${methodRow(M.tonggwan,  ys.primary==='통관')}
+    ${M.gyeokguk ? `<div class="mth ${ys.primary==='격국'?'primary':''}">
+      <div class="mth-hd"><span class="mth-nm">격국</span><span class="mth-w">${M.gyeokguk.gyeok||''}</span></div>
+      <div class="mth-r">${M.gyeokguk.reason}</div></div>` : ''}
+    ${methodRow(M.eokbu,     ys.primary==='억부')}
+
+    <div class="note" style="margin-top:14px">네 방법이 같은 오행을 가리킬수록 신뢰도가 올라갑니다.
+    명리는 사람마다 해석이 갈리는 분야이고, 특히 전왕·조후·격국 판정은 술사마다 견해가 다릅니다.
+    이 결과는 참고용 계산이지 정답이 아닙니다.</div>
+  </div>`;
+}
+
+/** 12간지 시간표 (명식 입력 폼용) */
+function hourTableHTML(curH, curMi) {
+  const on = (curH != null) ? hourBranchName(curH, curMi || 0) : null;
+  return `<div class="pop-note" style="margin-top:12px;border:none;padding:0">
+    <div style="color:var(--mute);font-size:10px;letter-spacing:.14em;margin-bottom:7px">12간지 시간 (동경 135도 보정)</div>
+    <div class="hrs">
+      ${HOUR_RANGES.map(([b,s,e])=>`<div class="hr ${on===b?'on':''}"><span class="hr-b e-${
+        BRANCH_ELEM[BRANCHES.indexOf(b)]}">${H(b)}</span><span class="hr-t">${s}~${e}</span></div>`).join('')}
+    </div>
+    <div style="margin-top:8px">한국은 동경 135도 표준시를 쓰지만 서울은 동경 127도라
+    시계가 태양시보다 약 30분 빠릅니다. 그래서 자시가 23:00이 아니라 <b>23:30</b>에 시작합니다.</div>
+  </div>`;
+}
+
+// ---------- 뷰: 내 명식 ----------
+// ============================================================
+// 상세 풀이 — 규칙 기반 명식 해석 엔진
+// 명식의 계산 결과(일간, 오행, 용신, 신살, 대운/세운)를 문장으로 풀어낸다.
+// LLM 없이 즉시 동작하며, "AI 심화" 버튼으로 서버 해석을 덧붙일 수 있다.
+// ============================================================
+
+// 십성별 성격 키워드 (일간 대비 오행 관계)
+const DAYMASTER_TRAITS = {
+  목: { nature:'나무', keyword:'성장과 확장', pos:'추진력이 있고 곧으며 미래를 향해 뻗어가는 기질', neg:'고집이 세고 융통성이 부족해질 수 있는 면', tip:'방향이 막히면 부러지기 쉬우니 유연함을 함께 기르면 좋습니다.' },
+  화: { nature:'불', keyword:'표현과 확산', pos:'밝고 열정적이며 사람을 끌어당기는 기질', neg:'감정 기복이 크고 성급해질 수 있는 면', tip:'타오른 뒤 꺼지지 않도록 꾸준함을 더하면 힘이 오래갑니다.' },
+  토: { nature:'흙', keyword:'포용과 중재', pos:'믿음직하고 두루 품으며 중심을 잡는 기질', neg:'변화를 꺼리고 답답하게 느껴질 수 있는 면', tip:'너무 머무르지 말고 때로 흐름에 몸을 맡기면 좋습니다.' },
+  금: { nature:'쇠', keyword:'결단과 정리', pos:'분명하고 원칙이 서 있으며 마무리가 야무진 기질', neg:'날카롭고 차갑게 비칠 수 있는 면', tip:'단단함이 지나치면 부러지니 부드러움을 덧대면 좋습니다.' },
+  수: { nature:'물', keyword:'지혜와 유연', pos:'총명하고 임기응변에 능하며 상황에 잘 스며드는 기질', neg:'속을 알기 어렵고 마음이 흔들리기 쉬운 면', tip:'흐름에 휩쓸리지 않도록 중심을 잡아두면 좋습니다.' },
+};
+
+const ELEM_ROLE_LABEL = {
+  same:'비겁(같은 기운, 자기 세력)',
+  gen:'인성(나를 돕는 기운)',
+  drain:'식상(내가 표현하는 기운)',
+  ctrl:'재성(내가 다루는 기운)',
+  ovr:'관성(나를 다스리는 기운)',
+};
+
+function elemRole(me, e) {
+  if (e === me) return 'same';
+  if (e === GEN_OF[me]) return 'gen';
+  if (e === DRAIN[me]) return 'drain';
+  if (e === CTRL[me]) return 'ctrl';
+  if (e === OVR_OF[me]) return 'ovr';
+  return null;
+}
+
+// 신살별 짧은 의미
+const SHINSAL_MEANING = {
+  천을귀인:'하늘이 돕는 귀인. 어려울 때 뜻밖의 도움을 받는 복.',
+  도화:'사람을 끄는 매력. 인기와 이성 인연이 따르나 구설도 함께.',
+  역마:'움직임과 이동의 기운. 여행·이주·변동이 잦고 활동적.',
+  화개:'예술과 종교, 고독의 별. 깊이 파고드는 재능이 있음.',
+  양인:'강한 칼의 기운. 결단력과 추진력이 크나 과하면 다툼.',
+  백호:'격렬한 기운. 강렬한 추진력이나 사고·충돌을 조심.',
+  괴강:'우두머리의 기상. 카리스마가 크나 극단으로 치우치기 쉬움.',
+};
+
+/**
+ * 명식 전체를 구조화된 풀이 데이터로 변환.
+ * viewNatal이 이미 계산한 p, ys, du를 받아서 재사용한다.
+ */
+function buildInterpretation(p, ys, du, natal) {
+  const me = ys.me;
+  const dt = DAYMASTER_TRAITS[me];
+  const total = ys.total || Object.values(ys.count).reduce((a,b)=>a+b,0);
+
+  // --- 1. 일간·성격 기질 ---
+  const neutral = !ys.extreme && ys.score >= 1.8 && ys.score < 2.8;
+  const strengthWord = ys.extreme === 'super_strong' ? '매우 강한'
+    : ys.extreme === 'super_weak' ? '매우 약한'
+    : neutral ? '강약이 엇비슷한(중화에 가까운)'
+    : ys.strong ? '강한' : '약한';
+  const daymaster = {
+    stem: p.day[0],
+    elem: me,
+    title: `${p.day[0]}(${me}) 일간 — ${dt.nature}의 기질`,
+    body: `당신은 ${dt.nature}에 비유되는 ${me} 일간입니다. ${dt.keyword}을(를) 본질로 하며, ${dt.pos}이 있습니다. `
+      + `사주 안에서 일간의 힘은 ${strengthWord} 편입니다(득령 ${ys.deukryeong?'○':'×'}·득지 ${ys.deukji?'○':'×'}·득세 ${ys.deukse?'○':'×'}, ${ys.score.toFixed(1)}/4). `
+      + (neutral
+          ? `강하지도 약하지도 않은 균형에 가까워, 상황에 따라 유연하게 대응하는 힘이 있습니다. 어느 한쪽으로 치우친 운이 올 때 그 영향을 특히 잘 탑니다.`
+          : ys.strong
+          ? `기운이 넉넉하니 밖으로 펼치고 나눠주는 쪽이 잘 맞습니다. 다만 ${dt.neg}은 주의가 필요합니다.`
+          : `기운이 여유롭지 않으니 무리하기보다 돕는 환경과 사람을 곁에 두는 편이 좋습니다. ${dt.neg}이 드러날 수 있어 스스로를 돌보는 습관이 중요합니다.`),
+    tip: dt.tip,
+  };
+
+  // --- 2. 오행 균형과 보완법 ---
+  const sorted = Object.entries(ys.count).sort((a,b)=>b[1]-a[1]);
+  const strongest = sorted[0], weakest = sorted[sorted.length-1];
+  const missing = Object.entries(ys.count).filter(([,v])=>v < total*0.08).map(([e])=>e);
+  const balance = {
+    title: '오행의 균형',
+    strongest: strongest[0], weakest: weakest[0],
+    missing,
+    body: `오행 중 <b class="e-${strongest[0]}">${strongest[0]}</b>이(가) 가장 강하고(${strongest[1].toFixed(1)}), `
+      + `<b class="e-${weakest[0]}">${weakest[0]}</b>이(가) 가장 약합니다(${weakest[1].toFixed(1)}). `
+      + (missing.length
+          ? `특히 ${missing.map(e=>`<b class="e-${e}">${e}</b>`).join('·')} 기운이 거의 없어, 그 오행이 상징하는 영역(${missing.map(e=>ELEM_ROLE_LABEL[elemRole(me,e)]||e).join(', ')})에서 아쉬움이 생기기 쉽습니다.`
+          : `오행이 비교적 고루 갖춰져 큰 결핍은 없습니다.`),
+    remedy: `부족한 <b class="e-${weakest[0]}">${weakest[0]}</b>을(를) 보완하려면, 색·방위·생활 습관에서 그 기운을 가까이 하면 도움이 됩니다. `
+      + `(${weakest[0]}: ${ELEM_ADVICE[weakest[0]]})`,
+  };
+
+  // --- 3. 용신 활용 조언 ---
+  const yong = ys.yongsin[0];
+  const yongRole = yong ? ELEM_ROLE_LABEL[elemRole(me, yong)] : '';
+  const useful = {
+    title: '용신 활용법',
+    yongsin: ys.yongsin, huisin: ys.huisin, gisin: ys.gisin, gusin: ys.gusin,
+    body: yong
+      ? `당신에게 가장 이로운 기운(용신)은 <b class="e-${yong}">${yong}</b>입니다. ${ys.primary}을(를) 기준으로 정해졌습니다. `
+        + `${yong}은(는) 당신에게 ${yongRole} 역할을 하며, 이 기운이 살아날 때 일이 풀리고 컨디션이 좋아집니다. `
+        + (ys.huisin.length?`이를 돕는 희신 <b class="e-${ys.huisin[0]}">${ys.huisin[0]}</b>도 함께 챙기면 좋습니다. `:'')
+        + `반대로 기신 <b class="e-${ys.gisin[0]}">${ys.gisin[0]}</b>이(가) 강해지는 때·환경은 피하는 편이 유리합니다.`
+      : '용신이 뚜렷하게 잡히지 않는 구조입니다. 특정 기운에 기대기보다 전체 균형을 살피는 편이 좋습니다.',
+    advice: yong ? `실천 팁 — ${ELEM_ADVICE[yong]} 이런 것들이 ${yong} 기운을 북돋웁니다.` : '',
+  };
+
+  // --- 4. 신살·대운·세운 해석 ---
+  const shinList = [];
+  for (const [nm,gz] of [['년',p.year],['월',p.month],['일',p.day],['시',p.hour]]) {
+    if(!gz) continue;
+    for (const s of shinsal(p.day[0], p.day[1], gz[1], gz))
+      shinList.push({ pos:nm, name:s, meaning: SHINSAL_MEANING[s] || '' });
+  }
+  const nowY = nowKST().y;
+  const age = nowY - natal.y + 1;
+  const curDae = [...du.list].reverse().find(x => age >= x.age) || du.list[0];
+  const seun = yearGanjiRaw(nowY);
+  const daeElem = elemOfStem(curDae.gz[0]);
+  const seElem = elemOfStem(seun[0]);
+  const daeGood = ys.yongsin.includes(daeElem) || ys.huisin.includes(daeElem);
+  const daeBad = ys.gisin.includes(daeElem) || ys.gusin.includes(daeElem);
+  const seGood = ys.yongsin.includes(seElem) || ys.huisin.includes(seElem);
+  const seBad = ys.gisin.includes(seElem) || ys.gusin.includes(seElem);
+
+  const fortune = {
+    title: '신살 · 대운 · 세운',
+    shinsal: shinList,
+    daeun: {
+      gz: curDae.gz, age: curDae.age, elem: daeElem,
+      tone: daeGood?'순풍':daeBad?'역풍':'보통',
+      body: `지금은 ${curDae.age}세부터 시작된 <b>${curDae.gz}</b> 대운 안에 있습니다. `
+        + `대운의 천간 ${curDae.gz[0]}(${daeElem})은(는) `
+        + (daeGood?`당신의 용희신에 해당해, 이 10년은 흐름을 타기 좋은 시기입니다. 하고 싶은 일을 펼쳐볼 만합니다.`
+           :daeBad?`당신의 기구신에 해당해, 이 10년은 다소 버거울 수 있습니다. 무리한 확장보다 내실을 다지는 편이 좋습니다.`
+           :`용신도 기신도 아니라, 큰 굴곡 없이 흘러가는 무난한 시기입니다.`),
+    },
+    seun: {
+      gz: seun, year: nowY, elem: seElem,
+      tone: seGood?'순풍':seBad?'역풍':'보통',
+      body: `올해(${nowY}년)는 <b>${seun}</b> 세운입니다. 세운 천간 ${seun[0]}(${seElem})은(는) `
+        + (seGood?`용희신에 들어, 새로운 시도나 결정에 힘이 실리는 해입니다.`
+           :seBad?`기구신에 들어, 조심스럽게 움직이는 편이 좋은 해입니다. 건강과 관계를 특히 살피세요.`
+           :`무난한 흐름의 해입니다.`),
+    },
+  };
+
+  return { daymaster, balance, useful, fortune };
+}
+
+// 오행별 보완 조언 (색·방위·생활)
+const ELEM_ADVICE = {
+  목:'초록색, 동쪽 방위, 나무·식물, 산책과 새벽 활동',
+  화:'붉은색, 남쪽 방위, 햇빛과 밝은 조명, 사람들과의 활발한 교류',
+  토:'노란색·황토색, 중앙, 흙과 도자기, 규칙적인 생활과 안정된 공간',
+  금:'흰색·금속색, 서쪽 방위, 금속 소품, 정리정돈과 마무리 습관',
+  수:'검정·남색, 북쪽 방위, 물과 가까운 곳, 충분한 수면과 사색',
+};
+
+
+// ============================================================
+// 상세 풀이 렌더 + AI 심화
+// ============================================================
+function interpretationHTML(p, ys, du, natal) {
+  const I = buildInterpretation(p, ys, du, natal);
+
+  const section = (num, title, inner) => `
+    <div class="interp-sec">
+      <div class="interp-h"><span class="interp-n">${num}</span>${title}</div>
+      ${inner}
+    </div>`;
+
+  const shinHTML = I.fortune.shinsal.length
+    ? I.fortune.shinsal.map(s=>`<div class="shin-row">
+        <span class="shin-name">${s.pos}지 ${s.name}</span>
+        <span class="shin-mean">${s.meaning}</span></div>`).join('')
+    : '<div class="interp-p" style="color:var(--mute)">특별히 잡히는 신살이 없습니다. 무난한 구성입니다.</div>';
+
+  return `<div class="card interp">
+    <h3>상세 풀이</h3>
+
+    ${section('一', I.daymaster.title, `
+      <div class="interp-p">${I.daymaster.body}</div>
+      <div class="interp-tip">${I.daymaster.tip}</div>`)}
+
+    ${section('二', I.balance.title, `
+      <div class="interp-p">${I.balance.body}</div>
+      <div class="interp-tip">${I.balance.remedy}</div>`)}
+
+    ${section('三', I.useful.title, `
+      <div class="interp-p">${I.useful.body}</div>
+      ${I.useful.advice?`<div class="interp-tip">${I.useful.advice}</div>`:''}`)}
+
+    ${section('四', I.fortune.title, `
+      ${shinHTML}
+      <div class="interp-p" style="margin-top:12px">
+        <span class="tone tone-${I.fortune.daeun.tone}">${I.fortune.daeun.tone}</span>
+        ${I.fortune.daeun.body}</div>
+      <div class="interp-p">
+        <span class="tone tone-${I.fortune.seun.tone}">${I.fortune.seun.tone}</span>
+        ${I.fortune.seun.body}</div>`)}
+
+    <div class="interp-ai" id="aiZone">
+      <button class="btn ghost" id="aiGo">AI로 더 깊이 풀어보기</button>
+      <div class="interp-note">위 풀이는 명식 데이터로 자동 생성한 기본 해석입니다.
+      버튼을 누르면 AI가 네 기둥의 상호작용까지 엮어 더 자세히 풀어줍니다.</div>
+    </div>
+
+    <div class="note" style="margin-top:14px">이 풀이는 참고용입니다. 명리는 해석이 갈리는 분야이며,
+    같은 명식도 보는 사람에 따라 달리 읽힐 수 있습니다.</div>
+  </div>`;
+}
+
+// AI 심화 — Supabase Edge Function 호출 (없으면 안내)
+async function requestAIInterpretation(p, ys, du, natal) {
+  const zone = document.querySelector('#aiZone');
+  const btn = document.querySelector('#aiGo');
+  if (btn) { btn.disabled = true; btn.textContent = 'AI가 풀이 중…'; }
+
+  // 명식을 구조화해 서버로 넘긴다 (원문 그대로가 아니라 계산 결과만)
+  const payload = {
+    pillars: { year:p.year, month:p.month, day:p.day, hour:p.hour },
+    dayMaster: ys.me,
+    strength: { score: ys.score, strong: ys.strong, extreme: ys.extreme,
+      deukryeong: ys.deukryeong, deukji: ys.deukji, deukse: ys.deukse },
+    elements: ys.count,
+    yongsin: ys.yongsin, huisin: ys.huisin, gisin: ys.gisin, gusin: ys.gusin,
+    primary: ys.primary,
+    daeun: du.list.map(x=>({ age:x.age, gz:x.gz })),
+    currentYear: nowKST().y,
+    birth: { y:natal.y, m:natal.m, d:natal.d, h:natal.h, gender:natal.gender },
+  };
+
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/interpret`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || SUPABASE_KEY}`,
+        'apikey': SUPABASE_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const msg = res.status === 404
+        ? 'AI 풀이 기능이 아직 서버에 준비되지 않았습니다. (interpret 함수 미배포)'
+        : `AI 풀이를 불러오지 못했습니다. (오류 ${res.status})`;
+      throw new Error(msg);
+    }
+
+    const out = await res.json();
+    const text = out.text || out.interpretation || '';
+    if (!text) throw new Error('AI가 빈 응답을 보냈습니다.');
+
+    // 문단 단위로 안전하게 렌더 (HTML 주입 방지)
+    const paras = text.split(/\n{2,}/).map(pr =>
+      `<p class="ai-p">${esc(pr).replace(/\n/g,'<br>')}</p>`).join('');
+    zone.innerHTML = `<div class="ai-result">
+      <div class="ai-badge">AI 심화 풀이</div>
+      ${paras}
+      <div class="interp-note">AI가 생성한 해석입니다. 참고용으로만 봐주세요.</div>
+    </div>`;
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'AI로 더 깊이 풀어보기'; }
+    const warn = document.createElement('div');
+    warn.className = 'err';
+    warn.textContent = e.message;
+    zone.appendChild(warn);
+  }
+}
+
+
+function viewNatal() {
+  if (!state.natal) return natalForm();
+  const n = state.natal;
+  const birth = fromKST(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0);
+  const p = computeSaju(birth, n.h, n.mi);
+  const ys = analyzeYongsinFull(p);
+  const du = computeDaeun(p, birth, n.gender);
+  const nowY = nowKST().y;
+  const age = nowY - n.y + 1;
+  const cur = [...du.list].reverse().find(x => age >= x.age) || du.list[0];
+
+  const shin = [];
+  for (const [nm,gz] of [['년',p.year],['월',p.month],['일',p.day],['시',p.hour]]) {
+    if(!gz) continue;
+    for (const s of shinsal(p.day[0], p.day[1], gz[1], gz)) shin.push(`${nm}지 ${s}`);
+  }
+
+  const maxE = Math.max(...Object.values(ys.count));
+  const hb = n.h != null ? hourBranchName(n.h, n.mi || 0) : null;
+  const hr = hb ? HOUR_RANGES.find(r => r[0] === hb) : null;
+
+  return `
+  ${myeongsikHTML(p, n.h!=null)}
+  ${hr?`<div class="term-strip" style="margin-top:14px">
+    <span><b>${hb}시</b> ${hr[1]}~${hr[2]}</span>
+    ${p.dayShift?'<span>· 자시 이후 출생이라 일주는 다음날 기준</span>':''}
+  </div>`:''}
+  <div class="card"><h3>오행 세력</h3>
+    ${Object.entries(ys.count).map(([e,v])=>`
+      <div class="stat-row"><span class="e-${e}">${e}</span>
+      <div style="flex:1;margin:0 12px"><div class="bar"><i style="width:${v/maxE*100}%;background:var(--${{목:'mok',화:'hwa',토:'to',금:'geum',수:'su'}[e]})"></i></div></div>
+      <span class="n">${v.toFixed(1)}</span></div>`).join('')}
+  </div>
+  ${yongsinCardHTML(ys, p)}
+  <div class="card"><h3>신살 · 귀인</h3>
+    <div class="day-tags">${shin.length?shin.map(s=>`<span class="tag ${/귀인/.test(s)?'good':/양인|백호|괴강/.test(s)?'bad':''}">${s}</span>`).join(''):'<span style="color:var(--mute);font-size:12px">해당 없음</span>'}</div>
+  </div>
+  <div class="card"><h3>대운 <span style="color:var(--mute);font-size:11px;letter-spacing:0">${du.forward?'순행':'역행'} · ${du.startAge}세 시작</span></h3>
+    <div class="luck">${du.list.map(x=>`<div class="luck-i ${x===cur?'now':''}">
+      <div class="age">${x.age}세</div>
+      <div class="g"><span class="e-${elemOfStem(x.gz[0])}">${H(x.gz[0])}</span><br><span class="e-${elemOfBranch(x.gz[1])}">${H(x.gz[1])}</span></div>
+    </div>`).join('')}</div>
+  </div>
+  <div class="card"><h3>세운</h3>
+    <div class="luck">${Array.from({length:8},(_,i)=>{const yy=nowY-1+i;const g=yearGanjiRaw(yy);
+      return `<div class="luck-i ${yy===nowY?'now':''}"><div class="age">${yy}</div>
+      <div class="g"><span class="e-${elemOfStem(g[0])}">${H(g[0])}</span><br><span class="e-${elemOfBranch(g[1])}">${H(g[1])}</span></div></div>`;}).join('')}</div>
+  </div>
+  ${interpretationHTML(p, ys, du, n)}
+  <button class="btn ghost" id="reset">명식 다시 입력</button>`;
+}
+
+// ===== 생년월일 입력 드롭다운 =====
+// 자유 입력 대신 목록에서 고르게 해 오타·범위초과를 원천 차단한다.
+// 연: 현재연도-100 ~ 현재연도, 월: 1-12, 일: 선택된 연·월의 실제 말일까지.
+function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); } // m: 1-12
+
+function natalForm(prefill) {
+  const nowY = nowKST().y;
+  const pf = prefill || state.natal || {};
+  const selY = pf.y || 1990;
+  const selM = pf.m || 1;
+  const maxD = daysInMonth(selY, selM);
+  const selD = Math.min(pf.d || 1, maxD);
+  const selGender = pf.gender || 'M';
+  const hasHour = pf.h != null;
+
+  const opt = (v, label, sel) => `<option value="${v}"${v===sel?' selected':''}>${label}</option>`;
+  const years = [];
+  for (let y = nowY; y >= nowY - 100; y--) years.push(opt(y, y+'년', selY));
+  const months = [];
+  for (let m = 1; m <= 12; m++) months.push(opt(m, m+'월', selM));
+  const days = [];
+  for (let d = 1; d <= maxD; d++) days.push(opt(d, d+'일', selD));
+  const hours = ['<option value=""'+(hasHour?'':' selected')+'>모름</option>'];
+  for (let h = 0; h < 24; h++) hours.push(opt(h, String(h).padStart(2,'0')+'시', hasHour?pf.h:-1));
+  const mins = [];
+  for (let mi = 0; mi < 60; mi++) mins.push(opt(mi, String(mi).padStart(2,'0')+'분', pf.mi ?? 0));
+
+  return `<div class="card" style="margin-top:0">
+    <h3>명식 입력</h3>
+    <div class="dob">
+      <div class="pick"><select id="iy" aria-label="생년">${years.join('')}</select></div>
+      <div class="pick"><select id="im" aria-label="생월">${months.join('')}</select></div>
+      <div class="pick"><select id="id" aria-label="생일">${days.join('')}</select></div>
+    </div>
+    <div class="form-row" style="margin-top:9px">
+      <div><label class="fl">시</label><div class="pick"><select id="ih" aria-label="시">${hours.join('')}</select></div></div>
+      <div><label class="fl">분</label><div class="pick"><select id="imi" aria-label="분">${mins.join('')}</select></div></div>
+    </div>
+    <div class="form-row" style="margin-top:9px">
+      <div style="grid-column:1 / -1"><label class="fl">성별</label>
+        <div class="pick"><select id="ig" aria-label="성별">
+          <option value="M"${selGender==='M'?' selected':''}>남</option>
+          <option value="F"${selGender==='F'?' selected':''}>여</option>
+        </select></div></div>
+    </div>
+    <div id="natErr" class="err"></div>
+    <button class="btn" id="mk">만세력 산출</button>
+    <div class="note">양력 기준입니다. 연·월주는 절입 시각으로 판정하므로 절기 경계 출생이면 시·분까지 골라주세요.
+    시를 모르면 시주 없이 년·월·일주만 봅니다.</div>
+    ${hourTableHTML(hasHour?pf.h:null, pf.mi)}
+  </div>`;
+}
+
+// 기존 저장 데이터 파싱 — 예전 자유입력 형식이나 문자열이 섞여 있어도
+// 드롭다운이 읽을 수 있는 정규 형태 {y,m,d,h,mi,gender}로 변환한다.
+function parseNatal(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const num = (v) => { const n = parseInt(v, 10); return Number.isFinite(n) ? n : null; };
+  let y = num(raw.y ?? raw.year ?? raw.birthYear);
+  let m = num(raw.m ?? raw.month ?? raw.birthMonth);
+  let d = num(raw.d ?? raw.day ?? raw.birthDay);
+  // "1990-05-15" 같은 문자열도 허용
+  if ((y==null||m==null||d==null) && typeof raw.date === 'string') {
+    const mt = raw.date.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    if (mt) { y=+mt[1]; m=+mt[2]; d=+mt[3]; }
+  }
+  if (y==null || m==null || d==null) return null;
+  // 범위 보정
+  m = Math.min(12, Math.max(1, m));
+  d = Math.min(daysInMonth(y, m), Math.max(1, d));
+  let h = raw.h ?? raw.hour ?? null; h = (h==='' || h==null) ? null : num(h);
+  if (h!=null) h = Math.min(23, Math.max(0, h));
+  let mi = num(raw.mi ?? raw.minute) ?? 0; mi = Math.min(59, Math.max(0, mi));
+  const gender = (raw.gender==='F'||raw.gender==='여') ? 'F' : 'M';
+  return { y, m, d, h, mi, gender };
+}
+
+function natalObj() {
+  const n = state.natal;
+  const p = computeSaju(fromKST(n.y, n.m-1, n.d, n.h ?? 12, n.mi ?? 0), n.h, n.mi);
+  const ys = analyzeYongsin(p);
+  return { year:p.year, month:p.month, day:p.day, hour:p.hour, yongsin:ys.yongsin, gisin:ys.gisin };
+}
+
+// ---------- 동기화 표시 ----------
+function syncHTML() {
+  const map = {
+    off:     ['!', '저장하려면 로그인해주세요.'],
+    idle:    ['·', '동기화됨'],
+    saving:  ['◌', '저장 중'],
+    saved:   ['✓', '저장됨'],
+    error:   ['!', '저장 실패'],
+    offline: ['', ''],
+  };
+
+  const [ic, tx] = map[state.sync] || ['', ''];
+
+  if (!tx) {
+    return `<span id="sync"></span>`;
+  }
+
+  return `<span id="sync" class="sync ${state.sync}">${ic} ${tx}</span>`;
+}
+
+// ---------- 뷰: 계정 ----------
+function viewAccount() {
+  if (!SERVER_MODE) return `<div class="card" style="margin-top:0">
+    <h3>로컬 전용 모드</h3>
+    <p class="lead">지금은 파일로 직접 열려 있어서 계정과 동기화를 쓸 수 없습니다.
+    서버에서 실행하면 아이디로 로그인해 여러 기기에서 같은 기록을 볼 수 있습니다.</p>
+    <div class="note" style="margin-top:14px">기록은 새로고침하면 사라집니다.
+    아래로 파일 백업은 지금도 가능합니다.</div>
+    ${backupBlockHTML(true)}
+  </div>`;
+
+  if (!state.user) return `<div class="card" style="margin-top:0">
+  <h3 id="authTtl">로그인</h3>
+  <p class="lead">이메일로 로그인하면 여러 기기에서 같은 기록을 이어서 사용할 수 있습니다.</p>
+
+  <div style="margin-top:16px">
+    <label class="fl">이메일</label>
+    <input
+      id="au"
+      type="email"
+      autocomplete="email"
+      placeholder="example@email.com"
+    >
+  </div>
+
+  <div style="margin-top:10px">
+    <label class="fl">비밀번호</label>
+    <input
+      id="ap"
+      type="password"
+      autocomplete="current-password"
+      placeholder="8자 이상"
+    >
+  </div>
+
+  <div id="aerr" class="err"></div>
+
+<button class="btn" id="ago">로그인</button>
+
+<button class="btn ghost google-btn" id="googleLogin" type="button">
+  <svg class="google-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
+    <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.07H2.18a11 11 0 0 0 0 9.86l3.66-2.84z"/>
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
+  </svg>
+  <span>Google로 계속하기</span>
+</button>
+
+<button class="btn ghost" id="aswap">
+  계정이 없으신가요? 가입하기
+</button>
+
+${backupBlockHTML(true)}
+</div>`;
+
+  return `<div class="card" style="margin-top:0">
+    <h3>계정</h3>
+    <div class="kv">
+     <span class="k">이메일</span>
+     <span>${esc(state.user?.email ?? '')}</span>
+    </div>
+    <div class="kv"><span class="k">기록</span><span>${Object.keys(state.entries).length}일</span></div>
+    <div class="kv"><span class="k">동기화</span><span>${state.sync==='error'?'<span style="color:var(--alert)">실패 — 다시 시도해주세요</span>':'서버에 저장됨 (v'+state.rev+')'}</span></div>
+    <button class="btn ghost" id="alo">로그아웃</button>
+  </div>
+  ${backupBlockHTML(false)}
+  <div class="card">
+    <h3>비밀번호 변경</h3>
+    <div><label class="fl">현재 비밀번호</label><input id="pc" type="password" autocomplete="current-password"></div>
+    <div style="margin-top:10px"><label class="fl">새 비밀번호</label><input id="pn" type="password" autocomplete="new-password" placeholder="8자 이상"></div>
+    <div id="perr" class="err"></div>
+    <button class="btn ghost" id="pgo">변경하기</button>
+    <div class="note" style="margin-top:12px">변경하면 다른 기기의 로그인이 모두 해제됩니다.</div>
+  </div>
+  <div class="card danger">
+    <h3>계정 삭제</h3>
+    <p class="lead">기록이 모두 지워지며 되돌릴 수 없습니다. 먼저 백업을 받아두세요.</p>
+    <div style="margin-top:12px"><label class="fl">비밀번호 확인</label><input id="dp" type="password"></div>
+    <div id="derr" class="err"></div>
+    <button class="btn ghost danger-btn" id="dgo">계정 영구 삭제</button>
+  </div>`;
+}
+
+function backupBlockHTML(localOnly) {
+  return `<div class="card"><h3>백업</h3>
+    <p class="lead">기록을 파일로 내려받아 보관하거나, 백업 파일에서 되살릴 수 있습니다.</p>
+    <div class="bk">
+      <button class="btn ghost" id="bkOut">백업 파일 내려받기</button>
+      <button class="btn ghost" id="bkIn">백업 파일에서 복원</button>
+    </div>
+    <input type="file" id="bkFile" accept="application/json,.json" hidden>
+    <div id="bkMsg" class="err"></div>
+    <div class="note" style="margin-top:12px">복원하면 <b>같은 날짜</b>의 기록은 백업본이 아니라 현재 기록을 남깁니다(병합).
+    ${localOnly?'':'복원 결과는 서버에도 반영됩니다.'}</div>
+  </div>`;
+}
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---------- 백업 ----------
+function exportBackup() {
+  const dump = {
+    format: 'manseryeok-diary/v1',
+    exported: new Date().toISOString(),
+    username: state.user?.email ?? null,
+    rev: state.rev,
+    data: { natal: state.natal, entries: state.entries },
+  };
+  const blob = new Blob([JSON.stringify(dump, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `manseryeok-backup-${isoKST(new Date())}.json`;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+async function importBackup(file, msgEl) {
+  const show = (t, bad=true) => { msgEl.textContent = t; msgEl.className = 'err' + (bad?'':' ok'); };
+  try {
+    const dump = JSON.parse(await file.text());
+    if (dump.format !== 'manseryeok-diary/v1') return show('이 앱의 백업 파일이 아닙니다.');
+    const d = dump.data || {};
+    if (typeof d.entries !== 'object' || d.entries === null) return show('백업 파일이 손상되었습니다.');
+
+    // 병합: 같은 날짜는 현재 기록을 우선한다 (복원이 최근 기록을 덮지 않도록)
+    const before = Object.keys(state.entries).length;
+    state.entries = { ...d.entries, ...state.entries };
+    state.natal = state.natal || d.natal || null;
+    const added = Object.keys(state.entries).length - before;
+
+    recomputeWarn();
+    if (state.user) await pushNow();
+    show(`복원 완료 — ${added}일 추가 (전체 ${Object.keys(state.entries).length}일)`, false);
+    setTimeout(render, 900);
+  } catch {
+    show('파일을 읽을 수 없습니다.');
+  }
+}
+
+// ---------- 뷰: 주의 날짜 ----------
+function viewWarn() {
+  if (!state.natal) return `<div class="empty"><div class="ic">命</div>
+    <p>먼저 <b>내 명식</b>에서 사주를 입력해주세요.<br>기록을 명식과 대조해야 분석할 수 있습니다.</p></div>`;
+
+  const list = collectSamples();
+
+  if (list.length < 10) return `<div class="empty"><div class="ic">數</div>
+    <p>기록 <b>${list.length}일</b> / 최소 10일 필요<br>
+    <span style="font-size:11.5px">패턴을 신뢰하려면 표본이 쌓여야 합니다.<br>
+    날짜별 기록과 시운별 기록이 모두 표본에 포함됩니다.</span></p></div>`;
+
+  const nat = natalObj();
+  const st = buildStats(nat, list, { minSamples:3 });
+  const fc = forecast(nat, list, { days:180, from:new Date(), minSamples:3 });
+  const risky = fc.riskTags.slice().sort((a,b)=>a.delta-b.delta);
+
+  if (!fc.days.length) return `<div class="empty"><div class="ic">靜</div>
+    <p>아직 뚜렷한 위험 패턴이 없습니다.<br>
+    <span style="font-size:11.5px">기록 ${list.length}일 · 베이스라인 ${st.baseline.toFixed(2)}<br>
+    반복되는 구조가 나타나면 여기에 표시됩니다.</span></p></div>`;
+
+  const seen = new Set(); const uniq = [];
+  for (const d of fc.days) { if (seen.has(d.date)) continue; seen.add(d.date); uniq.push(d); }
+
+  return `
+  <div class="card" style="margin-top:0"><h3>분석 요약</h3>
+    <div class="kv"><span class="k">기록 일수</span><span>${list.length}일</span></div>
+    <div class="kv"><span class="k">평소 컨디션 (베이스라인)</span><span>${st.baseline.toFixed(2)}</span></div>
+    <div class="kv"><span class="k">발견된 위험 구조</span><span>${risky.length}개</span></div>
+    <div class="kv"><span class="k">향후 180일 주의일</span><span>${uniq.length}일</span></div>
+  </div>
+  <div class="card"><h3>반복 확인된 구조</h3>
+    ${risky.slice(0,8).map(s=>`<div class="stat-row">
+      <span>${s.tag}${s.aliases&&s.aliases.length?`<span style="color:var(--mute);font-size:10px;margin-left:6px">= ${s.aliases.join(' · ')}</span>`:''}</span>
+      <span class="n">${s.n}회 · ${s.level}</span>
+      <span class="delta neg">${s.delta.toFixed(2)}</span>
+    </div>`).join('')}
+  </div>
+  <div style="margin-top:18px">
+  ${uniq.slice(0,14).map(d=>{
+    const dd = Math.ceil((new Date(d.date+'T12:00') - new Date())/86400000);
+    return `<div class="warn-i">
+      <div class="top">
+        <div><span class="dt">${d.date}</span><span class="gz"><span class="e-${elemOfStem(d.ganji[0])}">${H(d.ganji[0])}</span><span class="e-${elemOfBranch(d.ganji[1])}">${H(d.ganji[1])}</span></span>
+        <span style="color:var(--mute);font-size:11px;margin-left:6px">D-${dd}</span></div>
+        <span class="cf">신뢰도 ${d.level} ${(d.confidence*100).toFixed(0)}%</span>
+      </div>
+      <div class="bar"><i style="width:${Math.min(100,Math.abs(d.predicted)/3*100)}%"></i></div>
+      <div class="day-tags">${d.reasons.map(r=>`<span class="tag bad">${r.tag} <span style="color:var(--mute)">n=${r.n}</span></span>`).join('')}</div>
+    </div>`;
+  }).join('')}
+  </div>
+  <div class="note"><b>읽는 법.</b> 이 목록은 예언이 아니라 당신의 기록에서 반복된 패턴입니다.
+  신뢰도는 표본 수와 효과 크기로 계산되며, 어떤 경우에도 90%를 넘기지 않습니다.<br><br>
+  주의일을 미리 알면 그날 실제로 나쁘게 기록할 확률이 올라갑니다(확증편향).
+  판단이 흔들린다고 느끼면 그날도 평소처럼 기록하세요. 데이터가 스스로를 교정합니다.</div>`;
+}
+
+function recomputeWarn() {
+  state.warnSet = new Set();
+  if (!state.natal) return;
+  const list = collectSamples();
+  if (list.length < 10) return;
+  try {
+    const fc = forecast(natalObj(), list, { days:365, from:new Date() });
+    for (const d of fc.days) if (d.confidence >= 0.35) state.warnSet.add(d.date);
+  } catch(e) {}
+}
+
+// ---------- 라우팅 ----------
+const TABS = [
+  { id:'today', gz:'今', name:'오늘의 만세력' },
+  { id:'cal',   gz:'月', name:'월별 만세력 보기' },
+  { id:'natal', gz:'命', name:'내 명식' },
+  { id:'warn',  gz:'警', name:'주의 날짜' },
+  { id:'acct',  gz:'戶', name:'계정 · 백업' },
+];
+
+function render() {
+  $('#nav').innerHTML = TABS.map(t=>`<div class="nav-i ${state.tab===t.id?'on':''}" data-t="${t.id}">
+    <span class="gz">${t.gz}</span>${t.name}</div>`).join('');
+  $('#ttl').innerHTML = TABS.find(t=>t.id===state.tab).name + syncHTML();
+  const v = $('#view');
+  v.innerHTML = state.tab==='today' ? viewToday()
+    : state.tab==='cal' ? viewCalendar()
+    : state.tab==='natal' ? viewNatal()
+    : state.tab==='acct' ? viewAccount()
+    : viewWarn();
+
+  $('#nav').onclick = e => { const t=e.target.closest('.nav-i'); if(!t)return;
+    state.tab=t.dataset.t; closeNav(); render(); };
+
+  if (state.tab==='cal') {
+    $('#pm').onclick = ()=>{ state.cal=new Date(state.cal.getFullYear(),state.cal.getMonth()-1,1); render(); };
+    $('#nm').onclick = ()=>{ state.cal=new Date(state.cal.getFullYear(),state.cal.getMonth()+1,1); render(); };
+    $('#sy').onchange = e => { state.cal=new Date(+e.target.value, state.cal.getMonth(), 1); render(); };
+    $('#sm').onchange = e => { state.cal=new Date(state.cal.getFullYear(), +e.target.value, 1); render(); };
+    if ($('#tdy')) $('#tdy').onclick = ()=>{ const n=nowKST(); state.cal=new Date(n.y,n.m,1); render(); };
+    const si=$('#segI'), sp=$('#segPop');
+    if (si) si.onclick = e => { e.stopPropagation();
+      const open = sp.hasAttribute('hidden');
+      sp.toggleAttribute('hidden', !open);
+      si.setAttribute('aria-expanded', open);
+      si.classList.toggle('on', open);
+    };
+    document.addEventListener('click', e => {
+      if (sp && !sp.hasAttribute('hidden') && !sp.contains(e.target) && e.target !== si) {
+        sp.setAttribute('hidden',''); si?.classList.remove('on'); si?.setAttribute('aria-expanded','false');
+      }
+    }, { once: true });
+    $('#grid').onclick = e => { const c=e.target.closest('.cell'); if(!c||c.classList.contains('pad'))return;
+      openSheet(c.dataset.d); };
+  }
+  if (state.tab==='natal') {
+    // 연/월 변경 시 '일' 목록을 실제 말일에 맞춰 다시 채운다 (2월 30일 등 방지)
+    const syncDays = () => {
+      const y=+$('#iy').value, m=+$('#im').value;
+      const maxD = daysInMonth(y, m);
+      const sel = $('#id'); const prev = +sel.value;
+      sel.innerHTML = Array.from({length:maxD},(_,i)=>{const d=i+1;
+        return `<option value="${d}"${d===Math.min(prev,maxD)?' selected':''}>${d}일</option>`;}).join('');
+    };
+    if ($('#iy')) $('#iy').onchange = syncDays;
+    if ($('#im')) $('#im').onchange = syncDays;
+
+    if ($('#mk')) $('#mk').onclick = () => {
+      const err = (t)=>{ const e=$('#natErr'); if(e){e.textContent=t;e.className='err';} };
+      const y=+$('#iy').value, m=+$('#im').value, d=+$('#id').value;
+      const hv=$('#ih').value, h = hv===''?null:+hv, mi=+($('#imi').value||0);
+      // 드롭다운이라 범위는 안전하지만 방어적으로 재검증
+      if(!y||!m||!d){ return err('생년월일을 모두 선택해주세요.'); }
+      if(m<1||m>12){ return err('월이 올바르지 않습니다.'); }
+      if(d<1||d>daysInMonth(y,m)){ return err(`${y}년 ${m}월은 ${daysInMonth(y,m)}일까지 있습니다.`); }
+      if(h!=null && (h<0||h>23)){ return err('시가 올바르지 않습니다.'); }
+      if(mi<0||mi>59){ return err('분이 올바르지 않습니다.'); }
+      const today = nowKST();
+      if(y>today.y || (y===today.y && (m>today.m+1 || (m===today.m+1 && d>today.d)))){
+        return err('아직 오지 않은 날짜입니다.');
+      }
+      state.natal={y,m,d,h,mi,gender:$('#ig').value}; recomputeWarn(); queueSave(); render();
+    };
+    if ($('#reset')) $('#reset').onclick = ()=>{ state.natal=null; state.warnSet=new Set(); queueSave(); render(); };
+    if ($('#aiGo')) $('#aiGo').onclick = () => {
+      const nn = state.natal;
+      const bp = computeSaju(fromKST(nn.y, nn.m-1, nn.d, nn.h ?? 12, nn.mi ?? 0), nn.h, nn.mi);
+      requestAIInterpretation(bp, analyzeYongsinFull(bp), computeDaeun(bp, fromKST(nn.y, nn.m-1, nn.d, nn.h ?? 12, nn.mi ?? 0), nn.gender), nn);
+    };
+  }
+  if (state.tab==='acct') bindAccount();
+}
+
+// ---------- 계정 핸들러 ----------
+function bindAccount() {
+  const bkOut = $('#bkOut'), bkIn = $('#bkIn'), bkFile = $('#bkFile');
+  if (bkOut) bkOut.onclick = exportBackup;
+  if (bkIn)  bkIn.onclick  = () => bkFile.click();
+  if (bkFile) bkFile.onchange = e => { const f=e.target.files[0]; if(f) importBackup(f, $('#bkMsg')); e.target.value=''; };
+
+  if ($('#googleLogin')) {
+    $('#googleLogin').onclick = loginWithGoogle;
+  }
+
+  let mode = 'login';
+  const err = (el, t) => { const e=$(el); if(e){ e.textContent=t; e.className='err'; } };
+
+  if ($('#aswap')) $('#aswap').onclick = () => {
+    mode = mode==='login' ? 'signup' : 'login';
+    $('#authTtl').textContent = mode==='login' ? '로그인' : '가입하기';
+    $('#ago').textContent     = mode==='login' ? '로그인' : '가입하고 시작하기';
+    $('#aswap').textContent   = mode==='login' ? '계정이 없으신가요? 가입하기' : '이미 계정이 있으신가요? 로그인';
+    $('#ap').setAttribute('autocomplete', mode==='login'?'current-password':'new-password');
+    err('#aerr','');
+  };
+
+  if ($('#ago')) $('#ago').onclick = async () => {
+    const u = $('#au').value.trim(), p = $('#ap').value;
+    if (!u || !p) return err('#aerr','이메일과 비밀번호를 입력해주세요.');
+    $('#ago').disabled = true;
+    try {
+      await (mode==='login' ? API.login(u,p) : API.signup(u,p));
+      // 가입 시 이메일 인증이 필요하면 세션이 없을 수 있다
+      const me = await API.me();
+      if (!me.user) {
+        err('#aerr','가입 확인 메일을 보냈습니다. 메일함을 확인해주세요.');
+        $('#ago').disabled = false;
+        return;
+      }
+      state.user = me.user; state.rev = me.rev ?? 0;
+      const sd = me.data || { natal:null, entries:{} };
+      // 로그인 전 로컬에 쓴 기록이 있으면 서버 기록과 합친다
+      const localCount = Object.keys(state.entries).length;
+      state.entries = { ...(sd.entries||{}), ...state.entries };
+      state.natal = state.natal || sd.natal || null;
+      state.sync = 'idle';
+      recomputeWarn();
+      if (localCount) await pushNow();
+      render();
+    } catch (e) {
+      err('#aerr', e.message);
+      $('#ago').disabled = false;
+    }
+  };
+
+  if ($('#alo')) $('#alo').onclick = async () => {
+    try { await API.logout(); } catch {}
+    state.user=null; state.rev=0; state.sync='off';
+    state.entries={}; state.natal=null; state.warnSet=new Set();
+    render();
+  };
+
+  if ($('#pgo')) $('#pgo').onclick = async () => {
+    const c=$('#pc').value, n=$('#pn').value;
+    if(!c||!n) return err('#perr','두 칸 모두 입력해주세요.');
+    $('#pgo').disabled=true;
+    try { await API.passwd(c,n); const e=$('#perr'); e.textContent='비밀번호를 변경했습니다.'; e.className='err ok';
+      $('#pc').value=''; $('#pn').value=''; }
+    catch(e){ err('#perr', e.message); }
+    $('#pgo').disabled=false;
+  };
+
+  if ($('#dgo')) $('#dgo').onclick = async () => {
+    const p=$('#dp').value;
+    if(!p) return err('#derr','비밀번호를 입력해주세요.');
+    if(!confirm('정말 계정을 삭제할까요? 모든 기록이 사라지며 되돌릴 수 없습니다.')) return;
+    try { await API.del(p); state.user=null; state.entries={}; state.natal=null; state.rev=0; state.sync='off'; state.tab='today'; render(); }
+    catch(e){ err('#derr', e.message); }
+  };
+}
+
+const openNav = ()=>{ $('#side').classList.add('on'); $('#scrim').classList.add('on'); };
+const closeNav = ()=>{ $('#side').classList.remove('on'); $('#scrim').classList.remove('on'); };
+$('#bg').onclick = openNav;
+$('#scrim').onclick = closeNav;
+$('#sbg').onclick = closeSheet;
+$('#shX').onclick = closeSheet;
+$('#hsbg').onclick = closeHourSheet;
+$('#hsX').onclick = closeHourSheet;
+
+// ===== Supabase 로그인 세션 유지 =====
+// 부팅 시 저장된 세션을 먼저 확인한다. 세션이 있으면 즉시 로그인 UI로,
+// 없으면 정상 비로그인 UI로 시작한다. (세션 확인 전에 '로그인 실패'를 띄우지 않는다)
+let __authListenerBound = false;
+
+async function boot() {
+  state.sync = 'checking';   // 세션 확인 중
+  try {
+    // getSession: 로컬에 저장된 세션을 동기적으로 복구 (팝업을 다시 열지 않음)
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session?.user) {
+      const me = await API.me();
+      state.user = me.user;
+      state.rev = me.rev ?? 0;
+      state.natal = parseNatal(me.data?.natal) ?? null;
+      state.entries = me.data?.entries ?? {};
+      state.sync = 'idle';
+      recomputeWarn();
+    } else {
+      // 정상 비로그인 — 오류가 아니다
+      state.user = null;
+      state.rev = 0;
+      state.sync = 'off';
+    }
+  } catch (error) {
+    console.error('세션 확인 실패:', error);
+    state.user = null;
+    state.sync = 'off';   // 네트워크 문제여도 비로그인으로 두고 오류로 표시하지 않음
+  }
+
+  // 콜백 URL의 인증 파라미터 정리 (detectSessionInUrl 처리 후 주소창 청소)
+  if (location.hash.includes('access_token') || location.search.includes('code=')) {
+    history.replaceState(null, '', location.pathname);
+  }
+
+  render();
+}
+
+// ===== Supabase 로그인 세션 유지 =====
+// onAuthStateChange 리스너는 단 한 번만 등록한다 (render 반복 호출과 무관).
+if (!__authListenerBound) {
+  __authListenerBound = true;
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    try {
+      if (event === 'SIGNED_OUT') {
+        state.user = null; state.rev = 0; state.sync = 'off';
+        state.entries = {}; state.natal = null; state.warnSet = new Set();
+        render();
+        return;
+      }
+      // SIGNED_IN · TOKEN_REFRESHED · INITIAL_SESSION · USER_UPDATED
+      if (session?.user) {
+        const me = await API.me();
+        state.user = me.user;
+        state.rev = me.rev ?? 0;
+        // 로그인 직전 로컬 기록이 있으면 병합 (덮어쓰기 방지)
+        const localEntries = state.entries || {};
+        const localNatal = state.natal;
+        state.natal = parseNatal(me.data?.natal) ?? localNatal ?? null;
+        state.entries = { ...(me.data?.entries ?? {}), ...localEntries };
+        state.sync = 'idle';
+        recomputeWarn();
+        render();
+      }
+    } catch (error) {
+      console.error('로그인 상태 반영 실패:', error);
+    }
+  });
+}
+
+boot();
+
+
+</script>
+</body>
+</html>
