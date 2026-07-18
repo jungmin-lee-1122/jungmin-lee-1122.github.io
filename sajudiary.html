@@ -1690,8 +1690,8 @@ function deriveFour(primary, st) {
     const gu = GISIN_TO_GUSIN[gi];                // 기신을 생하는 오행
     gisin = [gi];
     gusin = [gu];
-    gisinWhy = `${gi}은(는) 용신 ${y}을(를) 직접 극합니다.`;
-    gusinWhy = `${gu}은(는) 기신 ${gi}을(를) 생하여 용신 ${y}을(를) 간접적으로 약화시킵니다.`;
+    gisinWhy = `${withJosa(gi,'은/는')} 용신 ${withJosa(y,'을/를')} 직접 극합니다.`;
+    gusinWhy = `${withJosa(gu,'은/는')} 기신 ${withJosa(gi,'을/를')} 생하여 용신 ${withJosa(y,'을/를')} 간접적으로 약화시킵니다.`;
 
     // 복수 용신(부용신 포함)이면 각 용신의 기신·구신을 합쳐 중복 제거.
     // 단, 주용신 기준값을 대표로 앞에 둔다.
@@ -1806,6 +1806,26 @@ const HB = c => HANJA_B[c] || c;                 // 지지 전용
 const H = c => HANJA_S[c] || HANJA_B[c] || c;
 const elemOfStem  = c => STEM_ELEM[STEMS.indexOf(c)];
 const elemOfBranch= c => BRANCH_ELEM[BRANCHES.indexOf(c)];
+const branchText = b => `${b}${elemOfBranch(b)}(${HB(b)})`;
+const lastHangulJong = text => {
+  const chars = [...String(text)].reverse();
+  for (const ch of chars) {
+    const code = ch.charCodeAt(0);
+    if (code >= 0xAC00 && code <= 0xD7A3) return (code - 0xAC00) % 28;
+  }
+  return 0;
+};
+const withJosa = (text, pair) => {
+  const jong = lastHangulJong(text);
+  const has = jong !== 0;
+  const particle = pair === '이/가' ? (has ? '이' : '가')
+    : pair === '은/는' ? (has ? '은' : '는')
+    : pair === '을/를' ? (has ? '을' : '를')
+    : pair === '과/와' ? (has ? '과' : '와')
+    : pair === '으로/로' ? (has && jong !== 8 ? '으로' : '로')
+    : '';
+  return `${text}${particle}`;
+};
 const $ = s => document.querySelector(s);
 
 // 서버 위에서 돌고 있는지 확인. 파일로 직접 열었으면 로컬 전용 모드로 동작한다.
@@ -2754,7 +2774,7 @@ function yongsinCardHTML(ys, p) {
     </div>
 
     <div class="ys-why">
-      <b>${ys.primary}</b>을(를) 주법으로 봅니다. ${ys.rationale}
+      <b>${withJosa(ys.primary,'을/를')}</b> 주법으로 봅니다. ${ys.rationale}
       ${ys.gisinWhy?`<br><span style="color:var(--mute)">기신 근거 — ${ys.gisinWhy}</span>`:''}
       ${ys.gusinWhy?`<br><span style="color:var(--mute)">구신 근거 — ${ys.gusinWhy}</span>`:''}
       <span class="ys-conf">판정 신뢰도 ${(ys.confidence*100).toFixed(0)}%</span>
@@ -2852,7 +2872,7 @@ function buildInterpretation(p, ys, du, natal) {
     stem: p.day[0],
     elem: me,
     title: `${p.day[0]}(${me}) 일간 — ${dt.nature}의 기질`,
-    body: `당신은 ${dt.nature}에 비유되는 ${me} 일간입니다. ${dt.keyword}을(를) 본질로 하며, ${dt.pos}이 있습니다. `
+    body: `당신은 ${dt.nature}에 비유되는 ${me} 일간입니다. ${withJosa(dt.keyword,'을/를')} 본질로 하며, ${dt.pos}이 있습니다. `
       + `사주 안에서 일간의 힘은 ${strengthWord} 편입니다(득령 ${ys.deukryeong?'○':'×'}·득지 ${ys.deukji?'○':'×'}·득세 ${ys.deukse?'○':'×'}, ${ys.score.toFixed(1)}/4). `
       + (neutral
           ? `강하지도 약하지도 않은 균형에 가까워, 상황에 따라 유연하게 대응하는 힘이 있습니다. 어느 한쪽으로 치우친 운이 올 때 그 영향을 특히 잘 탑니다.`
@@ -2870,12 +2890,12 @@ function buildInterpretation(p, ys, du, natal) {
     title: '오행의 균형',
     strongest: strongest[0], weakest: weakest[0],
     missing,
-    body: `오행 중 <b class="e-${strongest[0]}">${strongest[0]}</b>이(가) 가장 강하고(${strongest[1].toFixed(1)}), `
-      + `<b class="e-${weakest[0]}">${weakest[0]}</b>이(가) 가장 약합니다(${weakest[1].toFixed(1)}). `
+    body: `오행 중 <b class="e-${strongest[0]}">${withJosa(strongest[0],'이/가')}</b> 가장 강하고(${strongest[1].toFixed(1)}), `
+      + `<b class="e-${weakest[0]}">${withJosa(weakest[0],'이/가')}</b> 가장 약합니다(${weakest[1].toFixed(1)}). `
       + (missing.length
           ? `특히 ${missing.map(e=>`<b class="e-${e}">${e}</b>`).join('·')} 기운이 거의 없어, 그 오행이 상징하는 영역(${missing.map(e=>ELEM_ROLE_LABEL[elemRole(me,e)]||e).join(', ')})에서 아쉬움이 생기기 쉽습니다.`
           : `오행이 비교적 고루 갖춰져 큰 결핍은 없습니다.`),
-    remedy: `부족한 <b class="e-${weakest[0]}">${weakest[0]}</b>을(를) 보완하려면, 색·방위·생활 습관에서 그 기운을 가까이 하면 도움이 됩니다. `
+    remedy: `부족한 <b class="e-${weakest[0]}">${withJosa(weakest[0],'을/를')}</b> 보완하려면, 색·방위·생활 습관에서 그 기운을 가까이 하면 도움이 됩니다. `
       + `(${weakest[0]}: ${ELEM_ADVICE[weakest[0]]})`,
   };
 
@@ -2886,10 +2906,10 @@ function buildInterpretation(p, ys, du, natal) {
     title: '용신 활용법',
     yongsin: ys.yongsin, huisin: ys.huisin, gisin: ys.gisin, gusin: ys.gusin,
     body: yong
-      ? `당신에게 가장 이로운 기운(용신)은 <b class="e-${yong}">${yong}</b>입니다. ${ys.primary}을(를) 기준으로 정해졌습니다. `
-        + `${yong}은(는) 당신에게 ${yongRole} 역할을 하며, 이 기운이 살아날 때 일이 풀리고 컨디션이 좋아집니다. `
+      ? `당신에게 가장 이로운 기운(용신)은 <b class="e-${yong}">${yong}</b>입니다. ${withJosa(ys.primary,'을/를')} 기준으로 정해졌습니다. `
+        + `${withJosa(yong,'은/는')} 당신에게 ${yongRole} 역할을 하며, 이 기운이 살아날 때 일이 풀리고 컨디션이 좋아집니다. `
         + (ys.huisin.length?`이를 돕는 희신 <b class="e-${ys.huisin[0]}">${ys.huisin[0]}</b>도 함께 챙기면 좋습니다. `:'')
-        + `반대로 기신 <b class="e-${ys.gisin[0]}">${ys.gisin[0]}</b>이(가) 강해지는 때·환경은 피하는 편이 유리합니다.`
+        + `반대로 기신 <b class="e-${ys.gisin[0]}">${withJosa(ys.gisin[0],'이/가')}</b> 강해지는 때·환경은 피하는 편이 유리합니다.`
       : '용신이 뚜렷하게 잡히지 않는 구조입니다. 특정 기운에 기대기보다 전체 균형을 살피는 편이 좋습니다.',
     advice: yong ? `실천 팁 — ${ELEM_ADVICE[yong]} 이런 것들이 ${yong} 기운을 북돋웁니다.` : '',
   };
@@ -2919,7 +2939,7 @@ function buildInterpretation(p, ys, du, natal) {
       gz: curDae.gz, age: curDae.age, elem: daeElem,
       tone: daeGood?'순풍':daeBad?'역풍':'보통',
       body: `지금은 ${curDae.age}세부터 시작된 <b>${curDae.gz}</b> 대운 안에 있습니다. `
-        + `대운의 천간 ${curDae.gz[0]}(${daeElem})은(는) `
+        + `대운의 천간 ${withJosa(`${curDae.gz[0]}(${daeElem})`,'은/는')} `
         + (daeGood?`당신의 용희신에 해당해, 이 10년은 흐름을 타기 좋은 시기입니다. 하고 싶은 일을 펼쳐볼 만합니다.`
            :daeBad?`당신의 기구신에 해당해, 이 10년은 다소 버거울 수 있습니다. 무리한 확장보다 내실을 다지는 편이 좋습니다.`
            :`용신도 기신도 아니라, 큰 굴곡 없이 흘러가는 무난한 시기입니다.`),
@@ -2927,7 +2947,7 @@ function buildInterpretation(p, ys, du, natal) {
     seun: {
       gz: seun, year: nowY, elem: seElem,
       tone: seGood?'순풍':seBad?'역풍':'보통',
-      body: `올해(${nowY}년)는 <b>${seun}</b> 세운입니다. 세운 천간 ${seun[0]}(${seElem})은(는) `
+      body: `올해(${nowY}년)는 <b>${seun}</b> 세운입니다. 세운 천간 ${withJosa(`${seun[0]}(${seElem})`,'은/는')} `
         + (seGood?`용희신에 들어, 새로운 시도나 결정에 힘이 실리는 해입니다.`
            :seBad?`기구신에 들어, 조심스럽게 움직이는 편이 좋은 해입니다. 건강과 관계를 특히 살피세요.`
            :`무난한 흐름의 해입니다.`),
@@ -3305,16 +3325,16 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
     if (natalFullObj.yongsin.includes(sElem)) {
       raw += 22 * bg.factor;
-      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 용신 배경을 만듭니다.`, weight:bg.factor });
+      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${withJosa(sElem,'이/가')} 용신 배경을 만듭니다.`, weight:bg.factor });
     } else if (natalFullObj.huisin.includes(sElem)) {
       raw += 12 * bg.factor;
-      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 희신으로 보조합니다.`, weight:bg.factor*0.7 });
+      positiveReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${withJosa(sElem,'이/가')} 희신으로 보조합니다.`, weight:bg.factor*0.7 });
     } else if (natalFullObj.gisin.includes(sElem)) {
       raw -= 22 * bg.factor;
-      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 기신 배경을 강화합니다.`, weight:bg.factor });
+      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${withJosa(sElem,'이/가')} 기신 배경을 강화합니다.`, weight:bg.factor });
     } else if (natalFullObj.gusin.includes(sElem)) {
       raw -= 12 * bg.factor;
-      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
+      negativeReasons.push({ src:'명식', text:`${bg.label} ${bg.gz}의 천간 ${withJosa(sElem,'이/가')} 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
     }
 
     if (natalFullObj.yongsin.includes(bElem)) raw += 8 * bg.factor;
@@ -3324,7 +3344,7 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
     if (bgRels.length) {
       const strongest = [...bgRels].sort((a,b)=>Math.abs(b.score)-Math.abs(a.score))[0];
       raw += strongest.score * 8 * bg.factor;
-      const txt = `${bg.label} ${bg.gz}의 지지 ${bg.gz[1]}이(가) 원국 ${strongest.name}지 ${strongest.branch}과(와) ${strongest.rel}`;
+      const txt = `${bg.label} ${bg.gz}의 지지 ${withJosa(branchText(bg.gz[1]),'이/가')} 원국 ${strongest.name}지 ${withJosa(branchText(strongest.branch),'과/와')} ${strongest.rel}`;
       if (strongest.score < 0) negativeReasons.push({ src:'명식', text:`${txt} 관계입니다.`, weight:Math.abs(strongest.score)*bg.factor });
       else positiveReasons.push({ src:'명식', text:`${txt}으로 조화를 보입니다.`, weight:strongest.score*bg.factor });
     }
@@ -3348,7 +3368,7 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
     if (rel) {
       raw += relScore * factor;
-      const text = `${aName} ${aGz}와 ${bName} ${bGz}가 ${rel} 관계`;
+      const text = `${withJosa(`${aName} ${aGz}`,'과/와')} ${withJosa(`${bName} ${bGz}`,'이/가')} ${rel} 관계`;
       if (relScore < 0) negativeReasons.push({ src:'명식', text:`${text}라 날짜 내부 흐름이 부딪힙니다.`, weight:Math.abs(relScore/8)*factor });
       else positiveReasons.push({ src:'명식', text:`${text}로 날짜 내부 흐름이 이어집니다.`, weight:(relScore/8)*factor });
     }
@@ -3366,7 +3386,7 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
     }
     seenFamily[fam] = r;
     raw += r.score * 12;
-    const txt = `일지 ${dBranch}이(가) 원국 ${r.name}지 ${r.branch}과(와) ${r.rel} 관계`;
+    const txt = `일지 ${withJosa(branchText(dBranch),'이/가')} 원국 ${r.name}지 ${withJosa(branchText(r.branch),'과/와')} ${r.rel} 관계`;
     if (r.score < 0) negativeReasons.push({ src:'명식', text:`${txt}입니다.`, weight: Math.abs(r.score) });
     else positiveReasons.push({ src:'명식', text:`${txt}로 조화롭습니다.`, weight: r.score });
   }
@@ -3383,10 +3403,10 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
   // (3) 그날 천간·지지 오행이 용희신/기구신인지 (용신 강, 희신 보조, 기신 강, 구신 보조)
   const scoreElem = (elem, label) => {
-    if (natalFullObj.yongsin.includes(elem)) { raw += 22; positiveReasons.push({ src:'명식', text:`${label} ${elem}이(가) 용신에 해당해 흐름을 돕습니다.`, weight:1 }); }
-    else if (natalFullObj.huisin.includes(elem)) { raw += 12; positiveReasons.push({ src:'명식', text:`${label} ${elem}이(가) 희신으로 용신을 보조합니다.`, weight:0.6 }); }
-    else if (natalFullObj.gisin.includes(elem)) { raw -= 22; negativeReasons.push({ src:'명식', text:`${label} ${elem}이(가) 기신으로 균형을 흔듭니다.`, weight:1 }); }
-    else if (natalFullObj.gusin.includes(elem)) { raw -= 12; negativeReasons.push({ src:'명식', text:`${label} ${elem}이(가) 구신으로 기신을 돕습니다.`, weight:0.6 }); }
+    if (natalFullObj.yongsin.includes(elem)) { raw += 22; positiveReasons.push({ src:'명식', text:`${label} ${withJosa(elem,'이/가')} 용신에 해당해 흐름을 돕습니다.`, weight:1 }); }
+    else if (natalFullObj.huisin.includes(elem)) { raw += 12; positiveReasons.push({ src:'명식', text:`${label} ${withJosa(elem,'이/가')} 희신으로 용신을 보조합니다.`, weight:0.6 }); }
+    else if (natalFullObj.gisin.includes(elem)) { raw -= 22; negativeReasons.push({ src:'명식', text:`${label} ${withJosa(elem,'이/가')} 기신으로 균형을 흔듭니다.`, weight:1 }); }
+    else if (natalFullObj.gusin.includes(elem)) { raw -= 12; negativeReasons.push({ src:'명식', text:`${label} ${withJosa(elem,'이/가')} 구신으로 기신을 돕습니다.`, weight:0.6 }); }
   };
   scoreElem(dStemElem, '일진 천간');
   // 지지 오행은 천간보다 약하게
@@ -3464,7 +3484,7 @@ function applyPurposeAdjustment(purpose, ctx) {
         if (isGi(dStemElem)) boost(true, -6, `재성의 날이나 재성이 기신이라 과욕은 경계해야 합니다.`);
         else boost(true, 8, `재성이 작동해 금전·계약 흐름에 힘이 실립니다.`);
       }
-      if (['편인','정인','정관'].includes(god)) boost(true, 5, `문서·안정을 뜻하는 ${god}이(가) 계약을 뒷받침합니다.`);
+      if (['편인','정인','정관'].includes(god)) boost(true, 5, `문서·안정을 뜻하는 ${withJosa(god,'이/가')} 계약을 뒷받침합니다.`);
       break;
     case 'exam': // 시험·면접 — 인성·관성·식상 조화
       if (['편인','정인'].includes(god)) boost(true, 8, `인성이 작동해 집중과 학습에 유리합니다.`);
@@ -3981,7 +4001,7 @@ function buildReasonLines(r, mode) {
   for (const er of (r.empReasons||[])) {
     if (lines.length >= 3) break;
     const dir = er.delta < 0 ? '낮았습니다' : '좋았습니다';
-    add('내 기록', `${er.tag}이(가) 있던 기록 ${er.n}회에서 평소보다 평균 ${Math.abs(er.delta).toFixed(1)}점 ${dir}.`);
+    add('내 기록', `${withJosa(er.tag,'이/가')} 있던 기록 ${er.n}회에서 평소보다 평균 ${Math.abs(er.delta).toFixed(1)}점 ${dir}.`);
   }
   // 명식 이유 (모드에 맞는 방향 우선)
   const natReasons = mode==='lucky'
