@@ -404,6 +404,37 @@ button:disabled{opacity:.5;cursor:default}
 .ai-p{font-size:13px;line-height:2;color:var(--paper-dim);margin-bottom:12px}
 .ai-p:last-of-type{margin-bottom:8px}
 
+
+/* ---------- 시운별 일기 그리드 ---------- */
+.hour-lead{font-size:11.5px;color:var(--mute);line-height:1.75;margin-bottom:12px}
+.hour-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.hcell{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--ink3);
+  padding:8px 3px 7px;text-align:center;cursor:pointer;position:relative;transition:.14s;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.hcell:hover{border-color:var(--line2)}
+.hcell:focus-visible{outline:2px solid var(--to);outline-offset:2px}
+.hcell.has{border-color:var(--to);background:rgba(185,138,62,.1)}
+.hcell-chk{
+  position:absolute;top:4px;right:5px;width:13px;height:13px;border-radius:2px;
+  border:1px solid var(--line2);font-size:9px;line-height:12px;color:var(--ink);
+}
+.hcell.has .hcell-chk{background:var(--to);border-color:var(--to)}
+.hcell-nm{font-size:10px;color:var(--paper-dim);letter-spacing:.04em;margin-top:2px}
+.hcell-gz{font-family:'Noto Serif KR',serif;font-size:15px;line-height:1.1;
+  display:flex;flex-direction:column}
+.hcell-t{font-family:'IBM Plex Mono',monospace;font-size:7.5px;color:var(--mute);
+  line-height:1.25;letter-spacing:-.02em}
+#hsheet .sheet-hd .gz{display:flex;align-items:center;gap:8px}
+#hsGz .e-목,#hsGz .e-화,#hsGz .e-토,#hsGz .e-금,#hsGz .e-수{font-size:19px}
+@media(max-width:520px){
+  .hour-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:360px){
+  .hour-grid{grid-template-columns:repeat(3,1fr)}
+}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -431,6 +462,16 @@ button:disabled{opacity:.5;cursor:default}
     <button id="shX">&times;</button>
   </div>
   <div class="sheet-body" id="shBody"></div>
+</div>
+
+<div class="sheet-bg" id="hsbg"></div>
+<div class="sheet" id="hsheet">
+  <div class="grab"></div>
+  <div class="sheet-hd">
+    <div><div class="gz" id="hsGz"></div><div class="dt" id="hsRange"></div></div>
+    <button id="hsX">&times;</button>
+  </div>
+  <div class="sheet-body" id="hsBody"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2118,6 +2159,132 @@ function viewCalendar() {
 }
 
 // ---------- 기록 시트 ----------
+// ============================================================
+// 시운별 일기 — 시(時)별 서브 일기
+// 날짜 하나에 12시진(자~해) 각각의 일기를 달 수 있다.
+// 시주의 천간+지지는 날짜(일간)에 따라 달라지므로 매번 계산한다.
+// ============================================================
+
+// 12지지 순서 (자시 시작)
+const HOUR_BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+
+/**
+ * 특정 날짜의 특정 시진에 대한 시주 간지를 구한다.
+ * 예: 2026-07-16(신묘일)의 오시 → 갑오시
+ *     같은 오시라도 다른 날이면 천간이 바뀐다.
+ * @param dateKey 'YYYY-MM-DD'
+ * @param branch  '자'~'해'
+ */
+function hourPillarFor(dateKey, branch) {
+  const [y,m,d] = dateKey.split('-').map(Number);
+  // 자시(23:30~)는 일주가 다음날로 넘어가므로, 해당 시진의 대표 시각으로 계산한다.
+  const bi = HOUR_BRANCHES.indexOf(branch);
+  // 각 시진의 중앙 시각(대략) — 자시만 00:30, 나머지는 짝수시 30분
+  const centerH = bi === 0 ? 0 : (bi * 2 + 1);   // 자=0시, 축=3시, 인=5시…
+  const dt = fromKST(y, m-1, d, centerH, 0);
+  const dayShift = dayShiftForHour(centerH, 0);
+  const dayDate = dayShift ? new Date(dt.getTime() + 86400000) : dt;
+  const dayGz = dayGanji(dayDate);
+  return hourGanji(dayGz[0], centerH, 0);
+}
+
+/**
+ * 저장된 entry에서 시별 일기 맵을 꺼낸다 (없으면 빈 객체).
+ * 구버전 데이터(hours 없음)도 안전하게 처리.
+ */
+function hourEntries(entry) {
+  return (entry && typeof entry.hours === 'object' && entry.hours) ? entry.hours : {};
+}
+
+/** 시별 일기가 실제 기록(기분/몸상태)을 담고 있는지 */
+function hourHasContent(he) {
+  return moodList(he).length > 0 || he.body != null;
+}
+
+/**
+ * 분석용 표본 수집.
+ * 날짜 전체 기록과 시별 기록을 모두 하나의 표본 배열로 펼친다.
+ * - 날짜 표본:  ganji = 그날의 일진(일주)
+ * - 시별 표본:  ganji = 그 날·그 시의 시주
+ * 시별 표본은 scope:'hour'로 표시해 필요 시 구분할 수 있다.
+ */
+function collectSamples() {
+  const out = [];
+  for (const [date, v] of Object.entries(state.entries)) {
+    // 날짜 전체 기록
+    if (moodList(v).length || v.body != null) {
+      out.push({ date, mood: v.mood, body: v.body, scope: 'day' });
+    }
+    // 시별 기록
+    const hrs = hourEntries(v);
+    for (const [branch, he] of Object.entries(hrs)) {
+      if (!hourHasContent(he)) continue;
+      out.push({
+        date, branch,
+        mood: he.mood, body: he.body,
+        scope: 'hour',
+        ganji: hourPillarFor(date, branch),   // 시주 간지를 직접 지정
+      });
+    }
+  }
+  return out;
+}
+
+/** 기록이 있는 표본 개수 (날짜+시별 합산) */
+function sampleCount() {
+  return collectSamples().length;
+}
+
+
+// 시별 일기 편집 중인 임시 상태 (openSheet 내부에서 갱신)
+let __sheetDraft = null;
+
+function moodPickerHTML(id, cur) {
+  return `<div class="moods" id="${id}">
+    ${Object.entries(MOOD).map(([k2,v])=>`<div class="mood ${cur.includes(k2)?'on':''}" data-m="${k2}" role="checkbox" aria-checked="${cur.includes(k2)}" tabindex="0">
+      <span class="em">${v.icon}</span><span class="nm">${v.label}</span></div>`).join('')}
+  </div>`;
+}
+function bodyPickerHTML(id, cur) {
+  return `<div class="bodies" id="${id}">
+    ${[1,2,3,4,5].map(n=>`<div class="bd ${cur===n?'on':''}" data-b="${n}">${n}
+      <small>${['매우 낮음','낮음','보통','좋음','아주 좋음'][n-1]}</small></div>`).join('')}
+  </div>`;
+}
+function bindMoodPicker(el, selObj) {
+  el.onclick = ev => { const t=ev.target.closest('.mood'); if(!t)return;
+    const k2=t.dataset.m; const i=selObj.mood.indexOf(k2);
+    if(i>=0) selObj.mood.splice(i,1); else selObj.mood.push(k2);
+    t.classList.toggle('on', i<0); t.setAttribute('aria-checked', i<0);
+  };
+  el.onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ev.preventDefault();ev.target.closest('.mood')?.click();} };
+}
+function bindBodyPicker(el, selObj) {
+  el.onclick = ev => { const t=ev.target.closest('.bd'); if(!t)return;
+    [...el.children].forEach(x=>x.classList.remove('on')); t.classList.add('on'); selObj.body=+t.dataset.b; };
+}
+
+// 시운별 그리드 (스크린샷 참고: 체크박스 + 간지 + 시각범위)
+function hourGridHTML(dateKey, hours) {
+  return `<div class="hour-grid" id="hourGrid">
+    ${HOUR_BRANCHES.map(b=>{
+      const gz = hourPillarFor(dateKey, b);
+      const hr = HOUR_RANGES.find(r=>r[0]===b);
+      const he = hours[b] || {};
+      const has = moodList(he).length>0 || he.body!=null || (he.memo&&he.memo.trim());
+      return `<div class="hcell ${has?'has':''}" data-b="${b}" role="button" tabindex="0" aria-pressed="${has}">
+        <div class="hcell-chk">${has?'✓':''}</div>
+        <div class="hcell-nm">${b}시</div>
+        <div class="hcell-gz">
+          <span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span>
+          <span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span>
+        </div>
+        <div class="hcell-t">${hr[1]}<br>${hr[2]}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
 function openSheet(k) {
   state.sel = k;
   const [ky,km,kd] = k.split('-').map(Number);
@@ -2125,6 +2292,8 @@ function openSheet(k) {
   const p = computeSaju(dt, 12);
   const e = state.entries[k] || {};
   const curMoods = moodList(e);
+  // 시별 일기는 편집 중 초안으로 복사 (저장 눌러야 반영)
+  __sheetDraft = JSON.parse(JSON.stringify(hourEntries(e)));
   $('#shDt').textContent = k + ' ' + ['일','월','화','수','목','금','토'][kstParts(dt).dow] + '요일';
   $('#shGz').textContent = `${p.year}년 ${p.month}월 ${p.day}일`;
 
@@ -2142,41 +2311,102 @@ function openSheet(k) {
     ${myeongsikHTML({...p, hour:null}, false)}
     ${rel}
     <div class="f-lbl">기분 <span class="hint">여러 개 선택할 수 있어요</span></div>
-    <div class="moods" id="moods">
-      ${Object.entries(MOOD).map(([k2,v])=>`<div class="mood ${curMoods.includes(k2)?'on':''}" data-m="${k2}" role="checkbox" aria-checked="${curMoods.includes(k2)}" tabindex="0">
-        <span class="em">${v.icon}</span><span class="nm">${v.label}</span></div>`).join('')}
-    </div>
+    ${moodPickerHTML('moods', curMoods)}
     <div class="f-lbl">몸상태 (5 = 가장 좋음)</div>
-    <div class="bodies" id="bodies">
-      ${[1,2,3,4,5].map(n=>`<div class="bd ${e.body===n?'on':''}" data-b="${n}">${n}
-        <small>${['매우 낮음','낮음','보통','좋음','아주 좋음'][n-1]}</small></div>`).join('')}
-    </div>
+    ${bodyPickerHTML('bodies', e.body)}
     <div class="f-lbl">메모</div>
     <textarea id="memo" placeholder="오늘 어땠나요">${e.memo||''}</textarea>
+
+    <div class="f-lbl" style="margin-top:26px">시운별 일기 <span class="hint">시간대를 눌러 시(時)별로 기록</span></div>
+    <div class="hour-lead" id="hourLead">시(時)를 선택해 그 시간대의 기분·몸상태를 따로 기록할 수 있어요.
+    시주 간지는 날짜에 따라 자동 계산됩니다.</div>
+    ${hourGridHTML(k, __sheetDraft)}
+
     <button class="btn" id="save">기록 저장</button>
     ${state.entries[k]?'<button class="btn ghost" id="del">이 기록 지우기</button>':''}
   `;
 
   let sel = { mood: [...curMoods], body: e.body };
-  $('#moods').onclick = ev => { const t=ev.target.closest('.mood'); if(!t)return;
-    const k2 = t.dataset.m;
-    const i = sel.mood.indexOf(k2);
-    if (i >= 0) sel.mood.splice(i,1); else sel.mood.push(k2);
-    t.classList.toggle('on', i < 0);
-    t.setAttribute('aria-checked', i < 0);
-  };
-  $('#moods').onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ ev.preventDefault(); ev.target.closest('.mood')?.click(); } };
-  $('#bodies').onclick = ev => { const t=ev.target.closest('.bd'); if(!t)return;
-    [...$('#bodies').children].forEach(x=>x.classList.remove('on')); t.classList.add('on'); sel.body=+t.dataset.b; };
+  bindMoodPicker($('#moods'), sel);
+  bindBodyPicker($('#bodies'), sel);
+
+  // 시운 그리드 클릭 → 시별 서브시트 열기
+  const grid = $('#hourGrid');
+  grid.onclick = ev => { const c=ev.target.closest('.hcell'); if(!c)return; openHourSheet(k, c.dataset.b); };
+  grid.onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ev.preventDefault(); const c=ev.target.closest('.hcell'); if(c)openHourSheet(k,c.dataset.b);} };
+
   $('#save').onclick = () => {
     const memo = $('#memo').value.trim();
-    if (!sel.mood.length && !sel.body && !memo) { closeSheet(); return; }
-    state.entries[k] = { mood: sel.mood, body:sel.body, memo };
+    // 내용이 담긴 시별 일기만 남긴다
+    const hours = {};
+    for (const [b,he] of Object.entries(__sheetDraft)) {
+      if (moodList(he).length || he.body!=null || (he.memo&&he.memo.trim())) hours[b]=he;
+    }
+    const hasHours = Object.keys(hours).length>0;
+    if (!sel.mood.length && !sel.body && !memo && !hasHours) {
+      // 아무것도 없으면 기존 기록 삭제
+      if (state.entries[k]) { delete state.entries[k]; recomputeWarn(); queueSave(); }
+      closeSheet(); render(); return;
+    }
+    state.entries[k] = { mood: sel.mood, body:sel.body, memo, ...(hasHours?{hours}:{}) };
     recomputeWarn(); queueSave(); closeSheet(); render();
   };
   if ($('#del')) $('#del').onclick = () => { delete state.entries[k]; recomputeWarn(); queueSave(); closeSheet(); render(); };
 
   $('#sheet').classList.add('on'); $('#sbg').classList.add('on');
+}
+
+// ---------- 시별 서브 시트 ----------
+function openHourSheet(dateKey, branch) {
+  const gz = hourPillarFor(dateKey, branch);
+  const hr = HOUR_RANGES.find(r=>r[0]===branch);
+  const he = __sheetDraft[branch] || { mood:[], body:null, memo:'' };
+  const curMoods = moodList(he);
+  let rel = '';
+  if (state.natal) {
+    const tags = extractTags(natalObj(), gz);
+    const bad = t => /^(충|원진|형|해|파)/.test(t) || /구기신|편관투출|상관투출/.test(t);
+    const good = t => /육합|용희신|천을귀인/.test(t);
+    const shown = tags.filter(t=>!t.startsWith('일주:'));
+    if (shown.length) rel = `<div class="f-lbl">이 시주와 내 명식의 관계</div><div class="day-tags">
+      ${shown.map(t=>`<span class="tag ${bad(t)?'bad':good(t)?'good':''}">${t}</span>`).join('')}</div>`;
+  }
+
+  $('#hsGz').innerHTML = `${branch}시 <span class="e-${elemOfStem(gz[0])}">${H(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${H(gz[1])}</span>`;
+  $('#hsRange').textContent = `${hr[1]} ~ ${hr[2]}`;
+  $('#hsBody').innerHTML = `
+    ${rel}
+    <div class="f-lbl">기분 <span class="hint">여러 개 선택 가능</span></div>
+    ${moodPickerHTML('hMoods', curMoods)}
+    <div class="f-lbl">몸상태</div>
+    ${bodyPickerHTML('hBodies', he.body)}
+    <div class="f-lbl">메모</div>
+    <textarea id="hMemo" placeholder="이 시간대는 어땠나요">${he.memo||''}</textarea>
+    <button class="btn" id="hSave">이 시간대 기록</button>
+    ${(curMoods.length||he.body!=null||he.memo)?'<button class="btn ghost" id="hClear">이 시간대 기록 지우기</button>':''}
+  `;
+  const hsel = { mood:[...curMoods], body: he.body };
+  bindMoodPicker($('#hMoods'), hsel);
+  bindBodyPicker($('#hBodies'), hsel);
+  $('#hSave').onclick = () => {
+    const memo = $('#hMemo').value.trim();
+    __sheetDraft[branch] = { mood: hsel.mood, body: hsel.body, memo };
+    refreshHourGrid(dateKey);
+    closeHourSheet();
+  };
+  if ($('#hClear')) $('#hClear').onclick = () => {
+    delete __sheetDraft[branch]; refreshHourGrid(dateKey); closeHourSheet();
+  };
+  $('#hsheet').classList.add('on'); $('#hsbg').classList.add('on');
+}
+function closeHourSheet(){ $('#hsheet').classList.remove('on'); $('#hsbg').classList.remove('on'); }
+function refreshHourGrid(dateKey){
+  const g = $('#hourGrid');
+  if (!g) return;
+  g.outerHTML = hourGridHTML(dateKey, __sheetDraft);
+  const ng = $('#hourGrid');
+  ng.onclick = ev => { const c=ev.target.closest('.hcell'); if(!c)return; openHourSheet(dateKey, c.dataset.b); };
+  ng.onkeydown = ev => { if(ev.key===' '||ev.key==='Enter'){ev.preventDefault(); const c=ev.target.closest('.hcell'); if(c)openHourSheet(dateKey,c.dataset.b);} };
 }
 const closeSheet = () => { $('#sheet').classList.remove('on'); $('#sbg').classList.remove('on'); state.sel=null; };
 
@@ -2836,14 +3066,12 @@ function viewWarn() {
   if (!state.natal) return `<div class="empty"><div class="ic">命</div>
     <p>먼저 <b>내 명식</b>에서 사주를 입력해주세요.<br>기록을 명식과 대조해야 분석할 수 있습니다.</p></div>`;
 
-  const list = Object.entries(state.entries)
-    .filter(([,v]) => moodList(v).length || v.body)
-    .map(([k,v]) => ({ date:k, mood:v.mood, body:v.body }));
+  const list = collectSamples();
 
   if (list.length < 10) return `<div class="empty"><div class="ic">數</div>
     <p>기록 <b>${list.length}일</b> / 최소 10일 필요<br>
     <span style="font-size:11.5px">패턴을 신뢰하려면 표본이 쌓여야 합니다.<br>
-    월별 만세력에서 기분·몸상태를 기록해주세요.</span></p></div>`;
+    날짜별 기록과 시운별 기록이 모두 표본에 포함됩니다.</span></p></div>`;
 
   const nat = natalObj();
   const st = buildStats(nat, list, { minSamples:3 });
@@ -2895,7 +3123,7 @@ function viewWarn() {
 function recomputeWarn() {
   state.warnSet = new Set();
   if (!state.natal) return;
-  const list = Object.entries(state.entries).filter(([,v])=>moodList(v).length||v.body).map(([k,v])=>({date:k,...v}));
+  const list = collectSamples();
   if (list.length < 10) return;
   try {
     const fc = forecast(natalObj(), list, { days:365, from:new Date() });
@@ -3069,6 +3297,8 @@ $('#bg').onclick = openNav;
 $('#scrim').onclick = closeNav;
 $('#sbg').onclick = closeSheet;
 $('#shX').onclick = closeSheet;
+$('#hsbg').onclick = closeHourSheet;
+$('#hsX').onclick = closeHourSheet;
 
 // ===== Supabase 로그인 세션 유지 =====
 // 부팅 시 저장된 세션을 먼저 확인한다. 세션이 있으면 즉시 로그인 UI로,
