@@ -456,9 +456,10 @@ button:disabled{opacity:.5;cursor:default}
 .flow-card.risk{border-left:2px solid var(--alert)}
 .flow-card.lucky{border-left:2px solid var(--ok)}
 .flow-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.flow-date{display:flex;align-items:baseline;gap:8px}
+.flow-date{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
 .flow-date .dt{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
-.flow-date .gz{font-family:'Noto Serif KR',serif;font-size:16px}
+.flow-date .gz{font-family:'Noto Serif KR',serif;font-size:16px;display:flex;gap:7px;flex-wrap:wrap}
+.flow-gz-unit{white-space:nowrap}
 .flow-date .dday{font-size:10.5px;color:var(--mute);font-family:'IBM Plex Mono',monospace}
 .flow-grade{font-size:11px;padding:3px 9px;border-radius:2px;letter-spacing:.04em;font-family:'Noto Serif KR',serif}
 .flow-grade.tone-good{background:rgba(75,158,122,.16);color:#7FC4A4;border:1px solid rgba(75,158,122,.4)}
@@ -1191,7 +1192,11 @@ function tagsForSample(natal, e) {
   if (e.scope === 'hour' && e.pillars?.year && e.pillars?.month && e.pillars?.day && e.pillars?.hour) {
     return extractTimedTags(natal, e.pillars, e.ctx);
   }
-  return extractTags(natal, e.ganji ?? dayGanji(new Date(e.date)), e.ctx);
+  if (e.pillars?.year && e.pillars?.month && e.pillars?.day) {
+    return extractDateTags(natal, e.pillars, e.ctx);
+  }
+  // 구버전 표본도 날짜에서 연주·월주·일주를 다시 계산해 전체 흐름으로 분석한다.
+  return extractDateTags(natal, datePillarsFor(e.date), e.ctx);
 }
 
 function buildStats(natal, entries, opts = {}) {
@@ -1242,7 +1247,7 @@ function buildStats(natal, entries, opts = {}) {
 
     // 일주 태그(60종)는 너무 특수해 표본이 절대 모이지 않음.
     // 통계에는 남기되 위험 승격 대상에서 제외 → 계열 태그로 일반화.
-    const tooSpecific = tag.startsWith('일주:') || /^시운(?:연주|월주|일주|시주):/.test(tag);
+    const tooSpecific = /^(?:연주|월주|일주):/.test(tag) || /^시운(?:연주|월주|일주|시주):/.test(tag);
 
     stats.push({
       tag, n, mean: m, delta, effect: d, confidence,
@@ -1361,8 +1366,10 @@ function forecast(natal, entries, { days = 365, from = new Date(), minSamples = 
   for (let i = 0; i < days; i++) {
     const d = new Date(from);
     d.setDate(d.getDate() + i);
-    const gz = dayGanji(d);
-    const tags = extractTags(natal, gz);
+    const dateKey = isoKST(d);
+    const pillars = datePillarsFor(dateKey);
+    const gz = pillars.day;
+    const tags = extractDateTags(natal, pillars);
     const raw = tags.map(t => pickTags.get(t)).filter(Boolean);
     if (!raw.length) continue;
 
@@ -1383,8 +1390,9 @@ function forecast(natal, entries, { days = 365, from = new Date(), minSamples = 
     conf = Math.min(0.9, conf);   // 확실성 상한 (태그 단위 상한과 동일)
 
     out.push({
-      date: d.toISOString().slice(0,10),
+      date: dateKey,
       ganji: gz,
+      pillars,
       predicted,
       confidence: conf,
       level: conf >= 0.6 ? '높음' : conf >= 0.35 ? '중간' : '낮음',
@@ -2277,6 +2285,42 @@ const HOUR_REFERENCE_TIMES = {
 };
 
 /**
+ * 길일·주의일과 날짜 기록에 사용할 해당 날짜의 연주·월주·일주를 계산한다.
+ * 시각을 지정하지 않는 날짜 분석은 KST 정오를 대표 시각으로 사용한다.
+ * 절입 당일처럼 월주가 하루 중 바뀌는 경우에는 정오 기준 월주가 적용된다.
+ */
+function datePillarsFor(dateKey) {
+  const [y,m,d] = String(dateKey).split('-').map(Number);
+  if (!y || !m || !d) throw new Error('유효하지 않은 날짜입니다.');
+  const dt = fromKST(y, m-1, d, 12, 0);
+  const p = computeSaju(dt, null, 0);
+  return { year:p.year, month:p.month, day:p.day };
+}
+
+/**
+ * 한 날짜의 연주·월주·일주를 모두 개인 명식과 대조하는 통계 태그.
+ * 일주는 기존 태그를 유지하고, 연주와 월주는 각각 연운·월운으로 구분한다.
+ */
+function extractDateTags(natal, p, ctx = {}) {
+  const yearTags = extractTags(natal, p.year, ctx)
+    .filter(t => !t.startsWith('일주:'))
+    .map(t => `연운:${t}`);
+  const monthTags = extractTags(natal, p.month, ctx)
+    .filter(t => !t.startsWith('일주:'))
+    .map(t => `월운:${t}`);
+  const dayTags = extractTags(natal, p.day, ctx);
+
+  return [...new Set([
+    ...yearTags,
+    ...monthTags,
+    ...dayTags,
+    `연주:${p.year}`,
+    `월주:${p.month}`,
+    `일주:${p.day}`,
+  ])];
+}
+
+/**
  * 특정 날짜와 시진을 하나의 실제 KST 날짜·시간으로 합쳐 사주 네 기둥을 계산한다.
  * 예: 2026-07-19 축시(01:30) → 병오년 을미월 갑오일 을축시
  * @param dateKey 'YYYY-MM-DD'
@@ -2315,15 +2359,15 @@ function timedSajuFromRecord(dateKey, branch, he) {
   return valid ? { ...calculated, ...saved } : calculated;
 }
 
-// 시운 통계는 그 시간의 일주를 날짜 흐름에 반영하고, 시주 관계 태그도 별도로 보존한다.
+// 시운 통계도 해당 날짜의 연주·월주·일주 전체와 시주를 함께 반영한다.
 function extractTimedTags(natal, p, ctx = {}) {
-  const dayTags = extractTags(natal, p.day, ctx);
+  const dateTags = extractDateTags(natal, p, ctx);
   const hourTags = extractTags(natal, p.hour, ctx)
     .filter(t => !t.startsWith('일주:'))
     .map(t => `시운:${t}`);
 
   return [...new Set([
-    ...dayTags,
+    ...dateTags,
     ...hourTags,
     `시운연주:${p.year}`,
     `시운월주:${p.month}`,
@@ -2348,16 +2392,23 @@ function hourHasContent(he) {
 /**
  * 분석용 표본 수집.
  * 날짜 전체 기록과 시별 기록을 모두 하나의 표본 배열로 펼친다.
- * - 날짜 표본:  ganji = 그날의 일진(일주)
- * - 시별 표본:  ganji = 그 날·그 시의 시주
+ * - 날짜 표본: 해당 날짜의 연주·월주·일주 전체
+ * - 시별 표본: 해당 날짜의 연주·월주·일주 + 선택 시간의 시주
  * 시별 표본은 scope:'hour'로 표시해 필요 시 구분할 수 있다.
  */
 function collectSamples() {
   const out = [];
   for (const [date, v] of Object.entries(state.entries)) {
-    // 날짜 전체 기록
+    // 날짜 전체 기록: 연주·월주·일주 전체를 계산해 표본에 포함한다.
     if (moodList(v).length || v.body != null) {
-      out.push({ date, mood: v.mood, body: v.body, scope: 'day' });
+      const p = datePillarsFor(date);
+      out.push({
+        date,
+        mood: v.mood, body: v.body,
+        scope: 'day',
+        ganji: p.day,
+        pillars: { year:p.year, month:p.month, day:p.day },
+      });
     }
     // 시별 기록: 날짜+시간을 합친 네 기둥 전체를 표본에 포함한다.
     const hrs = hourEntries(v);
@@ -3150,7 +3201,9 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
   const positiveReasons = [], negativeReasons = [], neutralReasons = [];
   if (!natalFullObj) return { natalScore:0, natalConfidence:0, positiveReasons, negativeReasons, neutralReasons };
 
-  const gz = (typeof date === 'string') ? dayGanji(fromKST(...date.split('-').map((v,i)=>i===1?+v-1:+v), 12)) : dayGanji(date);
+  const dateKey = typeof date === 'string' ? date : isoKST(date);
+  const transit = datePillarsFor(dateKey);
+  const gz = transit.day;
   const dStem = gz[0], dBranch = gz[1];
   const me = natalFullObj.strength.me;
   const dStemElem = STEM_ELEM[STEMS.indexOf(dStem)];
@@ -3158,7 +3211,68 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
 
   let raw = 0;
 
-  // (1) 지지 관계 — 계열 중복 방지: 같은 계열은 대표 1개만
+  // (0) 그날의 연주·월주 배경 흐름.
+  // 연주는 장기 배경, 월주는 실제 계절·월령 환경이므로 일주보다 낮되 분명한 비중으로 반영한다.
+  const background = [
+    { label:'연주', gz:transit.year, factor:0.35 },
+    { label:'월주', gz:transit.month, factor:0.65 },
+  ];
+  for (const bg of background) {
+    const sElem = STEM_ELEM[STEMS.indexOf(bg.gz[0])];
+    const bElem = BRANCH_ELEM[BRANCHES.indexOf(bg.gz[1])];
+
+    if (natalFullObj.yongsin.includes(sElem)) {
+      raw += 22 * bg.factor;
+      positiveReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 용신 배경을 만듭니다.`, weight:bg.factor });
+    } else if (natalFullObj.huisin.includes(sElem)) {
+      raw += 12 * bg.factor;
+      positiveReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 희신으로 보조합니다.`, weight:bg.factor*0.7 });
+    } else if (natalFullObj.gisin.includes(sElem)) {
+      raw -= 22 * bg.factor;
+      negativeReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 기신 배경을 강화합니다.`, weight:bg.factor });
+    } else if (natalFullObj.gusin.includes(sElem)) {
+      raw -= 12 * bg.factor;
+      negativeReasons.push({ src:'명식', text:`그날 ${bg.label} ${bg.gz}의 천간 ${sElem}이(가) 구신으로 기신을 돕습니다.`, weight:bg.factor*0.7 });
+    }
+
+    if (natalFullObj.yongsin.includes(bElem)) raw += 8 * bg.factor;
+    else if (natalFullObj.gisin.includes(bElem)) raw -= 8 * bg.factor;
+
+    const bgRels = branchRelations(natalFullObj, bg.gz[1]);
+    if (bgRels.length) {
+      const strongest = [...bgRels].sort((a,b)=>Math.abs(b.score)-Math.abs(a.score))[0];
+      raw += strongest.score * 8 * bg.factor;
+      const txt = `${bg.label} ${bg.gz}의 지지 ${bg.gz[1]}이(가) 원국 ${strongest.name}지 ${strongest.branch}과(와) ${strongest.rel}`;
+      if (strongest.score < 0) negativeReasons.push({ src:'명식', text:`${txt} 관계입니다.`, weight:Math.abs(strongest.score)*bg.factor });
+      else positiveReasons.push({ src:'명식', text:`${txt}으로 조화를 보입니다.`, weight:strongest.score*bg.factor });
+    }
+  }
+
+  // 연주·월주·일주 사이의 내부 관계도 함께 본다.
+  const transitPairs = [
+    ['연주', transit.year, '월주', transit.month, 0.35],
+    ['월주', transit.month, '일주', transit.day, 0.60],
+    ['연주', transit.year, '일주', transit.day, 0.25],
+  ];
+  for (const [aName, aGz, bName, bGz, factor] of transitPairs) {
+    const a = aGz[1], b = bGz[1];
+    let rel = null, relScore = 0;
+    if (isChung(a,b)) { rel='충'; relScore=-8; }
+    else if (isHyung(a,b)) { rel='형'; relScore=-6; }
+    else if (isWonjin(a,b)) { rel='원진'; relScore=-5; }
+    else if (isHae(a,b)) { rel='해'; relScore=-4; }
+    else if (isPa(a,b)) { rel='파'; relScore=-3; }
+    else if (isYukhap(a,b)) { rel='육합'; relScore=6; }
+
+    if (rel) {
+      raw += relScore * factor;
+      const text = `그날 ${aName} ${aGz}와 ${bName} ${bGz}가 ${rel} 관계`;
+      if (relScore < 0) negativeReasons.push({ src:'명식', text:`${text}라 날짜 내부 흐름이 부딪힙니다.`, weight:Math.abs(relScore/8)*factor });
+      else positiveReasons.push({ src:'명식', text:`${text}로 날짜 내부 흐름이 이어집니다.`, weight:(relScore/8)*factor });
+    }
+  }
+
+  // (1) 일주의 지지 관계 — 계열 중복 방지: 같은 계열은 대표 1개만
   const rels = branchRelations(natalFullObj, dBranch);
   const seenFamily = {};
   for (const r of rels) {
@@ -3230,7 +3344,13 @@ function evaluateNatalDate(natalFullObj, date, context = {}, purpose = 'decision
   const reasonCount = positiveReasons.length + negativeReasons.length;
   const natalConfidence = Math.min(0.85, 0.35 + reasonCount * 0.09);
 
-  return { natalScore, natalConfidence, positiveReasons, negativeReasons, neutralReasons, ganji: gz, purposeAdj };
+  return {
+    natalScore, natalConfidence,
+    positiveReasons, negativeReasons, neutralReasons,
+    ganji: gz,
+    pillars: { year:transit.year, month:transit.month, day:transit.day },
+    purposeAdj,
+  };
 }
 
 // 십성 → 오행 (일간 대비)
@@ -3411,7 +3531,15 @@ function computeDateFlow({ days = 180, purpose = 'decision', mode = 'risk' } = {
     const dateKey = isoKST(dt);
     let natEval;
     try { natEval = evaluateNatalDate(full, dateKey, {}, purpose); }
-    catch(e) { natEval = { natalScore:0, natalConfidence:0, positiveReasons:[], negativeReasons:[], neutralReasons:[], ganji: dayGanji(dt) }; }
+    catch(e) {
+      const p = datePillarsFor(dateKey);
+      natEval = {
+        natalScore:0, natalConfidence:0,
+        positiveReasons:[], negativeReasons:[], neutralReasons:[],
+        ganji:p.day,
+        pillars:p,
+      };
+    }
 
     const emp = empMap.get(dateKey);
     const empScale = emp ? empToScale(emp.predicted) : 0;
@@ -3422,6 +3550,7 @@ function computeDateFlow({ days = 180, purpose = 'decision', mode = 'risk' } = {
     results.push({
       date: dateKey,
       ganji: natEval.ganji,
+      pillars: natEval.pillars || datePillarsFor(dateKey),
       combinedScore: combo.combined,
       confidence: combo.confidence,
       empScale, empConf,
@@ -3721,12 +3850,18 @@ function flowCardHTML(r, mode, purpose) {
 
   const barW = Math.min(100, Math.abs(sc));
   const barColor = mode==='lucky' ? 'var(--ok)' : 'var(--alert)';
+  const p = r.pillars || datePillarsFor(r.date);
+  const fullGz = [
+    ['년', p.year], ['월', p.month], ['일', p.day],
+  ].map(([suffix, gz]) =>
+    `<span class="flow-gz-unit"><span class="e-${elemOfStem(gz[0])}">${HS(gz[0])}</span><span class="e-${elemOfBranch(gz[1])}">${HB(gz[1])}</span>${suffix}</span>`
+  ).join('');
 
   return `<div class="flow-card ${mode}">
     <div class="flow-top">
       <div class="flow-date">
         <span class="dt">${r.date}</span>
-        <span class="gz"><span class="e-${elemOfStem(r.ganji[0])}">${HS(r.ganji[0])}</span><span class="e-${elemOfBranch(r.ganji[1])}">${HB(r.ganji[1])}</span></span>
+        <span class="gz">${fullGz}</span>
         <span class="dday">D-${dd<0?0:dd}</span>
       </div>
       <span class="flow-grade tone-${gradeTone}">${grade}</span>
@@ -3830,7 +3965,8 @@ function recommendHours(dateKey, purpose) {
 function flowFooter() {
   return `<div class="note" style="margin-top:18px">이 분석은 사용자의 명식과 누적 기록에서 발견된 경향을 보여주는 참고 자료입니다.
   의료·법률·투자·계약 등 중요한 결정은 현실적인 조건과 전문가의 의견을 함께 확인하세요.<br><br>
-  점수는 AI가 아니라 명식 계산과 통계로 산출됩니다. 확정적인 길흉이 아니라 흐름의 경향입니다.</div>`;
+  점수는 AI가 아니라 해당 날짜의 연주·월주·일주 전체 명식 계산과 누적 기록 통계로 산출됩니다.
+  확정적인 길흉이 아니라 흐름의 경향입니다.</div>`;
 }
 
 // 캘린더용 주의일/길일 집합 재계산
