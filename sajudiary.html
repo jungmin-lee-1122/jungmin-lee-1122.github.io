@@ -1843,7 +1843,7 @@ const state = {
   // 운의 흐름 화면 상태 (세션 전용, 서버 저장 안 함)
   flowSeg: 'risk',      // 'risk'(주의일) | 'lucky'(길일 찾기)
   flowPurpose: 'decision',
-  flowRange: 60,        // 30 | 60 | 90 | 180
+  flowRange: 30,        // 30 | 60 | 90 | 180
   luckSet: null,        // 캘린더용 길일 집합
 };
 
@@ -3880,7 +3880,7 @@ function viewRisk() {
 // ---------- 길일 찾기 ----------
 function viewLucky() {
   const purpose = state.flowPurpose || 'decision';
-  const range = state.flowRange || 60;
+  const range = state.flowRange || 30;
   const flow = computeDateFlow({ days: range, purpose, mode:'opportunity' });
   const sampleN = flow.sampleN;
   const usingPersonal = sampleN >= 10;
