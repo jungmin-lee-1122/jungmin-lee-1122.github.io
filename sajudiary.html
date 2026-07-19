@@ -484,7 +484,7 @@ button:disabled{opacity:.5;cursor:default}
 .flow-hint{font-size:13.2px;color:var(--paper-dim);line-height:1.75;padding:12px 13px;
   background:rgba(185,138,62,.08);border:1px solid rgba(185,138,62,.25);border-radius:var(--r);margin-bottom:14px}
 .flow-hint b{color:var(--to)}
-.lucky-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.lucky-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
 .lucky-field .f-lbl{margin:0 0 7px}
 .lucky-field .pick{width:100%}
 .lucky-field .pick select{width:100%;padding:11px 28px 11px 12px;background:var(--ink3);
@@ -1421,8 +1421,7 @@ function forecast(natal, entries, { days = 365, from = new Date(), minSamples = 
 
   const out = [];
   for (let i = 0; i < days; i++) {
-    const d = new Date(from);
-    d.setDate(d.getDate() + i);
+    const d = new Date(from.getTime() + i * 86400000);
     const dateKey = isoKST(d);
     const pillars = datePillarsFor(dateKey);
     const gz = pillars.day;
@@ -1854,7 +1853,9 @@ const state = {
   // 운의 흐름 화면 상태 (세션 전용, 서버 저장 안 함)
   flowSeg: 'risk',      // 'risk'(주의일) | 'lucky'(길일 찾기)
   flowPurpose: 'decision',
+  flowDirection: 'future', // 'future'(향후) | 'past'(과거)
   flowRange: 30,        // 30 | 60 | 90 | 180
+  flowRiskRange: 180,   // 30 | 60 | 90 | 180
   luckSet: null,        // 캘린더용 길일 집합
 };
 
@@ -3617,18 +3618,22 @@ function personalizationStage(sampleN) {
 let __flowCache = null;
 function invalidateFlowCache() { __flowCache = null; }
 
-function computeDateFlow({ days = 180, purpose = 'decision', mode = 'risk' } = {}) {
+function computeDateFlow({ days = 180, purpose = 'decision', mode = 'risk', direction = 'future' } = {}) {
   const nat = natalObj();
   const full = nat.full;
   const samples = collectSamples();
   const sampleN = samples.length;
+  const now = nowKST();
+  const todayNoon = fromKST(now.y, now.m, now.d, 12);
+  const firstOffset = direction === 'past' ? -days : 0;
+  const firstDate = new Date(todayNoon.getTime() + firstOffset * 86400000);
 
   // 개인 기록 예측 (표본 10개 이상일 때만 의미)
   let empMap = new Map();
   let empConfByDate = new Map();
   if (sampleN >= 10) {
     try {
-      const fc = forecast(nat, samples, { days, from:new Date(), minSamples:3, mode });
+      const fc = forecast(nat, samples, { days, from:firstDate, minSamples:3, mode });
       for (const d of fc.days) {
         empMap.set(d.date, d);
         empConfByDate.set(d.date, d.confidence);
@@ -3637,10 +3642,9 @@ function computeDateFlow({ days = 180, purpose = 'decision', mode = 'risk' } = {
   }
 
   const results = [];
-  const from = new Date();
   for (let i = 0; i < days; i++) {
-    const dt = new Date(from);
-    dt.setDate(dt.getDate() + i);
+    // 미래는 오늘부터, 과거는 N일 전부터 어제까지 KST 기준으로 계산한다.
+    const dt = new Date(firstDate.getTime() + i * 86400000);
     const dateKey = isoKST(dt);
     let natEval;
     try { natEval = evaluateNatalDate(full, dateKey, {}, purpose); }
@@ -3674,7 +3678,7 @@ function computeDateFlow({ days = 180, purpose = 'decision', mode = 'risk' } = {
       natalPos: natEval.positiveReasons, natalNeg: natEval.negativeReasons,
     });
   }
-  return { results, sampleN, hasNatal: !!full };
+  return { results, sampleN, hasNatal: !!full, direction };
 }
 
 
@@ -3855,8 +3859,10 @@ function viewWarn() {
 
 // ---------- 주의일 ----------
 function viewRisk() {
-  const days = 180;
-  const flow = computeDateFlow({ days, purpose:'decision', mode:'risk' });
+  const direction = state.flowDirection || 'future';
+  const days = state.flowRiskRange || 180;
+  const periodWord = direction === 'past' ? '최근' : '향후';
+  const flow = computeDateFlow({ days, purpose:'decision', mode:'risk', direction });
   const sampleN = flow.sampleN;
   const usingPersonal = sampleN >= 10;
 
@@ -3867,10 +3873,25 @@ function viewRisk() {
     .slice(0, 14);
 
   const stageInfo = `<div class="card" style="margin-top:0"><h3>분석 방식</h3>
+    <div class="lucky-controls">
+      <div class="lucky-field">
+        <div class="f-lbl">조회 시점</div>
+        <div class="pick"><select id="directionSel">
+          <option value="future" ${direction==='future'?'selected':''}>미래</option>
+          <option value="past" ${direction==='past'?'selected':''}>과거</option>
+        </select></div>
+      </div>
+      <div class="lucky-field">
+        <div class="f-lbl">검색 범위</div>
+        <div class="pick"><select id="riskRangeSel">
+          ${[30,60,90,180].map(d=>`<option value="${d}" ${d===days?'selected':''}>${periodWord} ${d}일</option>`).join('')}
+        </select></div>
+      </div>
+    </div>
     <div class="kv"><span class="k">기준</span><span>${usingPersonal?'명식 + 개인 기록':'명식 기준'}</span></div>
     <div class="kv"><span class="k">사용 표본</span><span>날짜·시운 기록 ${sampleN}개</span></div>
     <div class="kv"><span class="k">개인화 단계</span><span>${personalizationStage(sampleN)}</span></div>
-    <div class="kv"><span class="k">분석 기간</span><span>향후 ${days}일</span></div>
+    <div class="kv"><span class="k">분석 기간</span><span>${periodWord} ${days}일</span></div>
   </div>`;
 
   const notEnough = !usingPersonal ? `<div class="flow-hint">개인 기록 표본이 부족해 현재는 <b>명식 기준</b>으로 분석합니다.
@@ -3879,20 +3900,22 @@ function viewRisk() {
   let cards;
   if (!picks.length) {
     cards = `<div class="empty"><div class="ic">靜</div>
-      <p>향후 ${days}일 안에 뚜렷하게 주의할 흐름이 잡히지 않았습니다.<br>
+      <p>${periodWord} ${days}일 안에 뚜렷하게 주의할 흐름이 잡히지 않았습니다.<br>
       <span style="font-size:13.2px">명식과 기록이 크게 치우치지 않는 무난한 기간입니다.</span></p></div>`;
   } else {
     cards = picks.map(r => flowCardHTML(r, 'risk')).join('');
   }
 
-  return stageInfo + notEnough + `<div style="margin-top:16px">${cards}</div>` + flowFooter();
+  return stageInfo + notEnough + `<div style="margin-top:16px">${cards}</div>` + flowFooter(direction);
 }
 
 // ---------- 길일 찾기 ----------
 function viewLucky() {
   const purpose = state.flowPurpose || 'decision';
+  const direction = state.flowDirection || 'future';
   const range = state.flowRange || 30;
-  const flow = computeDateFlow({ days: range, purpose, mode:'opportunity' });
+  const periodWord = direction === 'past' ? '최근' : '향후';
+  const flow = computeDateFlow({ days: range, purpose, mode:'opportunity', direction });
   const sampleN = flow.sampleN;
   const usingPersonal = sampleN >= 10;
 
@@ -3902,6 +3925,13 @@ function viewLucky() {
     <div class="lucky-sub">결정을 돕는 개인 맞춤 날짜 가이드</div>
     <div class="lucky-controls">
       <div class="lucky-field">
+        <div class="f-lbl">조회 시점</div>
+        <div class="pick"><select id="directionSel">
+          <option value="future" ${direction==='future'?'selected':''}>미래</option>
+          <option value="past" ${direction==='past'?'selected':''}>과거</option>
+        </select></div>
+      </div>
+      <div class="lucky-field">
         <div class="f-lbl">목적</div>
         <div class="pick"><select id="purSel">
           ${PURPOSES.map(p=>`<option value="${p.id}" ${p.id===purpose?'selected':''}>${p.label}</option>`).join('')}
@@ -3910,7 +3940,7 @@ function viewLucky() {
       <div class="lucky-field">
         <div class="f-lbl">검색 범위</div>
         <div class="pick"><select id="rangeSel">
-          ${[30,60,90,180].map(d=>`<option value="${d}" ${d===range?'selected':''}>향후 ${d}일</option>`).join('')}
+          ${[30,60,90,180].map(d=>`<option value="${d}" ${d===range?'selected':''}>${periodWord} ${d}일</option>`).join('')}
         </select></div>
       </div>
     </div>
@@ -3925,18 +3955,21 @@ function viewLucky() {
   let cards;
   if (!picks.length) {
     cards = `<div class="empty"><div class="ic">尋</div>
-      <p>향후 ${range}일 안에 <b>${purLabel}</b>에 뚜렷하게 좋은 날이 잡히지 않았습니다.<br>
+      <p>${periodWord} ${range}일 안에 <b>${purLabel}</b>에 뚜렷하게 좋은 날이 잡히지 않았습니다.<br>
       <span style="font-size:13.2px">기간을 늘리거나 다른 목적으로 살펴보세요.</span></p></div>`;
   } else {
     cards = picks.map(r => flowCardHTML(r, 'lucky', purpose)).join('');
   }
 
-  return controls + `<div style="margin-top:16px">${cards}</div>` + flowFooter();
+  return controls + `<div style="margin-top:16px">${cards}</div>` + flowFooter(direction);
 }
 
 // ---------- 흐름 카드 ----------
 function flowCardHTML(r, mode, purpose) {
-  const dd = Math.ceil((new Date(r.date+'T12:00') - new Date())/86400000);
+  const [ry,rm,rd] = r.date.split('-').map(Number);
+  const today = nowKST();
+  const dd = Math.round((fromKST(ry,rm-1,rd,12) - fromKST(today.y,today.m,today.d,12))/86400000);
+  const dateDistance = dd < 0 ? `${Math.abs(dd)}일 전` : dd === 0 ? '오늘' : `D-${dd}`;
   const ag = AGREEMENT_LABEL[r.agreement] || AGREEMENT_LABEL.natal_only;
 
   // 이유 최대 3개 (출처 배지). 부정/긍정 + 개인기록 통합, 계열 중복 제거
@@ -3975,7 +4008,7 @@ function flowCardHTML(r, mode, purpose) {
       <div class="flow-date">
         <span class="dt">${r.date}</span>
         <span class="gz">${fullGz}</span>
-        <span class="dday">D-${dd<0?0:dd}</span>
+        <span class="dday">${dateDistance}</span>
       </div>
       <span class="flow-grade tone-${gradeTone}">${grade}</span>
     </div>
@@ -4077,11 +4110,14 @@ function recommendHours(dateKey, purpose) {
     <div class="hour-rec-list">${chips}</div></div>`;
 }
 
-function flowFooter() {
+function flowFooter(direction = 'future') {
+  const pastNote = direction === 'past'
+    ? `<br><br>과거 결과는 현재까지 누적된 기록을 이용한 사후 분석이며, 당시 시점의 예측 결과를 재현한 것은 아닙니다.`
+    : '';
   return `<div class="note" style="margin-top:18px">이 분석은 사용자의 명식과 누적 기록에서 발견된 경향을 보여주는 참고 자료입니다.
   의료·법률·투자·계약 등 중요한 결정은 현실적인 조건과 전문가의 의견을 함께 확인하세요.<br><br>
   점수는 AI가 아니라 해당 날짜의 연주·월주·일주 전체 명식 계산과 누적 기록 통계로 산출됩니다.
-  확정적인 길흉이 아니라 흐름의 경향입니다.</div>`;
+  확정적인 길흉이 아니라 흐름의 경향입니다.${pastNote}</div>`;
 }
 
 // 캘린더용 주의일/길일 집합 재계산
@@ -4091,9 +4127,9 @@ function recomputeWarn() {
   if (!state.natal) return;
   invalidateFlowCache();
   try {
-    const risk = computeDateFlow({ days:120, purpose:'decision', mode:'risk' });
+    const risk = computeDateFlow({ days:120, purpose:'decision', mode:'risk', direction:'future' });
     for (const r of risk.results) if (r.combinedScore <= -25 && r.confidence >= 0.32) state.warnSet.add(r.date);
-    const luck = computeDateFlow({ days:120, purpose: state.flowPurpose||'decision', mode:'opportunity' });
+    const luck = computeDateFlow({ days:120, purpose: state.flowPurpose||'decision', mode:'opportunity', direction:'future' });
     for (const r of luck.results) if (r.combinedScore >= 25 && r.confidence >= 0.32) state.luckSet.add(r.date);
   } catch(e) {}
 }
@@ -4184,8 +4220,12 @@ function render() {
     });
     const purSel = $('#purSel');
     if (purSel) purSel.onchange = () => { state.flowPurpose = purSel.value; recomputeWarn(); render(); };
+    const directionSel = $('#directionSel');
+    if (directionSel) directionSel.onchange = () => { state.flowDirection = directionSel.value; render(); };
     const rangeSel = $('#rangeSel');
     if (rangeSel) rangeSel.onchange = () => { state.flowRange = +rangeSel.value; render(); };
+    const riskRangeSel = $('#riskRangeSel');
+    if (riskRangeSel) riskRangeSel.onchange = () => { state.flowRiskRange = +riskRangeSel.value; render(); };
   }
 }
 
