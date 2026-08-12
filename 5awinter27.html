@@ -21,9 +21,9 @@
   --bg:#f2f6fc;
   --bridge-navy:#132d66;   /* 히어로 하단 정리색 */
   --news-dark:#241405;     /* 뉴스 배너 바탕색 */
-  --fade-hero:clamp(90px,11vw,220px);    /* 히어로 하단 페이드 길이 */
-  --run-top:clamp(110px,13vw,270px);     /* 히어로 → 뉴스 전환 길이 */
-  --run-bottom:clamp(120px,15vw,300px);  /* 뉴스 → 밝은 섹션 전환 길이 */
+  --fade-hero:clamp(120px,14vw,290px);   /* 히어로 하단 페이드 길이 */
+  --run-top:clamp(150px,17vw,360px);     /* 히어로 → 뉴스 전환 길이 */
+  --run-bottom:clamp(170px,20vw,400px);  /* 뉴스 → 밝은 섹션 전환 길이 */
   --line:#dfe7f4;
   --inner:1560px;              /* 큰 화면에서 콘텐츠 최대 폭 */
   --pad:clamp(20px,4vw,80px);  /* 좌우 여백 */
@@ -84,11 +84,11 @@ strong{font-weight:800}
   height:calc(var(--run-bottom) + clamp(50px,5vw,110px));
   background:linear-gradient(180deg,
     rgba(36,20,5,0) 0%,
-    var(--news-dark) 16%,
-    var(--news-dark) 44%,
-    #33291f 60%,
-    #6f7686 76%,
-    #c3cee2 90%,
+    var(--news-dark) 12%,
+    var(--news-dark) 24%,   /* 어둠 유지 구간(짧게) */
+    #33291f 42%,
+    #6f7686 64%,
+    #c3cee2 84%,
     var(--bg) 100%);
   pointer-events:none;
 }
