@@ -19,6 +19,8 @@
   --ink:#16233c;
   --gray:#5c6a83;
   --bg:#f2f6fc;
+  --bridge-navy:#132d66;   /* 히어로 하단 정리색 */
+  --news-dark:#241405;     /* 뉴스 배너 바탕색 */
   --line:#dfe7f4;
   --inner:1560px;              /* 큰 화면에서 콘텐츠 최대 폭 */
   --pad:clamp(20px,4vw,80px);  /* 좌우 여백 */
@@ -35,17 +37,54 @@ strong{font-weight:800}
 
 /* ---------- HERO (이미지 배너) ---------- */
 .hero{
-  display:block;width:100%;
-  background:#0a2258;   /* 이미지 로딩 전/좌우 여백 색 */
+  position:relative;display:block;width:100%;
+  background:#0a2258;   /* 이미지 로딩 전 색 */
   line-height:0;
 }
-.hero img{
-  display:block;width:100%;height:auto;
+.hero img{display:block;width:100%;height:auto}
+/* 히어로 하단을 남색으로 정리해 다음 배너와 이어지게 */
+.hero::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;
+  height:clamp(50px,6vw,120px);
+  background:linear-gradient(180deg, rgba(19,45,102,0) 0%, rgba(19,45,102,.78) 60%, var(--bridge-navy) 100%);
+  pointer-events:none;
+}
+
+/* ---------- NEWS BANNER (히어로 → 밝은 섹션 연결) ---------- */
+.news-band{
+  position:relative;width:100%;line-height:0;
+  padding-top:clamp(56px,6vw,120px);
+  background-color:var(--news-dark);
+}
+/* 남색 → 갈색 그라데이션 띠 (이미지 상단까지 살짝 덮어 이음새 제거) */
+.news-band::before{
+  content:"";position:absolute;left:0;right:0;top:0;z-index:2;
+  height:calc(clamp(56px,6vw,120px) + clamp(40px,4vw,80px));
+  background:linear-gradient(180deg,
+    var(--bridge-navy) 0%,
+    #1d2440 28%,
+    #2a1c10 52%,
+    var(--news-dark) 70%,
+    rgba(36,20,5,0) 100%);
+  pointer-events:none;
+}
+.news-band img{position:relative;z-index:1;display:block;width:100%;height:auto}
+/* 이미지 하단 → 밝은 섹션으로 용해 */
+.news-band::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;z-index:2;
+  height:clamp(80px,11vw,210px);
+  background:linear-gradient(180deg,
+    rgba(242,246,252,0) 0%,
+    rgba(242,246,252,.55) 45%,
+    rgba(242,246,252,.92) 80%,
+    var(--bg) 100%);
+  pointer-events:none;
 }
 
 /* ---------- SECTION SHELL ---------- */
 .section{width:100%;padding:clamp(56px,7vw,130px) var(--pad)}
 .section-light{background:var(--bg)}
+.section-after-band{padding-top:clamp(20px,2.5vw,48px)}
 .section-white{background:#fff}
 .section-navy{background:linear-gradient(160deg,#0b2358,#123674);color:#fff}
 .h2{
@@ -191,8 +230,14 @@ strong{font-weight:800}
          alt="2027 윈터스쿨 - 2028 대입 개편, 준비는 이번 겨울부터. 달라진 입시에 맞춘 선제적 학습 전략. 1월 4일(월) 개강">
   </header>
 
+  <!-- ================= 2028 대입 판이 바뀐다 (배너) ================= -->
+  <section class="news-band">
+    <img src="news.webp"
+         alt="2028 대입 판이 바뀐다! 내신만도, 수능만도 아닌 전면적인 변화?">
+  </section>
+
   <!-- ================= 무엇이 달라지나요 ================= -->
-  <section class="section section-light">
+  <section class="section section-light section-after-band">
     <div class="inner">
       <h2 class="h2 reveal">2028 대입, <span class="accent">무엇이 달라지나요?</span></h2>
       <div class="grid-3">
