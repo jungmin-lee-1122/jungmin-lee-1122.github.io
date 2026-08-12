@@ -21,6 +21,9 @@
   --bg:#f2f6fc;
   --bridge-navy:#132d66;   /* 히어로 하단 정리색 */
   --news-dark:#241405;     /* 뉴스 배너 바탕색 */
+  --fade-hero:clamp(90px,11vw,220px);    /* 히어로 하단 페이드 길이 */
+  --run-top:clamp(110px,13vw,270px);     /* 히어로 → 뉴스 전환 길이 */
+  --run-bottom:clamp(120px,15vw,300px);  /* 뉴스 → 밝은 섹션 전환 길이 */
   --line:#dfe7f4;
   --inner:1560px;              /* 큰 화면에서 콘텐츠 최대 폭 */
   --pad:clamp(20px,4vw,80px);  /* 좌우 여백 */
@@ -42,41 +45,50 @@ strong{font-weight:800}
   line-height:0;
 }
 .hero img{display:block;width:100%;height:auto}
-/* 히어로 하단을 남색으로 정리해 다음 배너와 이어지게 */
+/* 히어로 하단을 길게 남색으로 눌러 다음 배너로 넘어갈 준비 */
 .hero::after{
   content:"";position:absolute;left:0;right:0;bottom:0;
-  height:clamp(50px,6vw,120px);
-  background:linear-gradient(180deg, rgba(19,45,102,0) 0%, rgba(19,45,102,.78) 60%, var(--bridge-navy) 100%);
+  height:var(--fade-hero);
+  background:linear-gradient(180deg,
+    rgba(19,45,102,0) 0%,
+    rgba(19,45,102,.35) 38%,
+    rgba(19,45,102,.80) 72%,
+    var(--bridge-navy) 100%);
   pointer-events:none;
 }
 
 /* ---------- NEWS BANNER (히어로 → 밝은 섹션 연결) ---------- */
 .news-band{
   position:relative;width:100%;line-height:0;
-  padding-top:clamp(56px,6vw,120px);
+  padding-top:var(--run-top);      /* 남색이 갈색으로 넘어가는 활주로 */
+  padding-bottom:var(--run-bottom);/* 갈색이 밝은 섹션으로 풀리는 활주로 */
   background-color:var(--news-dark);
 }
-/* 남색 → 갈색 그라데이션 띠 (이미지 상단까지 살짝 덮어 이음새 제거) */
+/* 남색 → 갈색 (이미지 상단까지 투명하게 이어져 이음새 제거) */
 .news-band::before{
   content:"";position:absolute;left:0;right:0;top:0;z-index:2;
-  height:calc(clamp(56px,6vw,120px) + clamp(40px,4vw,80px));
+  height:calc(var(--run-top) + clamp(50px,5vw,110px));
   background:linear-gradient(180deg,
     var(--bridge-navy) 0%,
-    #1d2440 28%,
-    #2a1c10 52%,
-    var(--news-dark) 70%,
+    #172a56 22%,
+    #1e2338 42%,
+    #2a1c10 60%,
+    var(--news-dark) 76%,
     rgba(36,20,5,0) 100%);
   pointer-events:none;
 }
 .news-band img{position:relative;z-index:1;display:block;width:100%;height:auto}
-/* 이미지 하단 → 밝은 섹션으로 용해 */
+/* 이미지 하단 → 어둠 유지 → 밝은 섹션으로 용해 */
 .news-band::after{
   content:"";position:absolute;left:0;right:0;bottom:0;z-index:2;
-  height:clamp(80px,11vw,210px);
+  height:calc(var(--run-bottom) + clamp(50px,5vw,110px));
   background:linear-gradient(180deg,
-    rgba(242,246,252,0) 0%,
-    rgba(242,246,252,.55) 45%,
-    rgba(242,246,252,.92) 80%,
+    rgba(36,20,5,0) 0%,
+    var(--news-dark) 16%,
+    var(--news-dark) 44%,
+    #33291f 60%,
+    #6f7686 76%,
+    #c3cee2 90%,
     var(--bg) 100%);
   pointer-events:none;
 }
