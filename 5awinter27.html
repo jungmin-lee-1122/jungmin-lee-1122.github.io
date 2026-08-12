@@ -33,53 +33,14 @@ body{
 .inner{width:100%;max-width:var(--inner);margin:0 auto}
 strong{font-weight:800}
 
-/* ---------- HERO ---------- */
+/* ---------- HERO (이미지 배너) ---------- */
 .hero{
-  position:relative;width:100%;
-  min-height:clamp(460px,62vw,760px);
-  display:flex;align-items:center;
-  padding:clamp(48px,6vw,96px) var(--pad);
-  background:
-    radial-gradient(110% 85% at 76% 76%, rgba(120,180,255,.38) 0%, rgba(10,32,80,0) 58%),
-    linear-gradient(165deg,#05173f 0%,#0a2258 45%,#123a86 100%);
-  overflow:hidden;color:#fff;
+  display:block;width:100%;
+  background:#0a2258;   /* 이미지 로딩 전/좌우 여백 색 */
+  line-height:0;
 }
-.hero-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
-.hero-inner{position:relative;z-index:3;width:100%;max-width:var(--inner);margin:0 auto}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
-.hero-top{display:flex;gap:clamp(16px,2vw,32px);align-items:flex-start;flex-wrap:wrap}
-.badge-year{
-  display:inline-block;background:var(--yellow);color:#0b2350;
-  font-family:"Black Han Sans","Pretendard",sans-serif;
-  font-size:clamp(38px,5vw,76px);line-height:1;
-  padding:.16em .24em .2em;transform:skewX(-6deg);
-  box-shadow:0 8px 26px rgba(0,0,0,.28);
-}
-.hero-eyebrow{font-size:clamp(14px,1.35vw,22px);line-height:1.85;color:#cfe0ff;padding-top:.5em}
-.hero-eyebrow b{color:#fff;font-weight:800}
-.hero-title{
-  font-family:"Black Han Sans","Pretendard",sans-serif;
-  font-size:clamp(56px,11vw,180px);line-height:.95;letter-spacing:-.03em;
-  margin:.12em 0 .06em;text-shadow:0 12px 44px rgba(0,0,0,.45);
-}
-.hero-script{
-  font-family:"Nanum Pen Script",cursive;
-  font-size:clamp(26px,3.6vw,58px);line-height:1.35;color:#eaf3ff;
-  text-align:center;transform:rotate(-6deg);
-  text-shadow:0 4px 18px rgba(0,0,0,.45);
-}
-.hero-pill{
-  display:inline-flex;align-items:center;gap:.6em;
-  margin-top:.9em;padding:.6em 1.5em;
-  border:1.5px solid rgba(255,255,255,.55);border-radius:999px;
-  font-size:clamp(15px,1.4vw,24px);font-weight:700;letter-spacing:-.02em;
-  background:rgba(255,255,255,.07);backdrop-filter:blur(2px);
-}
-.snow{position:absolute;top:-10px;border-radius:50%;background:#fff;animation:fall linear infinite;z-index:2}
-@keyframes fall{
-  0%{transform:translate3d(0,-20px,0);opacity:0}
-  10%{opacity:.85}
-  100%{transform:translate3d(30px,760px,0);opacity:0}
+.hero img{
+  display:block;width:100%;height:auto;
 }
 
 /* ---------- SECTION SHELL ---------- */
@@ -207,8 +168,6 @@ strong{font-weight:800}
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:960px){
-  .hero-grid{grid-template-columns:1fr;gap:20px}
-  .hero-script{text-align:left;transform:none}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
   .cta-row{flex-direction:column;align-items:flex-start}
@@ -219,7 +178,6 @@ strong{font-weight:800}
   .info-list{gap:14px}
 }
 @media (prefers-reduced-motion:reduce){
-  .snow{display:none}
   .reveal{opacity:1;transform:none;transition:none}
   .cta-btn{transition:none}
 }
@@ -227,72 +185,10 @@ strong{font-weight:800}
 </head>
 <body>
 
-  <!-- ================= HERO ================= -->
+  <!-- ================= HERO (배너 이미지) ================= -->
   <header class="hero">
-    <svg class="hero-art" viewBox="0 0 1600 700" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-      <defs>
-        <radialGradient id="sun" cx="50%" cy="50%">
-          <stop offset="0%" stop-color="#fff6d8" stop-opacity=".95"/>
-          <stop offset="45%" stop-color="#ffd88a" stop-opacity=".45"/>
-          <stop offset="100%" stop-color="#ffb45e" stop-opacity="0"/>
-        </radialGradient>
-        <linearGradient id="mtnFar" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#7f9fd6" stop-opacity=".55"/>
-          <stop offset="100%" stop-color="#2a4a8e" stop-opacity=".25"/>
-        </linearGradient>
-        <linearGradient id="mtnMid" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#cfe0f7" stop-opacity=".92"/>
-          <stop offset="55%" stop-color="#3f66ad" stop-opacity=".72"/>
-          <stop offset="100%" stop-color="#12306e" stop-opacity=".9"/>
-        </linearGradient>
-        <linearGradient id="mtnNear" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#eef5ff" stop-opacity=".95"/>
-          <stop offset="45%" stop-color="#3c62a8" stop-opacity=".92"/>
-          <stop offset="100%" stop-color="#0a1f4d" stop-opacity="1"/>
-        </linearGradient>
-      </defs>
-      <g fill="#fff" opacity=".85">
-        <circle cx="200" cy="70" r="2"/><circle cx="430" cy="44" r="1.5"/><circle cx="640" cy="110" r="1.8"/>
-        <circle cx="900" cy="52" r="1.6"/><circle cx="1120" cy="120" r="2.2"/><circle cx="1330" cy="60" r="1.6"/>
-        <circle cx="1480" cy="170" r="2"/><circle cx="1240" cy="230" r="1.5"/><circle cx="820" cy="170" r="1.4"/>
-        <circle cx="320" cy="200" r="1.7"/><circle cx="1040" cy="30" r="1.3"/><circle cx="560" cy="240" r="1.2"/>
-      </g>
-      <circle cx="1230" cy="470" r="240" fill="url(#sun)"/>
-      <path d="M700 470 L900 270 L1010 380 L1140 235 L1300 470 Z" fill="url(#mtnFar)"/>
-      <path d="M560 505 L820 230 L960 375 L1080 275 L1260 505 Z" fill="url(#mtnMid)"/>
-      <path d="M430 575 L660 320 L780 430 L900 300 L1090 505 L1190 420 L1390 575 Z" fill="url(#mtnMid)" opacity=".9"/>
-      <path d="M820 230 L890 310 L856 318 L820 290 L784 322 L750 310 Z" fill="#f3f8ff" opacity=".9"/>
-      <path d="M900 300 L966 380 L934 386 L900 358 L870 386 L842 374 Z" fill="#f3f8ff" opacity=".72"/>
-      <path d="M980 700 L1200 400 L1320 530 L1450 390 L1600 700 Z" fill="url(#mtnNear)"/>
-      <path d="M0 700 L230 440 L390 570 L540 450 L780 700 Z" fill="url(#mtnNear)" opacity=".92"/>
-      <path d="M430 700 L710 480 L890 620 L1070 510 L1300 700 Z" fill="#071a44" opacity=".72"/>
-      <g stroke="#fff" fill="none" opacity=".26">
-        <path d="M80 300 l0 80 M48 320 l64 40 M112 320 l-64 40" stroke-width="3"/>
-        <path d="M130 440 l0 54 M108 452 l44 30 M152 452 l-44 30" stroke-width="2.4" opacity=".7"/>
-      </g>
-    </svg>
-
-    <div class="hero-inner">
-      <div class="hero-grid">
-        <div>
-          <div class="hero-top">
-            <span class="badge-year">2027</span>
-            <p class="hero-eyebrow">
-              2028 대입 개편, 준비는 이번 겨울부터<br>
-              달라진 입시에 맞춘 <b>선제적 학습 전략</b>
-            </p>
-          </div>
-          <h1 class="hero-title">윈터스쿨</h1>
-          <p class="hero-pill">
-            <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-              <path d="M12 2v20M4 6l16 12M20 6L4 18"/>
-            </svg>
-            1월 4일 (월) 개강
-          </p>
-        </div>
-        <p class="hero-script">흔들리는 입시 앞에,<br>흔들리지 않는 겨울</p>
-      </div>
-    </div>
+    <img src="hero.webp"
+         alt="2027 윈터스쿨 - 2028 대입 개편, 준비는 이번 겨울부터. 달라진 입시에 맞춘 선제적 학습 전략. 1월 4일(월) 개강">
   </header>
 
   <!-- ================= 무엇이 달라지나요 ================= -->
@@ -477,24 +373,6 @@ strong{font-weight:800}
   </section>
 
 <script>
-// 눈송이
-(function(){
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var hero = document.querySelector('.hero');
-  for (var i = 0; i < 45; i++) {
-    var s = document.createElement('span');
-    var size = Math.random() * 4 + 2;
-    s.className = 'snow';
-    s.style.left = (Math.random() * 100) + '%';
-    s.style.width = size + 'px';
-    s.style.height = size + 'px';
-    s.style.animationDuration = (Math.random() * 8 + 8) + 's';
-    s.style.animationDelay = (-Math.random() * 14) + 's';
-    s.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
-    hero.appendChild(s);
-  }
-})();
-
 // 스크롤 등장
 (function(){
   var items = document.querySelectorAll('.reveal');
