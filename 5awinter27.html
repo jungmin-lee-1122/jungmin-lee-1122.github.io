@@ -213,6 +213,36 @@ strong{font-weight:800}
 .cta-btn:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(0,0,0,.32)}
 .cta-btn:focus-visible{outline:3px solid #fff;outline-offset:4px}
 
+/* ---------- MYTH SECTION (영상) ---------- */
+.myth-section{
+  position:relative;width:100%;
+  padding:clamp(26px,3vw,56px) 0 clamp(56px,7vw,130px);
+  background:linear-gradient(180deg,#0b2358 0%,#0e2c66 45%,#123674 100%);
+  color:#fff;
+}
+.myth-video{
+  position:relative;width:100%;line-height:0;
+  aspect-ratio:1920 / 640;   /* 아래 검은 여백은 잘라냄 */
+  overflow:hidden;
+}
+.myth-video video{
+  display:block;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+}
+/* 영상 하단의 어두운 끝을 남색으로 풀어줌 */
+.myth-video::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;
+  height:clamp(70px,9vw,170px);
+  background:linear-gradient(180deg,
+    rgba(14,44,102,0) 0%,
+    rgba(14,44,102,.55) 45%,
+    rgba(14,44,102,.92) 80%,
+    #0e2c66 100%);
+  pointer-events:none;
+}
+.myth-section .inner{padding:0 var(--pad)}
+.myth-section .myth-note{margin-top:clamp(24px,3.2vw,56px)}
+
 /* ---------- REVEAL ---------- */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
 .reveal.on{opacity:1;transform:none}
@@ -288,32 +318,14 @@ strong{font-weight:800}
     </div>
   </section>
 
-  <!-- ================= 오해 체크리스트 ================= -->
-  <section class="section section-navy">
+  <!-- ================= 오해 체크리스트 (영상) ================= -->
+  <section class="section-navy myth-section">
+    <div class="myth-video">
+      <video src="myth.mp4" poster="myth-poster.jpg"
+             autoplay muted loop playsinline preload="metadata"
+             aria-label="우리 아이, 아직도 이렇게 생각하고 계시나요? - 입시에 대한 흔한 오해들"></video>
+    </div>
     <div class="inner">
-      <h2 class="h2 reveal">우리 아이, 아직도 <span class="accent">이렇게 생각하고</span> 계시나요?</h2>
-      <div class="grid-5">
-        <div class="myth reveal">
-          <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
-          고1은 아직<br>수능 공부<br>안 해도 되겠지.
-        </div>
-        <div class="myth reveal">
-          <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
-          문과니까<br>과학은 내신만<br>넘기면 되겠지.
-        </div>
-        <div class="myth reveal">
-          <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
-          5등급제로<br>바뀌면 내신 따기는<br>쉬워진 거 아닌가?
-        </div>
-        <div class="myth reveal">
-          <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
-          수시는 내신,<br>정시는 수능만<br>챙기면 되겠지.
-        </div>
-        <div class="myth reveal">
-          <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
-          선택과목은<br>학교 가서 정해도<br>늦지 않겠지.
-        </div>
-      </div>
       <p class="myth-note reveal"><span class="bang">!</span> 입시의 규칙이 바뀌면, <b>준비의 순서도</b> 바뀌어야 합니다.</p>
     </div>
   </section>
@@ -430,6 +442,13 @@ strong{font-weight:800}
   </section>
 
 <script>
+// 모션 최소화 설정이면 영상 정지
+(function(){
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var v = document.querySelector('.myth-video video');
+  if (v) { v.removeAttribute('autoplay'); v.pause(); v.setAttribute('controls',''); }
+})();
+
 // 스크롤 등장
 (function(){
   var items = document.querySelectorAll('.reveal');
