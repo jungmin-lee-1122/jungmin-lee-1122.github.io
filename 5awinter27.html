@@ -217,31 +217,30 @@ strong{font-weight:800}
 .myth-section{
   position:relative;width:100%;
   padding:clamp(26px,3vw,56px) 0 clamp(56px,7vw,130px);
-  background:linear-gradient(180deg,#0b2358 0%,#0e2c66 45%,#123674 100%);
+  background:linear-gradient(180deg,#0e2c66 0%,#0e2c66 55%,#123674 100%);
   color:#fff;
 }
 .myth-video{
   position:relative;width:100%;line-height:0;
-  aspect-ratio:1920 / 640;   /* 아래 검은 여백은 잘라냄 */
+  aspect-ratio:1920 / 652;   /* 아래 검은 여백만 잘라냄 (말풍선은 y=620까지) */
   overflow:hidden;
+  background:#000;
 }
 .myth-video video{
   display:block;width:100%;height:100%;
   object-fit:cover;object-position:center top;
 }
-/* 영상 하단의 어두운 끝을 남색으로 풀어줌 */
-.myth-video::after{
-  content:"";position:absolute;left:0;right:0;bottom:0;
-  height:clamp(70px,9vw,170px);
+/* 영상이 끝나는 검정 → 섹션 남색으로 풀어주는 띠 */
+.myth-fade{
+  width:100%;height:clamp(90px,11vw,210px);
   background:linear-gradient(180deg,
-    rgba(14,44,102,0) 0%,
-    rgba(14,44,102,.55) 45%,
-    rgba(14,44,102,.92) 80%,
+    #000000 0%,
+    #04102a 28%,
+    #0a2050 62%,
     #0e2c66 100%);
-  pointer-events:none;
 }
 .myth-section .inner{padding:0 var(--pad)}
-.myth-section .myth-note{margin-top:clamp(24px,3.2vw,56px)}
+.myth-section .myth-note{margin-top:clamp(20px,2.6vw,44px)}
 
 /* ---------- REVEAL ---------- */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
@@ -325,6 +324,7 @@ strong{font-weight:800}
              autoplay muted loop playsinline preload="metadata"
              aria-label="우리 아이, 아직도 이렇게 생각하고 계시나요? - 입시에 대한 흔한 오해들"></video>
     </div>
+    <div class="myth-fade" aria-hidden="true"></div>
     <div class="inner">
       <p class="myth-note reveal"><span class="bang">!</span> 입시의 규칙이 바뀌면, <b>준비의 순서도</b> 바뀌어야 합니다.</p>
     </div>
