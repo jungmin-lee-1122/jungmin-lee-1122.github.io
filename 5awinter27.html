@@ -311,6 +311,9 @@ strong{font-weight:800}
   background:rgba(255,255,255,.55);
   margin:clamp(44px,4.6vw,100px) auto clamp(34px,3.6vw,80px);
 }
+.stem-row{display:flex;align-items:center;justify-content:center}
+.stem-book{display:none}   /* PC에서는 배경 오브제가 담당 */
+.mo-br{display:none}
 .ask-kicker{font-size:clamp(17px,1.6vw,34px);color:rgba(255,255,255,.85);letter-spacing:-.02em}
 .ask-punch{
   margin-top:clamp(18px,1.9vw,42px);
@@ -582,8 +585,12 @@ strong{font-weight:800}
   .deco-tilt,.deco-small,.deco-pencil,.deco-slim{display:none}
   .deco-note{bottom:2%;opacity:.7}
   .deco-cal{top:4%;opacity:.7}
-  .deco-stack{top:auto;bottom:4%;left:2%;opacity:.75}
-  .deco-open{top:auto;bottom:3%;right:2%;opacity:.75}
+  .ask-deco{display:none}          /* 배경 오브제가 하단 문구를 가려서 해제 */
+  .stem-row{gap:clamp(24px,6vw,54px);margin:38px 0 30px}
+  .ask-stem{height:64px;margin:0}
+  .stem-book{display:block;width:clamp(78px,13vw,130px);height:auto;
+    filter:drop-shadow(0 10px 22px rgba(8,26,74,.3))}
+  .stem-book.tilt{width:clamp(50px,8vw,84px);transform:rotate(-12deg)}
 }
 @media (max-width:640px){
   .wcards{grid-template-columns:1fr}
@@ -594,7 +601,7 @@ strong{font-weight:800}
   .ch-cards{grid-template-columns:1fr;gap:18px}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
-  .cta-row{flex-direction:column;align-items:flex-start}
+  .cta-row{flex-direction:column;align-items:flex-start;gap:clamp(18px,2.6vw,30px)}
   .info-list{width:100%;align-items:flex-start}
 }
 @media (max-width:560px){
@@ -665,7 +672,11 @@ strong{font-weight:800}
   .bubbles{margin-top:28px;gap:14px}
   .brow{gap:14px}
   .bubble{font-size:15px;padding:13px 20px;max-width:100%;line-height:1.45}
-  .ask-stem{height:44px;margin:32px auto 24px}
+  .ask-stem{height:52px}
+  .stem-row{gap:clamp(22px,7vw,40px);margin:32px 0 24px}
+  .stem-book{width:clamp(74px,21vw,118px)}
+  .stem-book.tilt{width:clamp(46px,13vw,72px)}
+  .mo-br{display:block}
   .ask-kicker{font-size:14px}
   .ask-punch{font-size:25px;margin-top:10px}
   .deco-stack{width:110px}
@@ -708,7 +719,8 @@ strong{font-weight:800}
   .sd-flow-card p{font-size:14px}
 
   .cta{padding:56px var(--pad)}
-  .cta-row{gap:28px}
+  .cta-row{gap:16px}
+  .cta-sub{margin-top:.6em}
   .cta h2{font-size:26px;line-height:1.35}
   .cta-sub{font-size:15px}
   .info-list{gap:14px}
@@ -729,6 +741,8 @@ strong{font-weight:800}
   .winter-copy h2,.cta h2,.rules-wrap .sd-title,.h2{font-size:23px}
   .w-badge{width:118px;height:118px}
   .info-list dd{font-size:17px}
+  .cta-row{gap:14px}
+  .info-list{gap:12px}
   .ch-card h3{font-size:18px}
   .deco-note,.deco-cal{display:none}
 }
@@ -864,9 +878,35 @@ strong{font-weight:800}
         </div>
       </div>
 
-      <div class="ask-stem" aria-hidden="true"></div>
+      <div class="stem-row" aria-hidden="true">
+        <svg class="stem-book" viewBox="0 0 230 150" xmlns="http://www.w3.org/2000/svg">
+          <path d="M115 42C88 24 50 20 18 30v88c32-10 70-6 97 12z" fill="#ffffff"/>
+          <path d="M115 42c27-18 65-22 97-12v88c-32-10-70-6-97 12z" fill="#eaf1ff"/>
+          <path d="M115 42v88" stroke="#c2d3f4" stroke-width="3" stroke-linecap="round"/>
+          <g fill="#c9d8f6" opacity=".85">
+            <rect x="34" y="52" width="62" height="5" rx="2.5"/>
+            <rect x="34" y="68" width="52" height="5" rx="2.5"/>
+            <rect x="34" y="84" width="58" height="5" rx="2.5"/>
+            <rect x="136" y="52" width="62" height="5" rx="2.5"/>
+            <rect x="136" y="68" width="46" height="5" rx="2.5"/>
+            <rect x="136" y="84" width="56" height="5" rx="2.5"/>
+          </g>
+          <path d="M18 118c32-10 70-6 97 12 27-18 65-22 97-12v10c-32-10-70-6-97 12-27-18-65-22-97-12z" fill="#d9e4fb"/>
+        </svg>
+
+        <div class="ask-stem"></div>
+
+        <svg class="stem-book tilt" viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="14" width="92" height="122" rx="9" fill="#ffffff"/>
+          <rect x="14" y="14" width="20" height="122" rx="9" fill="#cbdcfd"/>
+          <g fill="#dbe6fb">
+            <rect x="46" y="46" width="46" height="7" rx="3.5"/>
+            <rect x="46" y="64" width="34" height="7" rx="3.5"/>
+          </g>
+        </svg>
+      </div>
       <p class="ask-kicker reveal">입시의 규칙이 바뀌는 지금</p>
-      <p class="ask-punch reveal"><span class="mint">준비의 순서도</span> 바뀌어야 합니다!</p>
+      <p class="ask-punch reveal"><span class="mint">준비의 순서도</span><br class="mo-br"> 바뀌어야 합니다!</p>
     </div>
   </section>
 
