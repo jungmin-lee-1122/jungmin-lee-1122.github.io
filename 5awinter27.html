@@ -375,6 +375,12 @@ strong{font-weight:800}
   font-size:clamp(34px,4.5vw,88px);font-weight:900;
   letter-spacing:-.035em;line-height:1.28;color:#fff;
 }
+/* 카드 번호와 같은 파랑으로 형광펜 효과 */
+.winter-copy h2 .hl{
+  background:var(--w-blue);color:#fff;
+  padding:.04em .16em .1em;border-radius:.08em;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
 .winter-copy p{
   margin-top:clamp(24px,2.6vw,48px);
   font-size:clamp(16px,1.7vw,33px);line-height:1.95;color:#a7adb6;
@@ -617,9 +623,12 @@ strong{font-weight:800}
   .ch-cards{grid-template-columns:1fr;gap:18px}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
-  .cta-row{flex-direction:column;align-items:flex-start;gap:clamp(18px,2.6vw,30px)}
-  .cta-copy{flex:0 0 auto;width:100%}   /* 세로 정렬에선 basis가 '높이'가 되므로 해제 */
-  .info-list{width:100%;align-items:flex-start}
+  .cta-row{
+    flex-direction:column;align-items:flex-start;flex-wrap:nowrap;
+    gap:0;                                  /* 간격은 info-list의 margin으로만 제어 */
+  }
+  .cta-copy{flex:0 0 auto;width:100%;height:auto}  /* column에선 basis가 '높이'가 되므로 해제 */
+  .cta .cta-row .info-list{width:100%;align-items:flex-start;margin-top:22px}
 }
 @media (max-width:560px){
   .grid-3,.grid-4,.grid-5{grid-template-columns:1fr}
@@ -743,8 +752,8 @@ strong{font-weight:800}
   .sd-flow-card p{font-size:14px}
 
   .cta{padding:56px var(--pad)}
-  .cta-row{gap:16px}
-  .cta-sub{margin-top:.6em}
+  .cta .cta-row .info-list{margin-top:18px}
+  .cta-sub{margin-top:.55em}
   .cta h2{font-size:26px;line-height:1.35}
   .cta-sub{font-size:15px}
   .info-list{gap:14px}
@@ -772,7 +781,7 @@ strong{font-weight:800}
   .winter-copy h2,.cta h2,.rules-wrap .sd-title,.h2{font-size:23px}
   .w-badge{width:118px;height:118px}
   .info-list dd{font-size:17px}
-  .cta-row{gap:14px}
+  .cta .cta-row .info-list{margin-top:14px}
   .info-list{gap:12px}
   .ch-card h3{font-size:18px}
   .cta-props{margin-top:28px;gap:16px}
@@ -946,7 +955,7 @@ strong{font-weight:800}
   <section class="winter-section">
     <div class="winter-grid">
       <div class="winter-copy reveal">
-        <h2>그래서, 이번 겨울방학이 중요합니다.</h2>
+        <h2>그래서, <span class="hl">이번 겨울방학</span>이 중요합니다.</h2>
         <p>
           학기 중에는 학교 수업과 내신에 쫓깁니다.<br>
           새 학년이 시작되기 전, 부족한 영역을 진단하고<br>
