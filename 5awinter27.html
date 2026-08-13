@@ -19,6 +19,9 @@
   --ink:#16233c;
   --gray:#5c6a83;
   --bg:#f2f6fc;
+  --ask-blue:#4f85f7;      /* 말풍선 섹션 배경 */
+  --ask-mint:#9be1fc;      /* 강조 민트 */
+  --ask-bubble:#cbdcfd;    /* 밝은 말풍선 */
   --w-bg:#0a0a0b;          /* 겨울방학 섹션 배경 */
   --w-card:#1b1c1e;        /* 카드 배경 */
   --w-blue:#3f9ae0;        /* 포인트 블루 */
@@ -125,23 +128,65 @@ strong{font-weight:800}
 .change-card p{font-size:clamp(13.5px,1.15vw,19px);color:var(--gray);line-height:1.85}
 .change-card p + p{margin-top:.9em}
 
-/* ---------- MYTHS ---------- */
-.myth{
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;padding:clamp(22px,2.4vw,40px) clamp(12px,1.2vw,24px);
-  text-align:center;font-size:clamp(13.5px,1.15vw,19px);line-height:1.8;color:#dfe9ff;
+/* ---------- ASK SECTION (오해 말풍선) ---------- */
+.ask{
+  position:relative;width:100%;overflow:hidden;
+  padding:clamp(64px,7.5vw,150px) var(--pad) clamp(70px,8vw,160px);
+  background:var(--ask-blue);color:#fff;text-align:center;
 }
-.myth .check{display:block;width:clamp(22px,2vw,34px);height:clamp(22px,2vw,34px);margin:0 auto clamp(12px,1.2vw,20px);color:var(--yellow)}
-.myth-note{
-  display:flex;align-items:center;justify-content:center;gap:.6em;
-  margin-top:clamp(28px,3vw,52px);
-  font-size:clamp(17px,2vw,32px);font-weight:700;letter-spacing:-.03em;text-align:center;
+.ask .inner{position:relative;z-index:2}
+.ask-title{
+  font-size:clamp(28px,3.9vw,76px);font-weight:900;
+  letter-spacing:-.035em;line-height:1.28;
 }
-.myth-note .bang{
-  width:1.4em;height:1.4em;flex:none;border-radius:50%;background:#fff;color:var(--navy-800);
-  font-size:.7em;font-weight:900;display:flex;align-items:center;justify-content:center;
+.ask-title .mint{color:var(--ask-mint)}
+.ask-cursor{
+  display:block;margin:clamp(-6px,-.4vw,0px) auto 0;
+  width:clamp(30px,2.8vw,56px);height:auto;
+  transform:translateX(clamp(120px,15vw,300px));
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.25));
 }
-.myth-note b{color:var(--yellow);font-weight:900}
+/* 말풍선 */
+.bubbles{
+  margin-top:clamp(28px,3.4vw,64px);
+  display:flex;flex-direction:column;gap:clamp(16px,1.9vw,38px);
+}
+.brow{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:clamp(16px,2.6vw,58px);
+}
+.brow--a{transform:translateX(clamp(-40px,-2.5vw,0px))}
+.brow--b{transform:translateX(clamp(0px,3vw,70px))}
+.brow--c{transform:translateX(clamp(-30px,-1.6vw,0px))}
+.bubble{
+  border-radius:999px;
+  padding:clamp(13px,1.15vw,26px) clamp(20px,1.9vw,44px);
+  font-size:clamp(13.5px,1.25vw,25px);font-weight:600;letter-spacing:-.03em;
+  line-height:1.4;white-space:nowrap;
+}
+.bubble.ghost{background:rgba(255,255,255,.22);color:#fff}
+.bubble.solid{background:var(--ask-bubble);color:#16305e;box-shadow:0 6px 18px rgba(10,30,80,.12)}
+.bubble.lift{transform:translateY(clamp(-16px,-1.1vw,0px))}
+.bubble.drop{transform:translateY(clamp(0px,1.1vw,22px))}
+/* 마무리 */
+.ask-stem{
+  width:1px;height:clamp(40px,4.5vw,90px);
+  background:rgba(255,255,255,.55);
+  margin:clamp(30px,3.4vw,66px) auto clamp(24px,2.8vw,54px);
+}
+.ask-kicker{font-size:clamp(13px,1.15vw,23px);color:rgba(255,255,255,.85);letter-spacing:-.02em}
+.ask-punch{
+  margin-top:clamp(12px,1.4vw,28px);
+  font-size:clamp(24px,3.3vw,64px);font-weight:900;letter-spacing:-.035em;line-height:1.35;
+}
+.ask-punch .mint{color:var(--ask-mint)}
+/* 배경 책 장식 */
+.ask-deco{position:absolute;inset:0;z-index:1;pointer-events:none}
+.ask-deco svg{position:absolute;filter:drop-shadow(0 14px 26px rgba(8,26,74,.28))}
+.deco-stack{left:clamp(1%,3vw,7%);top:44%;width:clamp(110px,11vw,230px)}
+.deco-open{right:clamp(1%,3vw,6%);top:52%;width:clamp(120px,12vw,250px)}
+.deco-tilt{right:clamp(4%,7vw,14%);top:9%;width:clamp(70px,7vw,150px);opacity:.75;transform:rotate(-14deg)}
+.deco-small{left:clamp(6%,9vw,16%);top:12%;width:clamp(60px,6vw,120px);opacity:.6;transform:rotate(12deg)}
 
 /* ---------- WINTER SECTION (다크) ---------- */
 .winter-section{
@@ -150,7 +195,7 @@ strong{font-weight:800}
   color:#fff;
   /* 위: 앞 섹션 남색에서, 아래: 다음 흰 섹션으로 자연스럽게 */
   background:
-    linear-gradient(180deg,#123674 0%,#0d1a33 45%,var(--w-bg) 100%) top/100% clamp(80px,10vw,200px) no-repeat,
+    linear-gradient(180deg,var(--ask-blue) 0%,#26407e 40%,var(--w-bg) 100%) top/100% clamp(80px,10vw,200px) no-repeat,
     linear-gradient(180deg,var(--w-bg) 0%,#4a4c50 62%,#ffffff 100%) bottom/100% clamp(80px,10vw,200px) no-repeat,
     var(--w-bg);
 }
@@ -280,35 +325,6 @@ strong{font-weight:800}
 .cta-btn:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(0,0,0,.32)}
 .cta-btn:focus-visible{outline:3px solid #fff;outline-offset:4px}
 
-/* ---------- MYTH SECTION (영상) ---------- */
-.myth-section{
-  position:relative;width:100%;
-  padding:0px 0 clamp(40px,7vw,130px);
-  background:linear-gradient(180deg,#0e2c66 0%,#0e2c66 55%,#123674 100%);
-  color:#fff;
-}
-.myth-video{
-  position:relative;width:100%;line-height:0;
-  aspect-ratio:1920 / 652;   /* 아래 검은 여백만 잘라냄 (말풍선은 y=620까지) */
-  overflow:hidden;
-  background:#000;
-}
-.myth-video video{
-  display:block;width:100%;height:100%;
-  object-fit:cover;object-position:center top;
-}
-/* 영상이 끝나는 검정 → 섹션 남색으로 풀어주는 띠 */
-.myth-fade{
-  width:100%;height:clamp(90px,11vw,210px);
-  background:linear-gradient(180deg,
-    #000000 0%,
-    #04102a 28%,
-    #0a2050 62%,
-    #0e2c66 100%);
-}
-.myth-section .inner{padding:0 var(--pad)}
-.myth-section .myth-note{margin-top:clamp(20px,2.6vw,44px)}
-
 /* ---------- REVEAL ---------- */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
 .reveal.on{opacity:1;transform:none}
@@ -317,6 +333,15 @@ strong{font-weight:800}
 @media (max-width:1100px){
   .winter-grid{grid-template-columns:1fr;gap:clamp(28px,4vw,48px)}
   .winter-copy h2,.winter-copy p{text-align:center}
+}
+@media (max-width:860px){
+  .bubble{white-space:normal;max-width:88%}
+  .brow--a,.brow--b,.brow--c{transform:none}
+  .bubble.lift,.bubble.drop{transform:none}
+  .ask-cursor{transform:translateX(28%)}
+  .deco-tilt,.deco-small{display:none}
+  .deco-stack{top:auto;bottom:4%;left:2%;opacity:.75}
+  .deco-open{top:auto;bottom:3%;right:2%;opacity:.75}
 }
 @media (max-width:640px){
   .wcards{grid-template-columns:1fr}
@@ -394,16 +419,86 @@ strong{font-weight:800}
     </div>
   </section>
 
-  <!-- ================= 오해 체크리스트 (영상) ================= -->
-  <section class="section-navy myth-section">
-    <div class="myth-video">
-      <video src="myth.mp4?v=2" poster="myth-poster.jpg?v=2"
-             autoplay muted loop playsinline preload="metadata"
-             aria-label="우리 아이, 아직도 이렇게 생각하고 계시나요? - 입시에 대한 흔한 오해들"></video>
+  <!-- ================= 오해 말풍선 ================= -->
+  <section class="ask">
+    <div class="ask-deco" aria-hidden="true">
+      <!-- 쌓인 책 -->
+      <svg class="deco-stack" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(-4 100 110)">
+          <rect x="12" y="104" width="176" height="30" rx="7" fill="#ffe2a3"/>
+          <rect x="12" y="104" width="176" height="10" rx="5" fill="#ffd27a"/>
+          <rect x="26" y="116" width="60" height="6" rx="3" fill="#e8b95f" opacity=".55"/>
+        </g>
+        <g transform="rotate(3 100 82)">
+          <rect x="20" y="74" width="160" height="28" rx="7" fill="#ffffff"/>
+          <rect x="20" y="74" width="160" height="9" rx="4.5" fill="#dfe9ff"/>
+          <rect x="34" y="85" width="52" height="6" rx="3" fill="#c3d3f5" opacity=".7"/>
+        </g>
+        <g transform="rotate(-7 100 54)">
+          <rect x="28" y="46" width="144" height="26" rx="7" fill="#cbdcfd"/>
+          <rect x="28" y="46" width="144" height="9" rx="4.5" fill="#aec6fb"/>
+          <rect x="42" y="57" width="46" height="6" rx="3" fill="#8fb0f5" opacity=".7"/>
+        </g>
+      </svg>
+
+      <!-- 펼친 책 -->
+      <svg class="deco-open" viewBox="0 0 230 150" xmlns="http://www.w3.org/2000/svg">
+        <path d="M115 42C88 24 50 20 18 30v88c32-10 70-6 97 12z" fill="#ffffff"/>
+        <path d="M115 42c27-18 65-22 97-12v88c-32-10-70-6-97 12z" fill="#eaf1ff"/>
+        <path d="M115 42v88" stroke="#c2d3f4" stroke-width="3" stroke-linecap="round"/>
+        <g fill="#c9d8f6" opacity=".85">
+          <rect x="34" y="52" width="62" height="5" rx="2.5"/>
+          <rect x="34" y="68" width="52" height="5" rx="2.5"/>
+          <rect x="34" y="84" width="58" height="5" rx="2.5"/>
+          <rect x="136" y="52" width="62" height="5" rx="2.5"/>
+          <rect x="136" y="68" width="46" height="5" rx="2.5"/>
+          <rect x="136" y="84" width="56" height="5" rx="2.5"/>
+        </g>
+        <path d="M18 118c32-10 70-6 97 12 27-18 65-22 97-12v10c-32-10-70-6-97 12-27-18-65-22-97-12z" fill="#d9e4fb"/>
+      </svg>
+
+      <!-- 기울어진 책 -->
+      <svg class="deco-tilt" viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="14" y="14" width="92" height="122" rx="9" fill="#ffffff"/>
+        <rect x="14" y="14" width="20" height="122" rx="9" fill="#cbdcfd"/>
+        <g fill="#dbe6fb">
+          <rect x="46" y="46" width="46" height="7" rx="3.5"/>
+          <rect x="46" y="64" width="34" height="7" rx="3.5"/>
+        </g>
+      </svg>
+
+      <!-- 작은 책 -->
+      <svg class="deco-small" viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="16" y="18" width="88" height="116" rx="9" fill="#ffe2a3"/>
+        <rect x="16" y="18" width="18" height="116" rx="9" fill="#ffd27a"/>
+        <rect x="46" y="52" width="42" height="7" rx="3.5" fill="#eec372"/>
+      </svg>
     </div>
-    <div class="myth-fade" aria-hidden="true"></div>
+
     <div class="inner">
-      <p class="myth-note reveal"><span class="bang">!</span> 입시의 규칙이 바뀌면, <b>준비의 순서도</b> 바뀌어야 합니다.</p>
+      <h2 class="ask-title reveal"><span class="mint">우리 아이,</span><br>이렇게 생각하고 계신가요?</h2>
+      <svg class="ask-cursor" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 3l14 8.5-6.2 1.4L9.6 19z" fill="#dbe7ff" stroke="#2f5bd0" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+
+      <div class="bubbles">
+        <div class="brow brow--a reveal">
+          <span class="bubble ghost">고1은 아직 수능 공부 안 해도 되겠지.</span>
+          <span class="bubble solid drop">5등급제로 바뀌면 내신 따기는 오히려 쉬워진 거 아닌가?</span>
+        </div>
+        <div class="brow brow--b reveal">
+          <span class="bubble solid">문과니까 과학은 내신만 넘기면 되겠지.</span>
+          <span class="bubble ghost lift">수시는 내신, 정시는 수능만 챙기면 되겠지.</span>
+        </div>
+        <div class="brow brow--c reveal">
+          <span class="bubble ghost">선택과목은 학교 가서 정해도 늦지 않겠지.</span>
+          <span class="bubble solid drop">겨울방학엔 선행만 해두면 되는 거 아닌가?</span>
+        </div>
+      </div>
+
+      <div class="ask-stem" aria-hidden="true"></div>
+      <p class="ask-kicker reveal">입시의 규칙이 바뀌는 지금</p>
+      <p class="ask-punch reveal"><span class="mint">준비의 순서도</span> 바뀌어야 합니다!</p>
     </div>
   </section>
 
@@ -542,13 +637,6 @@ strong{font-weight:800}
   </section>
 
 <script>
-// 모션 최소화 설정이면 영상 정지
-(function(){
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var v = document.querySelector('.myth-video video');
-  if (v) { v.removeAttribute('autoplay'); v.pause(); v.setAttribute('controls',''); }
-})();
-
 // 스크롤 등장
 (function(){
   var items = document.querySelectorAll('.reveal');
