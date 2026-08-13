@@ -139,30 +139,60 @@ strong{font-weight:800}
 .cta{
   position:relative;width:100%;overflow:hidden;
   background:var(--ask-blue);   /* 말풍선 섹션과 같은 파랑 */
-  color:#fff;padding:clamp(110px,12vw,300px) var(--pad);
+  color:#fff;padding:clamp(100px,11vw,270px) var(--pad);
 }
 .cta .inner{position:relative;z-index:2}
 .cta-row{
   display:flex;align-items:center;justify-content:space-between;
   gap:clamp(40px,5vw,120px);flex-wrap:wrap;
 }
-.cta h2{font-size:clamp(42px,5.8vw,150px);font-weight:900;line-height:1.32;letter-spacing:-.04em}
-.cta h2 .accent{color:var(--yellow)}
-.cta-sub{margin-top:.7em;font-size:clamp(22px,2.2vw,50px);color:#dbe7ff;letter-spacing:-.03em}
-.info-list{display:flex;gap:clamp(36px,4.6vw,120px);text-align:center}
-.info-list .icon{
-  width:clamp(72px,6.6vw,160px);height:clamp(72px,6.6vw,160px);
-  color:#fff;opacity:.95;margin-bottom:.5em;
+.cta-copy{flex:1 1 520px;min-width:0}
+.cta h2{
+  font-size:clamp(38px,4.8vw,124px);font-weight:900;
+  line-height:1.32;letter-spacing:-.04em;color:#eaf3ff;
+  text-shadow:0 6px 22px rgba(6,32,92,.28);
 }
-.info-list dt{font-size:clamp(20px,1.95vw,44px);color:#cfdfff;margin-bottom:.3em}
-.info-list dd{font-size:clamp(26px,2.5vw,58px);font-weight:800;letter-spacing:-.03em}
-/* 배경 장식 — 말풍선 섹션의 책 오브제와 같은 계열, 다른 소품으로 */
+.cta h2 .lead-line{color:#bfe0ff}          /* 첫 줄은 한 톤 낮게 */
+.cta h2 .strong-line{color:#ffffff}        /* 둘째 줄 본문은 흰색 */
+.cta h2 .accent{
+  color:var(--yellow);
+  box-shadow:inset 0 -.2em 0 rgba(255,216,59,.28);
+}
+.cta-sub{
+  margin-top:.8em;font-size:clamp(20px,2vw,44px);
+  color:#c9dcff;letter-spacing:-.03em;
+}
+/* 오른쪽 정보 — 세로 스택, 우측 정렬 */
+.info-list{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;
+  gap:clamp(18px,1.9vw,42px);text-align:left;
+}
+.info-list > div{
+  display:grid;grid-template-columns:auto 1fr;
+  column-gap:clamp(16px,1.5vw,34px);align-items:center;
+}
+.info-list .info-ic{grid-row:span 2}
+.info-list dt,.info-list dd{grid-column:2}
+.info-ic{
+  flex:none;display:flex;align-items:center;justify-content:center;
+  width:clamp(64px,5.6vw,132px);height:clamp(64px,5.6vw,132px);
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  border:clamp(2px,.16vw,4px) solid rgba(255,255,255,.5);
+  box-shadow:0 12px 30px rgba(6,32,92,.22), inset 0 0 clamp(14px,1.4vw,32px) rgba(255,255,255,.14);
+}
+.info-list .icon{
+  width:52%;height:52%;color:#fff;opacity:.98;margin:0;
+}
+.info-list dt{font-size:clamp(15px,1.4vw,32px);color:#bfd7ff;margin-bottom:.25em;letter-spacing:-.02em}
+.info-list dd{font-size:clamp(21px,2vw,46px);font-weight:800;letter-spacing:-.03em;color:#fff}
+/* 배경 장식 — 말풍선 섹션의 오브제와 같은 계열, 다른 소품으로 */
 .cta-deco{position:absolute;inset:0;z-index:1;pointer-events:none}
 .cta-deco svg{position:absolute;filter:drop-shadow(0 18px 34px rgba(8,26,74,.28))}
-.deco-note{left:clamp(0%,2vw,4%);bottom:6%;width:clamp(150px,14vw,320px)}
-.deco-cal{right:clamp(0%,2vw,4%);top:12%;width:clamp(140px,13vw,300px);transform:rotate(7deg)}
-.deco-pencil{left:clamp(6%,9vw,18%);top:9%;width:clamp(80px,7vw,160px);opacity:.75;transform:rotate(-18deg)}
-.deco-slim{right:clamp(5%,8vw,16%);bottom:8%;width:clamp(110px,10vw,230px);opacity:.8;transform:rotate(-6deg)}
+.deco-note{left:clamp(0%,1.5vw,3%);bottom:7%;width:clamp(120px,11vw,250px);opacity:.9}
+.deco-pencil{left:clamp(3%,5vw,10%);top:10%;width:clamp(66px,5.6vw,130px);opacity:.7;transform:rotate(-18deg)}
+.deco-slim{left:clamp(11%,14vw,26%);bottom:4%;width:clamp(95px,8.4vw,190px);opacity:.6;transform:rotate(-6deg)}
+.deco-cal{right:clamp(1%,3vw,6%);bottom:6%;width:clamp(100px,9vw,200px);opacity:.75;transform:rotate(7deg)}
 
 /* ---------- CHANGE SECTION (무엇이 달라지나요) ---------- */
 .change{
@@ -540,11 +570,12 @@ strong{font-weight:800}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
   .cta-row{flex-direction:column;align-items:flex-start}
-  .info-list{width:100%;justify-content:space-between}
+  .info-list{width:100%;align-items:flex-start}
 }
 @media (max-width:560px){
   .grid-3,.grid-4,.grid-5{grid-template-columns:1fr}
-  .info-list{gap:14px}
+  .info-list{gap:16px}
+  .deco-slim{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
@@ -872,27 +903,27 @@ strong{font-weight:800}
 
     <div class="inner">
       <div class="cta-row">
-        <div class="reveal">
-          <h2>2028 대입을 앞서는 선택,<br>지금 시작해야 <span class="accent">앞서갑니다.</span></h2>
+        <div class="cta-copy reveal">
+          <h2><span class="lead-line">2028 대입을 앞서는 선택,</span><br><span class="strong-line">지금 시작해야</span> <span class="accent">앞서갑니다.</span></h2>
           <p class="cta-sub">2027 윈터스쿨에서 새로운 입시의 첫걸음을 함께하세요.</p>
         </div>
         <dl class="info-list reveal">
           <div>
-            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <span class="info-ic"><svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
               <rect x="8" y="11" width="32" height="30" rx="3"/><path d="M8 20h32M17 7v8M31 7v8M17 27h4M27 27h4M17 34h4M27 34h4"/>
-            </svg>
+            </svg></span>
             <dt>개강일</dt><dd>1월 4일 (월)</dd>
           </div>
           <div>
-            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <span class="info-ic"><svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="19" cy="18" r="7"/><path d="M7 40c0-7 5.5-12 12-12s12 5 12 12"/><path d="M32 12a6 6 0 010 12M35 40c0-6-2-9-4-11"/>
-            </svg>
+            </svg></span>
             <dt>대상</dt><dd>예비 고1·2·3</dd>
           </div>
           <div>
-            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <span class="info-ic"><svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M14 8l6 8-5 5c2 5 6 9 11 11l5-5 8 6-4 6c-1 1-3 1-4 1C19 38 10 29 7 16c0-1 0-3 1-4l6-4z"/>
-            </svg>
+            </svg></span>
             <dt>상담 문의</dt><dd>031-386-1881</dd>
           </div>
         </dl>
