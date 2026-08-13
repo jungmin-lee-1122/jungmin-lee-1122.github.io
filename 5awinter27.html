@@ -173,6 +173,19 @@ strong{font-weight:800}
   line-height:1.32;letter-spacing:-.04em;color:#eaf3ff;
   text-shadow:0 6px 22px rgba(6,32,92,.28);
 }
+/* 화면에 들어오면 흔들림 */
+.cta h2{--amp:1.5deg;--shift:9px;transform-origin:left center}
+.cta h2.shake{animation:ctaShake 1.15s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes ctaShake{
+  0%{transform:rotate(0) translateX(0)}
+  12%{transform:rotate(calc(var(--amp) * -1)) translateX(calc(var(--shift) * -1))}
+  27%{transform:rotate(var(--amp)) translateX(var(--shift))}
+  42%{transform:rotate(calc(var(--amp) * -.62)) translateX(calc(var(--shift) * -.6))}
+  57%{transform:rotate(calc(var(--amp) * .42)) translateX(calc(var(--shift) * .4))}
+  72%{transform:rotate(calc(var(--amp) * -.22)) translateX(calc(var(--shift) * -.2))}
+  86%{transform:rotate(calc(var(--amp) * .1)) translateX(calc(var(--shift) * .08))}
+  100%{transform:rotate(0) translateX(0)}
+}
 .cta h2 .lead-line{color:#bfe0ff}          /* 첫 줄은 한 톤 낮게 */
 .cta h2 .strong-line{color:#ffffff}        /* 둘째 줄 본문은 흰색 */
 .cta h2 .accent{
@@ -666,7 +679,7 @@ strong{font-weight:800}
   .grade p{font-size:clamp(15px,2vw,20px)}
   .grade .g-icon{width:clamp(40px,5.4vw,60px);height:clamp(40px,5.4vw,60px)}
   .cta{padding:clamp(64px,9vw,110px) var(--pad)}
-  .cta h2{font-size:clamp(30px,4.6vw,52px)}
+  .cta h2{font-size:clamp(30px,4.6vw,52px);--amp:1.3deg;--shift:7px}
   .cta-sub{font-size:clamp(16px,2.2vw,22px)}
   .rules-wrap section{padding:clamp(60px,8vw,100px) var(--pad)}
   .rules-wrap .sd-title{font-size:clamp(30px,4.6vw,54px)}
@@ -774,7 +787,7 @@ strong{font-weight:800}
   .cta{padding:56px var(--pad)}
   .cta .cta-row .info-list{margin-top:18px}
   .cta-sub{margin-top:.55em}
-  .cta h2{font-size:26px;line-height:1.35}
+  .cta h2{font-size:26px;line-height:1.35;--amp:1.1deg;--shift:5px}
   .cta-sub{font-size:15px}
   .info-list{gap:14px}
   .info-list > div{column-gap:14px}
@@ -810,7 +823,7 @@ strong{font-weight:800}
 @media (prefers-reduced-motion:reduce){
   .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
   .bubble.done:hover,.bubble.done:active{animation:none !important}
-  .w-conclusion,.w-conclusion::after{animation:none !important}
+  .w-conclusion,.w-conclusion::after,.cta h2.shake{animation:none !important}
   .reveal{opacity:1;transform:none;transition:none}
 }
 </style>
@@ -1102,7 +1115,7 @@ strong{font-weight:800}
       <div class="sd-inner">
         <h2 class="sd-title reveal"><em>윈터스쿨</em> 등록 절차</h2>
         <div class="sd-flow-grid">
-          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-347-5151</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-386-1881</p></article>
           <article class="sd-flow-card reveal"><small>STEP 02</small><h3>진단평가/서류제출</h3><p>진단평가 또는 성적표 제출</p></article>
           <article class="sd-flow-card reveal"><small>STEP 03</small><h3>상담/반 편성</h3><p>진단평가 및 성적표 기반으로<br>상담 후 반 편성 진행</p></article>
           <article class="sd-flow-card reveal"><small>STEP 04</small><h3>등록 완료</h3><p>사전예약금 및 수강료 납부 후 등록 완료</p></article>
@@ -1172,7 +1185,7 @@ strong{font-weight:800}
       <div class="cta-row">
         <div class="cta-copy reveal">
           <h2><span class="lead-line">2028 대입을 앞서는 선택,</span><br><span class="strong-line">지금 시작해야</span> <span class="accent">앞서갑니다.</span></h2>
-          <p class="cta-sub">2027 5A 윈터스쿨에서 새로운 입시의 첫걸음을 함께하세요.</p>
+          <p class="cta-sub">2027 윈터스쿨에서 새로운 입시의 첫걸음을 함께하세요.</p>
         </div>
         <dl class="info-list reveal">
           <div>
@@ -1191,7 +1204,7 @@ strong{font-weight:800}
             <span class="info-ic"><svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M14 8l6 8-5 5c2 5 6 9 11 11l5-5 8 6-4 6c-1 1-3 1-4 1C19 38 10 29 7 16c0-1 0-3 1-4l6-4z"/>
             </svg></span>
-            <dt>상담 문의</dt><dd>031-347-5151</dd>
+            <dt>상담 문의</dt><dd>031-386-1881</dd>
           </div>
         </dl>
       </div>
@@ -1237,6 +1250,26 @@ strong{font-weight:800}
   </section>
 
 <script>
+// CTA 제목 흔들림 (화면에 들어올 때마다)
+(function(){
+  var h = document.querySelector('.cta h2');
+  if (!h) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+
+  new IntersectionObserver(function(en){
+    en.forEach(function(e){
+      if (e.isIntersecting) {
+        h.classList.remove('shake');
+        void h.offsetWidth;          // 리플로우로 애니메이션 초기화
+        h.classList.add('shake');
+      } else {
+        h.classList.remove('shake');
+      }
+    });
+  }, { threshold: 0.55 }).observe(h);
+})();
+
 // 히어로 눈 내리기
 (function(){
   var layer = document.querySelector('.snow-layer');
