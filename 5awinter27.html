@@ -40,6 +40,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
 body{
   font-family:"Pretendard","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
   color:var(--ink);background:#fff;line-height:1.6;
@@ -54,6 +55,7 @@ strong{font-weight:800}
   background:#0a2258;   /* 이미지 로딩 전 색 */
   line-height:0;
 }
+.hero picture{display:block}
 .hero img{display:block;width:100%;height:auto}
 /* 히어로 하단을 길게 남색으로 눌러 다음 배너로 넘어갈 준비 */
 .hero::after{
@@ -86,9 +88,10 @@ strong{font-weight:800}
     rgba(6,7,13,0) 100%);
   pointer-events:none;
 }
-.news-band img{position:relative;z-index:1;display:block;width:100%;height:auto}
+.news-band picture{position:relative;z-index:1;display:block}
+.news-band img{display:block;width:100%;height:auto}
 /* 하단은 news-foot.webp(이미지 마지막 줄 색을 그대로 이어받아 밝은 색으로 용해)가 담당 */
-.news-foot{display:block;width:100%;height:auto;margin-top:-1px;position:relative;z-index:1}
+.news-foot{display:block;width:100%;margin-top:-1px;position:relative;z-index:1}
 
 /* ---------- SECTION SHELL ---------- */
 .section{width:100%;padding:clamp(80px,9vw,220px) var(--pad)}
@@ -550,6 +553,17 @@ strong{font-weight:800}
   .sd-info-table th,.sd-info-table td{display:block;width:100%;font-size:16px}
 }
 
+/* ===== 모바일 전용 배너 =====
+   hero-mo 1080x1300 / news-mo 1080x800 / change-bg-mo 1080x760
+   (히어로·뉴스는 <picture>로 교체, 달라지나요는 배경이라 CSS로 교체) */
+@media (max-width:768px){
+  .change{
+    background:url("change-bg-mo.webp?v=1") top center / 100% auto no-repeat, var(--ch-blue);
+    /* 곡선 최저점이 25.8vw → 여유를 두고 33vw부터 카드 시작 */
+    padding-top:33vw;
+  }
+}
+
 /* ---------- REVEAL ---------- */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
 .reveal.on{opacity:1;transform:none}
@@ -588,6 +602,137 @@ strong{font-weight:800}
   .info-list{gap:16px}
   .deco-slim{display:none}
 }
+/* ===== 태블릿 ===== */
+@media (max-width:1024px){
+  .section{padding:clamp(56px,8vw,90px) var(--pad)}
+  .h2{font-size:clamp(28px,4.4vw,44px);margin-bottom:clamp(30px,5vw,50px)}
+  .grade{
+    padding:clamp(30px,4.4vw,52px) clamp(24px,3.4vw,40px) clamp(76px,9vw,110px);
+    min-height:clamp(300px,42vw,420px);
+  }
+  .grade-tag{font-size:clamp(14px,1.9vw,19px);margin-bottom:clamp(16px,2.4vw,24px)}
+  .grade h3{font-size:clamp(21px,3.1vw,32px)}
+  .grade p{font-size:clamp(15px,2vw,20px)}
+  .grade .g-icon{width:clamp(40px,5.4vw,60px);height:clamp(40px,5.4vw,60px)}
+  .cta{padding:clamp(64px,9vw,110px) var(--pad)}
+  .cta h2{font-size:clamp(30px,4.6vw,52px)}
+  .cta-sub{font-size:clamp(16px,2.2vw,22px)}
+  .rules-wrap section{padding:clamp(60px,8vw,100px) var(--pad)}
+  .rules-wrap .sd-title{font-size:clamp(30px,4.6vw,54px)}
+  .rules-wrap .sd-desc{font-size:clamp(16px,2.1vw,24px)}
+  .sd-acc-title{min-height:auto;padding:clamp(22px,3vw,32px) clamp(22px,3vw,34px);font-size:clamp(20px,2.9vw,30px)}
+  .sd-acc-content{padding:0 clamp(22px,3vw,34px) clamp(26px,3.4vw,38px)}
+  .sd-info-table th,.sd-info-table td{padding:14px 16px;font-size:clamp(15px,1.9vw,19px)}
+  .sd-info-table th{width:clamp(120px,18vw,180px)}
+  .sd-flow-card h3{font-size:clamp(19px,2.6vw,26px)}
+  .sd-flow-card p{font-size:clamp(14px,1.9vw,18px)}
+  .sd-flow-card small{font-size:clamp(13px,1.7vw,16px)}
+  .winter-section{padding:clamp(60px,9vw,110px) var(--pad)}
+  .winter-copy h2{font-size:clamp(28px,4.6vw,46px)}
+  .winter-copy p{font-size:clamp(15px,2.1vw,20px)}
+  .wcard{padding:clamp(24px,3.4vw,38px);min-height:clamp(230px,32vw,300px)}
+  .wcard .n,.wcard .en,.wcard .ko{font-size:clamp(17px,2.6vw,26px)}
+  .wcard li{font-size:clamp(13.5px,1.9vw,17px)}
+  .w-badge{width:clamp(130px,19vw,180px);height:clamp(130px,19vw,180px)}
+  .w-badge small{font-size:clamp(11px,1.5vw,14px)}
+  .w-badge b{font-size:clamp(14px,1.9vw,18px)}
+  .w-conclusion{font-size:clamp(17px,2.5vw,26px);padding:clamp(18px,2.6vw,26px) clamp(22px,3vw,34px)}
+  .ask{padding:clamp(60px,8vw,110px) var(--pad) clamp(64px,9vw,120px)}
+  .ask-title{font-size:clamp(28px,5vw,54px)}
+  .bubble{font-size:clamp(14px,2.1vw,21px);padding:clamp(12px,1.8vw,18px) clamp(18px,2.4vw,28px)}
+  .ask-punch{font-size:clamp(24px,4.4vw,46px)}
+  .ask-kicker{font-size:clamp(14px,1.9vw,19px)}
+  .ch-card h3{font-size:clamp(18px,2.7vw,28px)}
+  .ch-card p{font-size:clamp(14px,2vw,20px)}
+  .ch-badge{width:clamp(42px,5.4vw,58px);height:clamp(46px,6vw,64px);font-size:clamp(17px,2.4vw,24px);margin-bottom:clamp(18px,2.4vw,28px)}
+}
+
+/* ===== 모바일 ===== */
+@media (max-width:768px){
+  .section{padding:52px var(--pad)}
+  .h2{font-size:26px;margin-bottom:26px}
+  /* 배너 아래 카드가 파란 영역 안에 들어오도록 여백 보정 */
+  .change{padding-bottom:56px}
+  .ch-cards{gap:14px}
+  .ch-card{padding:28px 20px 30px;border-radius:16px}
+  .ch-card h3{font-size:20px}
+  .ch-card p{font-size:15px;margin-top:16px}
+  .ch-badge{width:44px;height:48px;font-size:18px;margin-bottom:18px}
+
+  .ask{padding:56px var(--pad) 64px}
+  .ask-title{font-size:27px;line-height:1.35}
+  .ask-cursor{width:34px;transform:translateX(26%)}
+  .bubbles{margin-top:28px;gap:14px}
+  .brow{gap:14px}
+  .bubble{font-size:15px;padding:13px 20px;max-width:100%;line-height:1.45}
+  .ask-stem{height:44px;margin:32px auto 24px}
+  .ask-kicker{font-size:14px}
+  .ask-punch{font-size:25px;margin-top:10px}
+  .deco-stack{width:110px}
+  .deco-open{width:118px}
+
+  .winter-section{padding:60px var(--pad)}
+  .winter-copy h2{font-size:26px}
+  .winter-copy p{font-size:15px;line-height:1.8}
+  .wcards{gap:12px}
+  .wcard{padding:24px 20px;min-height:0}
+  .wcard .n{font-size:16px}
+  .wcard .en{font-size:18px}
+  .wcard .ko{font-size:19px}
+  .wcard li{font-size:14px}
+  .wcard ul{margin-top:14px}
+  .w-badge{width:132px;height:132px;margin:6px auto}
+  .w-arrow{border-left-width:14px;border-right-width:14px;border-top-width:16px;margin-top:14px}
+  .w-conclusion{font-size:16px;padding:16px 20px;line-height:1.5}
+
+  .grade{padding:26px 22px 66px;min-height:0;border-radius:14px}
+  .grade-tag{font-size:13px;margin-bottom:14px}
+  .grade h3{font-size:20px;margin-bottom:.4em}
+  .grade p{font-size:15px;line-height:1.7}
+  .grade .g-icon{width:38px;height:38px;right:18px;bottom:16px}
+
+  .rules-wrap section{padding:56px var(--pad)}
+  .rules-wrap .sd-title{font-size:27px;line-height:1.3}
+  .rules-wrap .sd-desc{font-size:15px;margin-top:16px}
+  .sd-accordion{margin-top:28px}
+  .sd-acc-item{border-radius:16px}
+  .sd-acc-title{padding:20px 18px;font-size:18px;gap:10px}
+  .sd-acc-title .sd-i{width:28px;height:28px;font-size:16px}
+  .sd-acc-content{padding:0 18px 22px}
+  .sd-info-table th,.sd-info-table td{display:block;width:100%;font-size:15px;padding:12px 14px}
+  .sd-info-table th{border-bottom:0}
+  .sd-notice{font-size:13px;margin-top:14px}
+  .sd-flow-grid{margin-top:28px;gap:10px}
+  .sd-flow-card{padding:22px 18px;border-radius:16px}
+  .sd-flow-card h3{font-size:18px}
+  .sd-flow-card p{font-size:14px}
+
+  .cta{padding:56px var(--pad)}
+  .cta-row{gap:28px}
+  .cta h2{font-size:26px;line-height:1.35}
+  .cta-sub{font-size:15px}
+  .info-list{gap:14px}
+  .info-list > div{column-gap:14px}
+  .info-ic{width:52px;height:52px;border-width:2px}
+  .info-list dt{font-size:13px}
+  .info-list dd{font-size:18px}
+  .deco-note{width:96px;bottom:3%;opacity:.55}
+  .deco-cal{width:82px;bottom:3%;opacity:.55}
+}
+
+/* ===== 소형 기기 ===== */
+@media (max-width:430px){
+  :root{--pad:16px}
+  .ask-title{font-size:24px}
+  .ask-punch{font-size:22px}
+  .bubble{font-size:14px;padding:12px 16px}
+  .winter-copy h2,.cta h2,.rules-wrap .sd-title,.h2{font-size:23px}
+  .w-badge{width:118px;height:118px}
+  .info-list dd{font-size:17px}
+  .ch-card h3{font-size:18px}
+  .deco-note,.deco-cal{display:none}
+}
+
 @media (prefers-reduced-motion:reduce){
   .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
   .w-conclusion,.w-conclusion::after{animation:none !important}
@@ -599,15 +744,24 @@ strong{font-weight:800}
 
   <!-- ================= HERO (배너 이미지) ================= -->
   <header class="hero">
-    <img src="hero.webp?v=2"
-         alt="2027 윈터스쿨 - 2028 대입 개편, 준비는 이번 겨울부터. 달라진 입시에 맞춘 선제적 학습 전략. 1월 4일(월) 개강">
+    <picture>
+      <source media="(max-width:768px)" srcset="hero-mo.webp?v=1">
+      <img src="hero.webp?v=2"
+           alt="2027 윈터스쿨 - 2028 대입 개편, 준비는 이번 겨울부터. 달라진 입시에 맞춘 선제적 학습 전략. 1월 4일(월) 개강">
+    </picture>
   </header>
 
   <!-- ================= 2028 대입 판이 바뀐다 (배너) ================= -->
   <section class="news-band">
-    <img src="news.webp?v=2"
-         alt="속보 - 2028 대입 개편, 입시 판 전면 재편. 내신 5등급제·통합형 수능 도입 예고, 학생·학부모 조기 대비 필요">
-    <img class="news-foot" src="news-foot.webp?v=2" alt="" aria-hidden="true">
+    <picture>
+      <source media="(max-width:768px)" srcset="news-mo.webp?v=1">
+      <img src="news.webp?v=2"
+           alt="속보 - 2028 대입 개편, 입시 판 전면 재편. 내신 5등급제·통합형 수능 도입 예고, 학생·학부모 조기 대비 필요">
+    </picture>
+    <picture class="news-foot">
+      <source media="(max-width:768px)" srcset="news-foot-mo.webp?v=1">
+      <img src="news-foot.webp?v=2" alt="" aria-hidden="true">
+    </picture>
   </section>
 
   <!-- ================= 무엇이 달라지나요 ================= -->
@@ -846,7 +1000,7 @@ strong{font-weight:800}
       <div class="sd-inner">
         <h2 class="sd-title reveal"><em>윈터스쿨</em> 등록 절차</h2>
         <div class="sd-flow-grid">
-          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-347-5151</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-386-1881</p></article>
           <article class="sd-flow-card reveal"><small>STEP 02</small><h3>진단평가/서류제출</h3><p>진단평가 또는 성적표 제출</p></article>
           <article class="sd-flow-card reveal"><small>STEP 03</small><h3>상담/반 편성</h3><p>진단평가 및 성적표 기반으로<br>상담 후 반 편성 진행</p></article>
           <article class="sd-flow-card reveal"><small>STEP 04</small><h3>등록 완료</h3><p>사전예약금 및 수강료 납부 후 등록 완료</p></article>
@@ -916,7 +1070,7 @@ strong{font-weight:800}
       <div class="cta-row">
         <div class="cta-copy reveal">
           <h2><span class="lead-line">2028 대입을 앞서는 선택,</span><br><span class="strong-line">지금 시작해야</span> <span class="accent">앞서갑니다.</span></h2>
-          <p class="cta-sub">2027 5A 윈터스쿨에서 새로운 입시의 첫걸음을 함께하세요.</p>
+          <p class="cta-sub">2027 윈터스쿨에서 새로운 입시의 첫걸음을 함께하세요.</p>
         </div>
         <dl class="info-list reveal">
           <div>
@@ -935,7 +1089,7 @@ strong{font-weight:800}
             <span class="info-ic"><svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M14 8l6 8-5 5c2 5 6 9 11 11l5-5 8 6-4 6c-1 1-3 1-4 1C19 38 10 29 7 16c0-1 0-3 1-4l6-4z"/>
             </svg></span>
-            <dt>상담 문의</dt><dd>031-347-5151</dd>
+            <dt>상담 문의</dt><dd>031-386-1881</dd>
           </div>
         </dl>
       </div>
