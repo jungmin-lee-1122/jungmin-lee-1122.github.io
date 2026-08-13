@@ -196,6 +196,9 @@ strong{font-weight:800}
 .deco-pencil{left:clamp(3%,5vw,10%);top:10%;width:clamp(66px,5.6vw,130px);opacity:.7;transform:rotate(-18deg)}
 .deco-slim{left:clamp(11%,14vw,26%);bottom:4%;width:clamp(95px,8.4vw,190px);opacity:.6;transform:rotate(-6deg)}
 .deco-cal{right:clamp(1%,3vw,6%);bottom:6%;width:clamp(100px,9vw,200px);opacity:.75;transform:rotate(7deg)}
+/* 모바일 전용 소품 — 흐름 안에 놓아 텍스트를 가리지 않음 */
+.cta-props{display:none}
+.cta-props .prop{height:auto;filter:drop-shadow(0 12px 26px rgba(8,26,74,.3))}
 
 /* ---------- CHANGE SECTION (무엇이 달라지나요) ---------- */
 .change{
@@ -602,6 +605,7 @@ strong{font-weight:800}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
   .cta-row{flex-direction:column;align-items:flex-start;gap:clamp(18px,2.6vw,30px)}
+  .cta-copy{flex:0 0 auto;width:100%}   /* 세로 정렬에선 basis가 '높이'가 되므로 해제 */
   .info-list{width:100%;align-items:flex-start}
 }
 @media (max-width:560px){
@@ -735,8 +739,14 @@ strong{font-weight:800}
   .info-ic{width:52px;height:52px;border-width:2px}
   .info-list dt{font-size:13px}
   .info-list dd{font-size:18px}
-  .deco-note{width:96px;bottom:3%;opacity:.55}
-  .deco-cal{width:82px;bottom:3%;opacity:.55}
+  .cta-deco{display:none}      /* 배경 오브제 해제 */
+  .cta-props{
+    display:flex;align-items:flex-end;justify-content:center;
+    gap:clamp(18px,6vw,34px);margin-top:36px;
+  }
+  .cta-props .prop-note{width:clamp(58px,16vw,88px)}
+  .cta-props .prop-pencil{width:clamp(22px,6vw,34px);transform:rotate(-14deg)}
+  .cta-props .prop-cal{width:clamp(54px,15vw,82px);transform:rotate(7deg)}
 }
 
 /* ===== 소형 기기 ===== */
@@ -752,7 +762,7 @@ strong{font-weight:800}
   .cta-row{gap:14px}
   .info-list{gap:12px}
   .ch-card h3{font-size:18px}
-  .deco-note,.deco-cal{display:none}
+  .cta-props{margin-top:28px;gap:16px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1140,6 +1150,44 @@ strong{font-weight:800}
             <dt>상담 문의</dt><dd>031-386-1881</dd>
           </div>
         </dl>
+      </div>
+
+      <div class="cta-props" aria-hidden="true">
+        <svg class="prop prop-note" viewBox="0 0 160 190" xmlns="http://www.w3.org/2000/svg">
+          <g transform="rotate(-6 80 95)">
+            <rect x="20" y="18" width="122" height="156" rx="12" fill="#ffffff"/>
+            <rect x="20" y="18" width="22" height="156" rx="11" fill="#cbdcfd"/>
+            <g fill="#dbe6fb">
+              <rect x="56" y="52" width="70" height="8" rx="4"/><rect x="56" y="76" width="54" height="8" rx="4"/>
+              <rect x="56" y="100" width="64" height="8" rx="4"/><rect x="56" y="124" width="42" height="8" rx="4"/>
+            </g>
+            <g fill="#8fb0f5">
+              <circle cx="31" cy="44" r="6"/><circle cx="31" cy="76" r="6"/>
+              <circle cx="31" cy="108" r="6"/><circle cx="31" cy="140" r="6"/>
+            </g>
+          </g>
+        </svg>
+
+        <svg class="prop prop-pencil" viewBox="0 0 60 180" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 26h32v118H14z" fill="#ffe2a3"/>
+          <path d="M14 26h12v118H14z" fill="#ffd27a"/>
+          <path d="M14 144h32l-16 26z" fill="#f6efe0"/>
+          <path d="M24 158l6 12 6-12z" fill="#3b4a6b"/>
+          <rect x="14" y="12" width="32" height="16" rx="5" fill="#cbdcfd"/>
+        </svg>
+
+        <svg class="prop prop-cal" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="16" y="26" width="128" height="118" rx="14" fill="#ffffff"/>
+          <path d="M16 40a14 14 0 0114-14h100a14 14 0 0114 14v18H16z" fill="#4a90e2"/>
+          <rect x="44" y="14" width="12" height="26" rx="6" fill="#2f6fc9"/>
+          <rect x="104" y="14" width="12" height="26" rx="6" fill="#2f6fc9"/>
+          <g fill="#d7e4fb">
+            <rect x="34" y="74" width="20" height="16" rx="4"/><rect x="70" y="74" width="20" height="16" rx="4"/>
+            <rect x="106" y="74" width="20" height="16" rx="4"/><rect x="34" y="102" width="20" height="16" rx="4"/>
+            <rect x="106" y="102" width="20" height="16" rx="4"/>
+          </g>
+          <rect x="70" y="102" width="20" height="16" rx="4" fill="#ffd27a"/>
+        </svg>
       </div>
     </div>
   </section>
