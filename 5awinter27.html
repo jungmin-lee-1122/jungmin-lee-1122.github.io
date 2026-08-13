@@ -164,7 +164,7 @@ strong{font-weight:800}
 }
 /* 오른쪽 정보 — 세로 스택, 우측 정렬 */
 .info-list{
-  flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;
   gap:clamp(18px,1.9vw,42px);text-align:left;
 }
 .info-list > div{
@@ -185,7 +185,7 @@ strong{font-weight:800}
   width:52%;height:52%;color:#fff;opacity:.98;margin:0;
 }
 .info-list dt{font-size:clamp(15px,1.4vw,32px);color:#bfd7ff;margin-bottom:.25em;letter-spacing:-.02em}
-.info-list dd{font-size:clamp(21px,2vw,46px);font-weight:800;letter-spacing:-.03em;color:#fff}
+.info-list dd{font-size:clamp(21px,2vw,46px);font-weight:800;letter-spacing:-.03em;color:#fff;white-space:nowrap}
 /* 배경 장식 — 말풍선 섹션의 오브제와 같은 계열, 다른 소품으로 */
 .cta-deco{position:absolute;inset:0;z-index:1;pointer-events:none}
 .cta-deco svg{position:absolute;filter:drop-shadow(0 18px 34px rgba(8,26,74,.28))}
