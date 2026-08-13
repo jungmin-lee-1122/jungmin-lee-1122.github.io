@@ -20,10 +20,9 @@
   --gray:#5c6a83;
   --bg:#f2f6fc;
   --bridge-navy:#132d66;   /* 히어로 하단 정리색 */
-  --news-dark:#241405;     /* 뉴스 배너 바탕색 */
+  --news-dark:#06070d;     /* 뉴스 배너 바탕색(새 이미지 상단) */
   --fade-hero:clamp(120px,14vw,290px);   /* 히어로 하단 페이드 길이 */
   --run-top:clamp(150px,17vw,360px);     /* 히어로 → 뉴스 전환 길이 */
-  --run-bottom:clamp(170px,20vw,400px);  /* 뉴스 → 밝은 섹션 전환 길이 */
   --line:#dfe7f4;
   --inner:1560px;              /* 큰 화면에서 콘텐츠 최대 폭 */
   --pad:clamp(20px,4vw,80px);  /* 좌우 여백 */
@@ -60,38 +59,25 @@ strong{font-weight:800}
 /* ---------- NEWS BANNER (히어로 → 밝은 섹션 연결) ---------- */
 .news-band{
   position:relative;width:100%;line-height:0;
-  padding-top:var(--run-top);      /* 남색이 갈색으로 넘어가는 활주로 */
-  padding-bottom:var(--run-bottom);/* 갈색이 밝은 섹션으로 풀리는 활주로 */
+  padding-top:var(--run-top);      /* 남색이 검정으로 넘어가는 활주로 */
   background-color:var(--news-dark);
 }
-/* 남색 → 갈색 (이미지 상단까지 투명하게 이어져 이음새 제거) */
+/* 남색 → 검정 (이미지 상단까지 투명하게 이어져 이음새 제거) */
 .news-band::before{
   content:"";position:absolute;left:0;right:0;top:0;z-index:2;
   height:calc(var(--run-top) + clamp(50px,5vw,110px));
   background:linear-gradient(180deg,
     var(--bridge-navy) 0%,
-    #172a56 22%,
-    #1e2338 42%,
-    #2a1c10 60%,
-    var(--news-dark) 76%,
-    rgba(36,20,5,0) 100%);
+    #10224b 24%,
+    #0a1330 46%,
+    #070c1a 64%,
+    var(--news-dark) 78%,
+    rgba(6,7,13,0) 100%);
   pointer-events:none;
 }
 .news-band img{position:relative;z-index:1;display:block;width:100%;height:auto}
-/* 이미지 하단 → 어둠 유지 → 밝은 섹션으로 용해 */
-.news-band::after{
-  content:"";position:absolute;left:0;right:0;bottom:0;z-index:2;
-  height:calc(var(--run-bottom) + clamp(50px,5vw,110px));
-  background:linear-gradient(180deg,
-    rgba(36,20,5,0) 0%,
-    var(--news-dark) 12%,
-    var(--news-dark) 24%,   /* 어둠 유지 구간(짧게) */
-    #33291f 42%,
-    #6f7686 64%,
-    #c3cee2 84%,
-    var(--bg) 100%);
-  pointer-events:none;
-}
+/* 하단은 news-foot.webp(이미지 마지막 줄 색을 그대로 이어받아 밝은 색으로 용해)가 담당 */
+.news-foot{display:block;width:100%;height:auto;margin-top:-1px;position:relative;z-index:1}
 
 /* ---------- SECTION SHELL ---------- */
 .section{width:100%;padding:clamp(56px,7vw,130px) var(--pad)}
@@ -274,7 +260,8 @@ strong{font-weight:800}
   <!-- ================= 2028 대입 판이 바뀐다 (배너) ================= -->
   <section class="news-band">
     <img src="news.webp"
-         alt="2028 대입 판이 바뀐다! 내신만도, 수능만도 아닌 전면적인 변화?">
+         alt="속보 - 2028 대입 개편, 입시 판 전면 재편. 내신 5등급제·통합형 수능 도입 예고, 학생·학부모 조기 대비 필요">
+    <img class="news-foot" src="news-foot.webp" alt="" aria-hidden="true">
   </section>
 
   <!-- ================= 무엇이 달라지나요 ================= -->
