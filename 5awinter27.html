@@ -384,21 +384,22 @@ strong{font-weight:800}
   --sd-blue2:#006fff;
   --sd-navy:#0e2550;
   --sd-sky:#eaf3ff;
-  --sd-sky2:#f5f9ff;
   --sd-line:#d7e4f7;
   --sd-red:#ff4d39;
-  --sd-max:1120px;
+  --sd-max:2200px;
   display:block;background:#fff;color:var(--sd-navy);letter-spacing:-0.04em;
 }
-.rules-wrap section{position:relative;padding:110px 20px;overflow:hidden}
+.rules-wrap section{position:relative;padding:clamp(90px,10vw,250px) var(--pad);overflow:hidden}
 .rules-wrap .sd-inner{width:min(var(--sd-max),100%);margin:0 auto;position:relative;z-index:2}
 .rules-wrap .sd-title{
-  margin-top:0;font-size:clamp(38px,5vw,72px);
-  color:var(--sd-blue);font-weight:950;text-align:center;letter-spacing:-0.04em;
+  margin-top:0;font-size:clamp(44px,5.6vw,150px);
+  color:var(--sd-blue);font-weight:950;text-align:center;
+  letter-spacing:-0.045em;line-height:1.18;
 }
 .rules-wrap .sd-title em{font-style:normal;color:#222}
 .rules-wrap .sd-desc{
-  margin-top:22px;font-size:21px;line-height:1.65;
+  margin-top:clamp(24px,2.4vw,52px);
+  font-size:clamp(19px,1.85vw,44px);line-height:1.6;
   color:#394760;font-weight:650;text-align:center;
 }
 /* 모집요강 */
@@ -407,34 +408,53 @@ strong{font-weight:800}
   background-image:linear-gradient(180deg,#eaf7ff 0%,#f7fbff 62%,#ffffff 100%);
   overflow:hidden;
 }
-.sd-accordion{margin-top:42px;display:grid;gap:14px}
-.sd-acc-item{overflow:hidden;border-radius:24px;border:1px solid var(--sd-line);background:#fff}
+.sd-accordion{margin-top:clamp(44px,4.6vw,110px);display:grid;gap:14px}
+.sd-acc-item{
+  overflow:hidden;border-radius:clamp(20px,2.2vw,52px);
+  border:1px solid var(--sd-line);background:#fff;
+}
 .sd-acc-title{
-  width:100%;min-height:82px;display:flex;align-items:center;gap:18px;
-  padding:0 30px;color:var(--sd-navy);background:#fff;
-  font-size:23px;font-weight:950;text-align:left;
+  width:100%;min-height:clamp(84px,8vw,190px);display:flex;align-items:center;
+  padding:0 clamp(30px,3vw,72px);color:var(--sd-navy);background:#fff;
+  font-size:clamp(24px,2.4vw,56px);font-weight:950;text-align:left;
 }
-.sd-acc-content{padding:0 30px 34px}
-.sd-info-table{width:100%;border-collapse:collapse;overflow:hidden;border-top:3px solid var(--sd-blue)}
+.sd-acc-content{padding:0 clamp(30px,3vw,72px) clamp(36px,3.6vw,84px)}
+.sd-info-table{
+  width:100%;border-collapse:collapse;overflow:hidden;
+  border-top:clamp(3px,.3vw,7px) solid var(--sd-blue);
+}
 .sd-info-table th,.sd-info-table td{
-  border-bottom:1px solid #dbe4f1;padding:16px 18px;
-  font-size:16px;line-height:1.55;text-align:left;
+  border-bottom:1px solid #dbe4f1;
+  padding:clamp(17px,1.7vw,40px) clamp(18px,1.8vw,42px);
+  font-size:clamp(17px,1.6vw,37px);line-height:1.55;text-align:left;
 }
-.sd-info-table th{width:170px;background:#edf5ff;color:var(--sd-blue);font-weight:950}
+.sd-info-table th{
+  width:clamp(170px,15vw,380px);background:#edf5ff;
+  color:var(--sd-blue);font-weight:950;
+}
 .sd-info-table td{color:#2e3d57;font-weight:650}
-.sd-notice{margin-top:18px;color:var(--sd-red);font-size:14px;line-height:1.5;font-weight:800}
+.sd-notice{
+  margin-top:clamp(20px,1.9vw,44px);color:var(--sd-red);
+  font-size:clamp(15px,1.4vw,32px);line-height:1.5;font-weight:800;
+}
 /* 등록 절차 */
 .sd-apply-flow{background:linear-gradient(180deg,#f7fbff 0%,#fff 100%)}
-.sd-flow-grid{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.sd-flow-grid{
+  margin-top:clamp(46px,4.8vw,115px);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.5vw,34px);
+}
 .sd-flow-card{
-  padding:26px 18px;border-radius:24px;background:#fff;border:1px solid var(--sd-line);
+  padding:clamp(28px,2.9vw,68px) clamp(20px,2vw,46px);
+  border-radius:clamp(20px,2.2vw,52px);background:#fff;border:1px solid var(--sd-line);
   box-shadow:0 16px 34px rgba(10,69,150,.06);text-align:center;align-content:center;
 }
-.sd-flow-card small{color:var(--sd-blue);font-size:14px;font-weight:950}
-.sd-flow-card h3{margin-top:10px;font-size:21px}
-.sd-flow-card p{margin-top:12px;color:#53627a;font-size:15px;line-height:1.5;font-weight:600}
+.sd-flow-card small{color:var(--sd-blue);font-size:clamp(15px,1.4vw,32px);font-weight:950}
+.sd-flow-card h3{margin-top:clamp(11px,1.1vw,26px);font-size:clamp(23px,2.2vw,50px);line-height:1.3}
+.sd-flow-card p{
+  margin-top:clamp(13px,1.3vw,30px);color:#53627a;
+  font-size:clamp(16px,1.55vw,35px);line-height:1.5;font-weight:600;
+}
 @media (max-width:980px){
-  .rules-wrap section{padding:78px 18px}
   .sd-flow-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width:640px){
@@ -443,7 +463,7 @@ strong{font-weight:800}
   .sd-flow-grid{grid-template-columns:1fr}
   .sd-acc-title{min-height:auto;padding:22px 20px;font-size:19px}
   .sd-acc-content{padding:0 20px 26px}
-  .sd-info-table th,.sd-info-table td{display:block;width:100%}
+  .sd-info-table th,.sd-info-table td{display:block;width:100%;font-size:16px}
 }
 
 /* ---------- REVEAL ---------- */
@@ -714,8 +734,8 @@ strong{font-weight:800}
   <div class="rules-wrap">
     <section class="sd-detail" id="detail">
       <div class="sd-inner">
-        <h2 class="sd-title reveal"><em>상세</em> 모집요강</h2>
-        <p class="sd-desc reveal">학년별 과정이 다르므로 학생의 학년에 맞는 요강을 확인해 주세요.</p>
+        <h2 class="sd-title reveal"><em>윈터스쿨</em> 모집요강</h2>
+        <p class="sd-desc reveal">새 학년이 시작되기 전, 부족한 영역을 진단하고<br>다음 학년의 학습 흐름을 먼저 완성합니다.</p>
 
         <div class="sd-accordion">
           <div class="sd-acc-item reveal">
@@ -738,7 +758,7 @@ strong{font-weight:800}
       <div class="sd-inner">
         <h2 class="sd-title reveal">등록 절차</h2>
         <div class="sd-flow-grid">
-          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-000-0000</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-386-1881</p></article>
           <article class="sd-flow-card reveal"><small>STEP 02</small><h3>진단평가/서류제출</h3><p>진단평가 또는 성적표 제출</p></article>
           <article class="sd-flow-card reveal"><small>STEP 03</small><h3>상담/반 편성</h3><p>진단평가 및 성적표 기반으로<br>상담 후 반 편성 진행</p></article>
           <article class="sd-flow-card reveal"><small>STEP 04</small><h3>등록 완료</h3><p>사전예약금 및 수강료 납부 후 등록 완료</p></article>
@@ -772,7 +792,7 @@ strong{font-weight:800}
             <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M14 8l6 8-5 5c2 5 6 9 11 11l5-5 8 6-4 6c-1 1-3 1-4 1C19 38 10 29 7 16c0-1 0-3 1-4l6-4z"/>
             </svg>
-            <dt>상담 문의</dt><dd>031-000-0000</dd>
+            <dt>상담 문의</dt><dd>031-386-1881</dd>
           </div>
         </dl>
       </div>
