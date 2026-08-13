@@ -19,7 +19,7 @@
   --ink:#16233c;
   --gray:#5c6a83;
   --bg:#f2f6fc;
-  --ch-blue:#8dc0fa;       /* 달라지나요 섹션 배경 */
+  --ch-blue:#7fc3ff;       /* 달라지나요 섹션 배경(이미지 하단색) */
   --ch-light:#f3f6fc;      /* 상단 밝은 영역 */
   --ch-navy:#142a68;       /* 진한 남색 텍스트 */
   --ch-badge:#6a8bf8;      /* 번호 배지 */
@@ -115,50 +115,17 @@ strong{font-weight:800}
 /* ---------- CHANGE SECTION (무엇이 달라지나요) ---------- */
 .change{
   position:relative;width:100%;overflow:hidden;
-  background:var(--ch-blue);
-  padding:0 var(--pad) clamp(90px,10vw,220px);
-}
-/* 위쪽 밝은 영역 + 아래로 볼록한 곡선 */
-.change-arc{
-  position:absolute;top:0;left:-6%;width:112%;
-  height:clamp(210px,26vw,560px);
-  background:var(--ch-light);
-  border-bottom-left-radius:50% 22%;
-  border-bottom-right-radius:50% 22%;
+  /* 곡선·제목·책 아이콘은 배경 이미지가 담당 (2560x960) */
+  background:url("change-bg.webp?v=1") top center / 100% auto no-repeat, var(--ch-blue);
+  /* 이미지 안에서 파란 영역이 시작되는 지점(약 y=350/2560) 아래로 카드 배치 */
+  padding:17.6vw var(--pad) clamp(90px,10vw,220px);
 }
 .change .inner{position:relative;z-index:1;max-width:2200px}
-.change-head{text-align:center;padding-top:clamp(46px,5vw,120px)}
-.pill-row{
-  display:flex;align-items:center;justify-content:center;
-  gap:clamp(6px,.6vw,14px);
-}
-.ch-pill{
-  position:relative;
-  border:clamp(2px,.18vw,4px) solid var(--ch-navy);
-  color:var(--ch-navy);background:transparent;
-  border-radius:999px;
-  padding:clamp(9px,.9vw,20px) clamp(24px,2.4vw,58px);
-  font-size:clamp(16px,1.55vw,34px);font-weight:800;letter-spacing:-.03em;
-}
-.ch-pill::before,.ch-pill::after{
-  content:"";position:absolute;left:50%;translate:-50% 0;
-  width:0;height:0;border-left:clamp(7px,.65vw,15px) solid transparent;
-  border-right:clamp(7px,.65vw,15px) solid transparent;
-}
-.ch-pill::before{bottom:calc(-1 * clamp(13px,1.2vw,28px));border-top:clamp(13px,1.2vw,28px) solid var(--ch-navy)}
-.ch-pill::after{bottom:calc(-1 * clamp(9px,.85vw,20px));border-top:clamp(9px,.85vw,20px) solid var(--ch-light)}
-.ch-books{width:clamp(46px,4.4vw,100px);height:auto;margin-left:clamp(-14px,-1vw,-6px)}
-.change-head h2{
-  margin-top:clamp(22px,2.4vw,54px);
-  font-size:clamp(34px,5vw,104px);font-weight:900;
-  color:var(--ch-navy);letter-spacing:-.04em;line-height:1.25;
-}
 
 /* 카드 3장 */
 .ch-cards{
   display:grid;grid-template-columns:repeat(3,1fr);
   gap:clamp(20px,2.4vw,56px);
-  margin-top:clamp(56px,7vw,170px);
 }
 .ch-card{
   border-radius:clamp(18px,2vw,46px);
@@ -436,7 +403,6 @@ strong{font-weight:800}
 }
 @media (max-width:960px){
   .ch-cards{grid-template-columns:1fr;gap:18px}
-  .change-arc{height:clamp(190px,40vw,320px)}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
   .cta-row{flex-direction:column;align-items:flex-start}
@@ -470,24 +436,7 @@ strong{font-weight:800}
 
   <!-- ================= 무엇이 달라지나요 ================= -->
   <section class="change">
-    <div class="change-arc" aria-hidden="true"></div>
     <div class="inner">
-      <div class="change-head">
-        <div class="pill-row">
-          <span class="ch-pill">2028 대입,</span>
-          <svg class="ch-books" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <g transform="rotate(-8 60 60)">
-              <rect x="12" y="66" width="96" height="16" rx="5" fill="#ffffff"/>
-              <rect x="16" y="56" width="92" height="14" rx="5" fill="#e8f0fb"/>
-              <rect x="10" y="30" width="100" height="30" rx="7" fill="#4a90e2"/>
-              <rect x="10" y="30" width="100" height="12" rx="6" fill="#7bb4ef"/>
-              <rect x="52" y="30" width="14" height="30" fill="#3d7fc9" opacity=".55"/>
-            </g>
-          </svg>
-        </div>
-        <h2>무엇이 달라지나요?</h2>
-      </div>
-
       <div class="ch-cards">
         <article class="ch-card">
           <div class="ch-badge">01</div>
