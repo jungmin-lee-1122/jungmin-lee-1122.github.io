@@ -308,6 +308,19 @@ strong{font-weight:800}
 .bubbles.on .brow:nth-child(3) .bubble:nth-child(1){animation-delay:.89s}
 .bubbles.on .brow:nth-child(3) .bubble:nth-child(2){animation-delay:1.10s}
 
+/* 등장이 끝난 뒤: 마우스 오버 / 터치하면 흔들림 */
+.bubble.done{opacity:1;transform:none;animation:none}
+.bubble.done:hover,
+.bubble.done:active{animation:wobble .58s cubic-bezier(.36,.07,.19,.97)}
+@keyframes wobble{
+  0%{transform:rotate(0) scale(1)}
+  18%{transform:rotate(-2.6deg) scale(1.045)}
+  36%{transform:rotate(2.1deg) scale(1.04)}
+  54%{transform:rotate(-1.5deg) scale(1.02)}
+  72%{transform:rotate(.9deg) scale(1.01)}
+  100%{transform:rotate(0) scale(1)}
+}
+
 /* 마무리 */
 .ask-stem{
   width:2px;height:clamp(58px,6vw,135px);
@@ -767,6 +780,7 @@ strong{font-weight:800}
 
 @media (prefers-reduced-motion:reduce){
   .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
+  .bubble.done:hover,.bubble.done:active{animation:none !important}
   .w-conclusion,.w-conclusion::after{animation:none !important}
   .reveal{opacity:1;transform:none;transition:none}
 }
@@ -1200,8 +1214,14 @@ strong{font-weight:800}
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
       !('IntersectionObserver' in window)) {
     boxes.forEach(function(b){ b.classList.add('on'); });
+    document.querySelectorAll('.bubble').forEach(function(b){ b.classList.add('done'); });
     return;
   }
+  document.querySelectorAll('.bubble').forEach(function(b){
+    b.addEventListener('animationend', function(ev){
+      if (ev.animationName === 'pop') b.classList.add('done');
+    });
+  });
   var io = new IntersectionObserver(function(en){
     en.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
   }, { threshold: 0.2 });
