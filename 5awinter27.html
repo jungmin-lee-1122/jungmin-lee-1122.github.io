@@ -19,6 +19,9 @@
   --ink:#16233c;
   --gray:#5c6a83;
   --bg:#f2f6fc;
+  --w-bg:#0a0a0b;          /* 겨울방학 섹션 배경 */
+  --w-card:#1b1c1e;        /* 카드 배경 */
+  --w-blue:#3f9ae0;        /* 포인트 블루 */
   --bridge-navy:#132d66;   /* 히어로 하단 정리색 */
   --news-dark:#06070d;     /* 뉴스 배너 바탕색(새 이미지 상단) */
   --fade-hero:clamp(120px,14vw,290px);   /* 히어로 하단 페이드 길이 */
@@ -140,18 +143,96 @@ strong{font-weight:800}
 }
 .myth-note b{color:var(--yellow);font-weight:900}
 
-/* ---------- PILLARS ---------- */
-.pillar{
-  background:#fff;border:1px solid var(--line);border-top:4px solid var(--blue-600);
-  border-radius:12px;padding:clamp(24px,2.4vw,44px) clamp(14px,1.4vw,28px);
-  text-align:center;box-shadow:0 8px 24px rgba(20,50,110,.06);
+/* ---------- WINTER SECTION (다크) ---------- */
+.winter-section{
+  position:relative;width:100%;overflow:hidden;
+  padding:clamp(76px,9vw,160px) var(--pad);
+  color:#fff;
+  /* 위: 앞 섹션 남색에서, 아래: 다음 흰 섹션으로 자연스럽게 */
+  background:
+    linear-gradient(180deg,#123674 0%,#0d1a33 45%,var(--w-bg) 100%) top/100% clamp(70px,9vw,180px) no-repeat,
+    linear-gradient(180deg,var(--w-bg) 0%,#4a4c50 62%,#ffffff 100%) bottom/100% clamp(70px,9vw,180px) no-repeat,
+    var(--w-bg);
 }
-.pillar-head{display:flex;align-items:center;justify-content:center;gap:.5em;margin-bottom:clamp(14px,1.4vw,24px)}
-.pillar-num{font-size:clamp(19px,1.8vw,30px);font-weight:900;color:#b9c9e6;line-height:1}
-.pillar-en{font-size:clamp(11.5px,1vw,16px);font-weight:800;letter-spacing:.06em;color:var(--blue-600)}
-.pillar .icon{width:clamp(38px,3.4vw,62px);height:clamp(38px,3.4vw,62px)}
-.pillar p{font-size:clamp(13px,1.1vw,18px);color:var(--gray);line-height:1.75}
-.pillar p b{display:block;color:var(--navy-800);font-weight:800;font-size:clamp(14.5px,1.35vw,22px);margin-top:.2em}
+/* 은은한 격자 패턴 */
+.winter-section::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size:38px 38px;
+  -webkit-mask-image:radial-gradient(46% 62% at 30% 45%, #000 0%, transparent 78%);
+  mask-image:radial-gradient(46% 62% at 30% 45%, #000 0%, transparent 78%);
+}
+.winter-grid{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:clamp(36px,5vw,90px);align-items:center;
+  width:100%;max-width:var(--inner);margin:0 auto;
+}
+.winter-copy h2{
+  font-size:clamp(28px,3.4vw,52px);font-weight:900;
+  letter-spacing:-.035em;line-height:1.3;color:#fff;
+}
+.winter-copy p{
+  margin-top:clamp(18px,2vw,32px);
+  font-size:clamp(14px,1.25vw,20px);line-height:2;color:#a7adb6;
+  text-align:center;
+}
+
+/* 오른쪽 카드 블록 */
+.winter-cards{position:relative}
+.winter-rule{
+  width:clamp(56px,5vw,84px);height:3px;border-radius:2px;
+  background:var(--w-blue);margin:0 auto clamp(18px,2vw,34px);
+}
+.wcards{
+  position:relative;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:clamp(10px,1vw,18px);
+}
+.wcard{
+  background:var(--w-card);border-radius:clamp(10px,1vw,18px);
+  padding:clamp(22px,2.1vw,38px);
+  min-height:clamp(190px,17vw,280px);
+}
+.wcard--right{text-align:right}
+.wcard .n{font-size:clamp(15px,1.35vw,22px);font-weight:800;color:var(--w-blue);line-height:1}
+.wcard .en{
+  margin-top:.45em;font-size:clamp(15px,1.5vw,25px);font-weight:800;
+  letter-spacing:.01em;color:#fff;
+}
+.wcard .ko{
+  margin-top:.2em;font-size:clamp(15px,1.45vw,24px);font-weight:800;
+  letter-spacing:-.03em;color:#fff;
+}
+.wcard ul{list-style:none;margin-top:clamp(14px,1.4vw,24px)}
+.wcard li{font-size:clamp(12.5px,1.05vw,17px);line-height:1.85;color:#8b919b}
+/* 가운데 원형 배지 */
+.w-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;
+  width:clamp(118px,11.5vw,190px);height:clamp(118px,11.5vw,190px);
+  border-radius:50%;background:var(--w-blue);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;line-height:1.5;color:#fff;
+  box-shadow:0 0 0 clamp(7px,.8vw,13px) var(--w-bg);
+}
+.w-badge small{font-size:clamp(10.5px,.85vw,14px);font-weight:600;opacity:.95}
+.w-badge b{font-size:clamp(13px,1.15vw,19px);font-weight:800;letter-spacing:-.02em}
+/* 아래 화살표 + 결론 바 */
+.w-arrow{
+  width:0;height:0;margin:clamp(10px,1.1vw,18px) auto 0;
+  border-left:clamp(11px,1.1vw,18px) solid transparent;
+  border-right:clamp(11px,1.1vw,18px) solid transparent;
+  border-top:clamp(13px,1.3vw,22px) solid var(--w-blue);
+}
+.w-conclusion{
+  margin-top:clamp(8px,.9vw,14px);
+  background:var(--w-blue);color:#fff;border-radius:999px;
+  padding:clamp(14px,1.4vw,24px) clamp(20px,2vw,40px);
+  text-align:center;font-weight:800;letter-spacing:-.03em;
+  font-size:clamp(13.5px,1.25vw,21px);
+}
 
 /* ---------- GRADE CARDS ---------- */
 .grade{
@@ -233,6 +314,15 @@ strong{font-weight:800}
 .reveal.on{opacity:1;transform:none}
 
 /* ---------- RESPONSIVE ---------- */
+@media (max-width:1100px){
+  .winter-grid{grid-template-columns:1fr;gap:clamp(28px,4vw,48px)}
+  .winter-copy h2,.winter-copy p{text-align:center}
+}
+@media (max-width:640px){
+  .wcards{grid-template-columns:1fr}
+  .wcard,.wcard--right{text-align:left;min-height:0}
+  .w-badge{position:static;transform:none;margin:0 auto;box-shadow:none}
+}
 @media (max-width:960px){
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
@@ -317,47 +407,70 @@ strong{font-weight:800}
     </div>
   </section>
 
-  <!-- ================= 그래서 이번 겨울 ================= -->
-  <section class="section section-light">
-    <div class="inner">
-      <h2 class="h2 reveal">그래서, <span class="accent">이번 겨울이 중요합니다.</span></h2>
-      <p class="lead reveal">
-        학기 중에는 학교 수업과 내신에 쫓깁니다.<br>
-        새 학년이 시작되기 전, 부족한 영역을 진단하고<br>
-        다음 학년의 학습 흐름을 먼저 완성할 수 있는 시간은 겨울방학입니다.
-      </p>
-      <div class="grid-4">
-        <article class="pillar reveal">
-          <div class="pillar-head"><span class="pillar-num">01</span><span class="pillar-en">FOUNDATION</span></div>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M24 14C20 10 13 10 8 12v24c5-2 12-2 16 2 4-4 11-4 16-2V12c-5-2-12-2-16 2z"/><path d="M24 14v24"/>
-          </svg>
-          <p>국어·수학·영어<b>핵심 기반 완성</b></p>
-        </article>
-        <article class="pillar reveal">
-          <div class="pillar-head"><span class="pillar-num">02</span><span class="pillar-en">INTEGRATED</span></div>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-            <circle cx="24" cy="24" r="4"/><ellipse cx="24" cy="24" rx="17" ry="7"/>
-            <ellipse cx="24" cy="24" rx="17" ry="7" transform="rotate(60 24 24)"/>
-            <ellipse cx="24" cy="24" rx="17" ry="7" transform="rotate(120 24 24)"/>
-          </svg>
-          <p>통합사회·통합과학<b>수능 기반 구축</b></p>
-        </article>
-        <article class="pillar reveal">
-          <div class="pillar-head"><span class="pillar-num">03</span><span class="pillar-en">SCHOOL RECORD</span></div>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M8 40h32"/><rect x="11" y="26" width="7" height="12"/><rect x="22" y="18" width="7" height="20"/><rect x="33" y="10" width="7" height="28"/>
-          </svg>
-          <p>내신 5등급제 대비<b>학업관리 프로그램</b></p>
-        </article>
-        <article class="pillar reveal">
-          <div class="pillar-head"><span class="pillar-num">04</span><span class="pillar-en">ROADMAP</span></div>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="22" cy="26" r="14"/><circle cx="22" cy="26" r="7"/><circle cx="22" cy="26" r="1.5" fill="currentColor"/>
-            <path d="M22 26L40 8M34 8h6v6"/>
-          </svg>
-          <p>학년·계열·목표대학별<b>학습 로드맵 설계</b></p>
-        </article>
+  <!-- ================= 그래서 이번 겨울방학 ================= -->
+  <section class="winter-section">
+    <div class="winter-grid">
+      <div class="winter-copy reveal">
+        <h2>그래서, 이번 겨울방학이 중요합니다.</h2>
+        <p>
+          학기 중에는 학교 수업과 내신에 쫓깁니다.<br>
+          새 학년이 시작되기 전, 부족한 영역을 진단하고<br>
+          다음 학년의 학습 흐름을 먼저 완성할 수 있는 시간은 겨울방학입니다.
+        </p>
+      </div>
+
+      <div class="winter-cards reveal">
+        <div class="winter-rule"></div>
+        <div class="wcards">
+          <article class="wcard">
+            <div class="n">01</div>
+            <div class="en">FOUNDATION</div>
+            <div class="ko">핵심기반 완성</div>
+            <ul>
+              <li>국어·수학·영어</li>
+              <li>기초 개념 정리</li>
+              <li>학년별 기본기 완성</li>
+            </ul>
+          </article>
+
+          <article class="wcard wcard--right">
+            <div class="n">02</div>
+            <div class="en">INTEGRATED</div>
+            <div class="ko">수능 기반 구축</div>
+            <ul>
+              <li>통합사회·통합과학</li>
+              <li>통합형 수능 대비</li>
+              <li>전 영역 기본기 강화</li>
+            </ul>
+          </article>
+
+          <article class="wcard">
+            <div class="n">03</div>
+            <div class="en">SCHOOL RECORD</div>
+            <div class="ko">학업관리 프로그램</div>
+            <ul>
+              <li>내신 5등급제 대비</li>
+              <li>학습 진단·보완</li>
+              <li>학교 성적 관리</li>
+            </ul>
+          </article>
+
+          <article class="wcard wcard--right">
+            <div class="n">04</div>
+            <div class="en">ROADMAP</div>
+            <div class="ko">학습 로드맵 설계</div>
+            <ul>
+              <li>학년·계열·목표대학별</li>
+              <li>개인별 학습 방향</li>
+              <li>겨울방학 학습 설계</li>
+            </ul>
+          </article>
+
+          <div class="w-badge"><small>달라진 입시에 맞춘</small><b>겨울 전략 설계</b></div>
+        </div>
+
+        <div class="w-arrow" aria-hidden="true"></div>
+        <p class="w-conclusion">핵심을 다지고, 수능 기반을 세우고, 다음 학년의 방향까지 완성합니다.</p>
       </div>
     </div>
   </section>
