@@ -112,6 +112,58 @@ strong{font-weight:800}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.6vw,28px)}
 .grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(12px,1.4vw,24px)}
 
+/* ---------- GRADE CARDS ---------- */
+.grade{
+  position:relative;border-radius:10px;overflow:hidden;color:#fff;
+  padding:clamp(44px,4.6vw,110px) clamp(32px,3.6vw,90px) clamp(110px,10vw,230px);
+  min-height:clamp(380px,40vw,900px);
+}
+.g3{background:linear-gradient(150deg,#2f3f8f,#4b3f8e 60%,#3a4fa0)}
+.g2{background:linear-gradient(150deg,#123a7d,#1d5aa8 60%,#17457f)}
+.g1{background:linear-gradient(150deg,#0f5f6d,#187f7a 60%,#12666b)}
+.grade::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 80% 100%, rgba(255,255,255,.16), transparent 60%)}
+.grade > *{position:relative;z-index:1}
+.grade-tag{
+  display:inline-block;background:rgba(255,255,255,.95);color:var(--navy-800);
+  font-size:clamp(17px,1.7vw,36px);font-weight:800;
+  padding:.35em 1.1em;border-radius:999px;margin-bottom:clamp(22px,2.4vw,56px);
+}
+.grade h3{font-size:clamp(26px,2.9vw,64px);font-weight:900;line-height:1.4;letter-spacing:-.03em;margin-bottom:.5em}
+.grade p{font-size:clamp(17px,1.75vw,38px);line-height:1.85;color:rgba(255,255,255,.9)}
+.grade .g-icon{
+  position:absolute;right:clamp(20px,2vw,44px);bottom:clamp(18px,2vw,40px);
+  width:clamp(56px,5.4vw,130px);height:clamp(56px,5.4vw,130px);color:rgba(255,255,255,.85);
+}
+
+/* ---------- CTA ---------- */
+.cta{
+  position:relative;width:100%;overflow:hidden;
+  background:var(--ask-blue);   /* 말풍선 섹션과 같은 파랑 */
+  color:#fff;padding:clamp(110px,12vw,300px) var(--pad);
+}
+.cta .inner{position:relative;z-index:2}
+.cta-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:clamp(40px,5vw,120px);flex-wrap:wrap;
+}
+.cta h2{font-size:clamp(42px,5.8vw,150px);font-weight:900;line-height:1.32;letter-spacing:-.04em}
+.cta h2 .accent{color:var(--yellow)}
+.cta-sub{margin-top:.7em;font-size:clamp(22px,2.2vw,50px);color:#dbe7ff;letter-spacing:-.03em}
+.info-list{display:flex;gap:clamp(36px,4.6vw,120px);text-align:center}
+.info-list .icon{
+  width:clamp(72px,6.6vw,160px);height:clamp(72px,6.6vw,160px);
+  color:#fff;opacity:.95;margin-bottom:.5em;
+}
+.info-list dt{font-size:clamp(20px,1.95vw,44px);color:#cfdfff;margin-bottom:.3em}
+.info-list dd{font-size:clamp(26px,2.5vw,58px);font-weight:800;letter-spacing:-.03em}
+/* 배경 장식 — 말풍선 섹션의 책 오브제와 같은 계열, 다른 소품으로 */
+.cta-deco{position:absolute;inset:0;z-index:1;pointer-events:none}
+.cta-deco svg{position:absolute;filter:drop-shadow(0 18px 34px rgba(8,26,74,.28))}
+.deco-note{left:clamp(0%,2vw,4%);bottom:6%;width:clamp(150px,14vw,320px)}
+.deco-cal{right:clamp(0%,2vw,4%);top:12%;width:clamp(140px,13vw,300px);transform:rotate(7deg)}
+.deco-pencil{left:clamp(6%,9vw,18%);top:9%;width:clamp(80px,7vw,160px);opacity:.75;transform:rotate(-18deg)}
+.deco-slim{right:clamp(5%,8vw,16%);bottom:8%;width:clamp(110px,10vw,230px);opacity:.8;transform:rotate(-6deg)}
+
 /* ---------- CHANGE SECTION (무엇이 달라지나요) ---------- */
 .change{
   position:relative;width:100%;overflow:hidden;
@@ -318,65 +370,52 @@ strong{font-weight:800}
 .w-badge b{font-size:clamp(17px,1.75vw,35px);font-weight:800;letter-spacing:-.02em}
 /* 아래 화살표 + 결론 바 */
 .w-arrow{
-  width:0;height:0;margin:clamp(16px,1.7vw,34px) auto 0;
-  border-left:clamp(17px,1.7vw,34px) solid transparent;
-  border-right:clamp(17px,1.7vw,34px) solid transparent;
-  border-top:clamp(20px,2vw,40px) solid var(--w-blue);
+  width:0;height:0;margin:clamp(18px,1.9vw,38px) auto 0;
+  border-left:clamp(20px,2vw,40px) solid transparent;
+  border-right:clamp(20px,2vw,40px) solid transparent;
+  border-top:clamp(23px,2.3vw,46px) solid var(--w-blue);
+  filter:drop-shadow(0 8px 18px rgba(63,154,224,.45));
 }
+/* 결론 바 — 이 섹션의 결론이므로 강조 */
 .w-conclusion{
-  margin-top:clamp(12px,1.3vw,26px);
-  background:var(--w-blue);color:#fff;border-radius:999px;
-  padding:clamp(20px,2.2vw,46px) clamp(28px,3vw,64px);
-  text-align:center;font-weight:800;letter-spacing:-.03em;
-  font-size:clamp(16px,1.8vw,37px);line-height:1.4;
+  position:relative;overflow:hidden;isolation:isolate;
+  margin:clamp(14px,1.5vw,30px) auto 0;
+  background:linear-gradient(100deg,#2c86e6 0%,#3f9ae0 46%,#5cb4f4 100%);
+  color:#eaf6ff;border-radius:999px;
+  padding:clamp(24px,2.5vw,54px) clamp(32px,3.4vw,78px);
+  text-align:center;font-weight:800;letter-spacing:-.035em;
+  font-size:clamp(19px,2.2vw,50px);line-height:1.4;
+  box-shadow:
+    inset 0 0 0 clamp(1px,.12vw,3px) rgba(255,255,255,.28),
+    0 22px 54px rgba(41,124,205,.45),
+    0 0 clamp(40px,5vw,110px) rgba(63,154,224,.30);
+  animation:glowPulse 3.4s ease-in-out infinite;
 }
-
-/* ---------- GRADE CARDS ---------- */
-.grade{
-  position:relative;border-radius:10px;overflow:hidden;color:#fff;
-  padding:clamp(44px,4.6vw,110px) clamp(32px,3.6vw,90px) clamp(110px,10vw,230px);
-  min-height:clamp(380px,40vw,900px);
+.w-conclusion b{
+  color:#fff;font-weight:900;
+  box-shadow:inset 0 -.22em 0 rgba(255,255,255,.28);
 }
-.g3{background:linear-gradient(150deg,#2f3f8f,#4b3f8e 60%,#3a4fa0)}
-.g2{background:linear-gradient(150deg,#123a7d,#1d5aa8 60%,#17457f)}
-.g1{background:linear-gradient(150deg,#0f5f6d,#187f7a 60%,#12666b)}
-.grade::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 80% 100%, rgba(255,255,255,.16), transparent 60%)}
-.grade > *{position:relative;z-index:1}
-.grade-tag{
-  display:inline-block;background:rgba(255,255,255,.95);color:var(--navy-800);
-  font-size:clamp(17px,1.7vw,36px);font-weight:800;
-  padding:.35em 1.1em;border-radius:999px;margin-bottom:clamp(22px,2.4vw,56px);
+/* 빛 훑고 지나가기 */
+.w-conclusion::after{
+  content:"";position:absolute;top:0;bottom:0;left:-40%;width:35%;
+  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.34),rgba(255,255,255,0));
+  transform:skewX(-18deg);pointer-events:none;
+  animation:sheen 4.2s ease-in-out infinite;
 }
-.grade h3{font-size:clamp(26px,2.9vw,64px);font-weight:900;line-height:1.4;letter-spacing:-.03em;margin-bottom:.5em}
-.grade p{font-size:clamp(17px,1.75vw,38px);line-height:1.85;color:rgba(255,255,255,.9)}
-.grade .g-icon{
-  position:absolute;right:clamp(20px,2vw,44px);bottom:clamp(18px,2vw,40px);
-  width:clamp(56px,5.4vw,130px);height:clamp(56px,5.4vw,130px);color:rgba(255,255,255,.85);
+@keyframes glowPulse{
+  0%,100%{box-shadow:
+    inset 0 0 0 clamp(1px,.12vw,3px) rgba(255,255,255,.28),
+    0 22px 54px rgba(41,124,205,.45),
+    0 0 clamp(40px,5vw,110px) rgba(63,154,224,.26)}
+  50%{box-shadow:
+    inset 0 0 0 clamp(1px,.12vw,3px) rgba(255,255,255,.42),
+    0 26px 62px rgba(41,124,205,.55),
+    0 0 clamp(60px,7vw,150px) rgba(90,180,244,.42)}
 }
-
-/* ---------- CTA ---------- */
-.cta{
-  width:100%;background:linear-gradient(120deg,#12439f,#1b56c8 55%,#1748a8);
-  color:#fff;padding:clamp(80px,9vw,220px) var(--pad);
+@keyframes sheen{
+  0%{left:-45%}
+  55%,100%{left:115%}
 }
-.cta-row{display:flex;align-items:center;justify-content:space-between;gap:clamp(28px,4vw,80px);flex-wrap:wrap}
-.cta h2{font-size:clamp(32px,4.1vw,92px);font-weight:900;line-height:1.4;letter-spacing:-.03em}
-.cta h2 .accent{color:var(--yellow)}
-.cta-sub{margin-top:.7em;font-size:clamp(18px,1.75vw,38px);color:#d5e3ff}
-.info-list{display:flex;gap:clamp(28px,4vw,80px);text-align:center}
-.info-list .icon{width:clamp(56px,5vw,120px);height:clamp(56px,5vw,120px);color:#fff;opacity:.95;margin-bottom:.5em}
-.info-list dt{font-size:clamp(17px,1.6vw,34px);color:#c7d9ff;margin-bottom:.3em}
-.info-list dd{font-size:clamp(20px,2vw,44px);font-weight:800}
-.cta-btn{
-  display:block;width:min(1080px,100%);margin:clamp(50px,5.4vw,130px) auto 0;
-  background:var(--yellow);color:#0f2b60;text-align:center;text-decoration:none;
-  font-size:clamp(22px,2.3vw,50px);font-weight:900;letter-spacing:-.02em;
-  padding:.85em 1.2em;border-radius:999px;box-shadow:0 12px 30px rgba(0,0,0,.25);
-  transition:transform .18s ease,box-shadow .18s ease;
-}
-.cta-btn:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(0,0,0,.32)}
-.cta-btn:focus-visible{outline:3px solid #fff;outline-offset:4px}
-
 
 /* ---------- 모집요강 · 등록절차 (썸머스쿨 sd- 스타일 이식) ---------- */
 .rules-wrap{
@@ -433,6 +472,10 @@ strong{font-weight:800}
   color:var(--sd-blue);font-weight:950;
 }
 .sd-info-table td{color:#2e3d57;font-weight:650}
+.sd-course-note{
+  margin-left:.4em;color:var(--sd-red);font-weight:900;
+  font-size:.82em;letter-spacing:-.03em;white-space:nowrap;
+}
 .sd-notice{
   margin-top:clamp(20px,1.9vw,44px);color:var(--sd-red);
   font-size:clamp(15px,1.4vw,32px);line-height:1.5;font-weight:800;
@@ -481,7 +524,9 @@ strong{font-weight:800}
   .bubble.lift{margin-bottom:0}
   .bubble.drop{margin-top:0}
   .ask-cursor{transform:translateX(28%)}
-  .deco-tilt,.deco-small{display:none}
+  .deco-tilt,.deco-small,.deco-pencil,.deco-slim{display:none}
+  .deco-note{bottom:2%;opacity:.7}
+  .deco-cal{top:4%;opacity:.7}
   .deco-stack{top:auto;bottom:4%;left:2%;opacity:.75}
   .deco-open{top:auto;bottom:3%;right:2%;opacity:.75}
 }
@@ -503,8 +548,8 @@ strong{font-weight:800}
 }
 @media (prefers-reduced-motion:reduce){
   .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
+  .w-conclusion,.w-conclusion::after{animation:none !important}
   .reveal{opacity:1;transform:none;transition:none}
-  .cta-btn{transition:none}
 }
 </style>
 </head>
@@ -692,7 +737,7 @@ strong{font-weight:800}
         </div>
 
         <div class="w-arrow" aria-hidden="true"></div>
-        <p class="w-conclusion">핵심을 다지고, 수능 기반을 세우고, 다음 학년의 방향까지 완성합니다.</p>
+        <p class="w-conclusion"><b>핵심</b>을 다지고, <b>수능 기반</b>을 세우고, <b>다음 학년의 방향</b>까지 완성합니다.</p>
       </div>
     </div>
   </section>
@@ -734,7 +779,7 @@ strong{font-weight:800}
   <div class="rules-wrap">
     <section class="sd-detail" id="detail">
       <div class="sd-inner">
-        <h2 class="sd-title reveal"><em>윈터스쿨</em> 모집요강</h2>
+        <h2 class="sd-title reveal"><em>2027 윈터스쿨</em> 모집요강</h2>
         <p class="sd-desc reveal">새 학년이 시작되기 전, 부족한 영역을 진단하고<br>다음 학년의 학습 흐름을 먼저 완성합니다.</p>
 
         <div class="sd-accordion">
@@ -745,6 +790,7 @@ strong{font-weight:800}
                 <tr><th>개강일</th><td>2027.01.04(월)</td></tr>
                 <tr><th>모집대상</th><td>예비 고1 · 예비 고2 · 예비 고3</td></tr>
                 <tr><th>교육과정</th><td>국어 · 수학 · 영어 핵심 기반 / 통합사회 · 통합과학 수능 기반 / 내신 5등급제 대비 학업관리</td></tr>
+                <tr><th>교육기간</th><td>2027년 1월 4일(월) ~ 2월 19일(금) <span class="sd-course-note">*7주과정</span></td></tr>
                 <tr><th>반 편성</th><td>진단평가 응시 후 상담을 통해 최종 반 편성</td></tr>
               </table>
               <p class="sd-notice">※ 2028 대입 개편에 맞춰 학년별 커리큘럼이 다르게 운영됩니다.</p>
@@ -756,7 +802,7 @@ strong{font-weight:800}
 
     <section class="sd-apply-flow" id="apply">
       <div class="sd-inner">
-        <h2 class="sd-title reveal">등록 절차</h2>
+        <h2 class="sd-title reveal"><em>윈터스쿨</em> 등록 절차</h2>
         <div class="sd-flow-grid">
           <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-386-1881</p></article>
           <article class="sd-flow-card reveal"><small>STEP 02</small><h3>진단평가/서류제출</h3><p>진단평가 또는 성적표 제출</p></article>
@@ -769,6 +815,61 @@ strong{font-weight:800}
 
   <!-- ================= CTA ================= -->
   <section class="cta">
+    <div class="cta-deco" aria-hidden="true">
+      <!-- 스프링 노트 -->
+      <svg class="deco-note" viewBox="0 0 160 190" xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(-6 80 95)">
+          <rect x="20" y="18" width="122" height="156" rx="12" fill="#ffffff"/>
+          <rect x="20" y="18" width="22" height="156" rx="11" fill="#cbdcfd"/>
+          <g fill="#dbe6fb">
+            <rect x="56" y="52" width="70" height="8" rx="4"/>
+            <rect x="56" y="76" width="54" height="8" rx="4"/>
+            <rect x="56" y="100" width="64" height="8" rx="4"/>
+            <rect x="56" y="124" width="42" height="8" rx="4"/>
+          </g>
+          <g fill="#8fb0f5">
+            <circle cx="31" cy="44" r="6"/><circle cx="31" cy="76" r="6"/>
+            <circle cx="31" cy="108" r="6"/><circle cx="31" cy="140" r="6"/>
+          </g>
+        </g>
+      </svg>
+
+      <!-- 달력 (개강일) -->
+      <svg class="deco-cal" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+        <rect x="16" y="26" width="128" height="118" rx="14" fill="#ffffff"/>
+        <path d="M16 40a14 14 0 0114-14h100a14 14 0 0114 14v18H16z" fill="#4a90e2"/>
+        <rect x="44" y="14" width="12" height="26" rx="6" fill="#2f6fc9"/>
+        <rect x="104" y="14" width="12" height="26" rx="6" fill="#2f6fc9"/>
+        <g fill="#d7e4fb">
+          <rect x="34" y="74" width="20" height="16" rx="4"/><rect x="70" y="74" width="20" height="16" rx="4"/>
+          <rect x="106" y="74" width="20" height="16" rx="4"/><rect x="34" y="102" width="20" height="16" rx="4"/>
+          <rect x="106" y="102" width="20" height="16" rx="4"/>
+        </g>
+        <rect x="70" y="102" width="20" height="16" rx="4" fill="#ffd27a"/>
+      </svg>
+
+      <!-- 연필 -->
+      <svg class="deco-pencil" viewBox="0 0 60 180" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 26h32v118H14z" fill="#ffe2a3"/>
+        <path d="M14 26h12v118H14z" fill="#ffd27a"/>
+        <path d="M14 144h32l-16 26z" fill="#f6efe0"/>
+        <path d="M24 158l6 12 6-12z" fill="#3b4a6b"/>
+        <rect x="14" y="12" width="32" height="16" rx="5" fill="#cbdcfd"/>
+      </svg>
+
+      <!-- 얇은 책 두 권 -->
+      <svg class="deco-slim" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(4 100 90)">
+          <rect x="16" y="80" width="168" height="24" rx="7" fill="#ffffff"/>
+          <rect x="16" y="80" width="168" height="8" rx="4" fill="#dfe9ff"/>
+        </g>
+        <g transform="rotate(-5 100 56)">
+          <rect x="26" y="48" width="148" height="24" rx="7" fill="#cbdcfd"/>
+          <rect x="26" y="48" width="148" height="8" rx="4" fill="#aec6fb"/>
+        </g>
+      </svg>
+    </div>
+
     <div class="inner">
       <div class="cta-row">
         <div class="reveal">
@@ -796,7 +897,6 @@ strong{font-weight:800}
           </div>
         </dl>
       </div>
-      <a class="cta-btn" href="#">윈터스쿨 상담 신청하기 &nbsp;&gt;</a>
     </div>
   </section>
 
