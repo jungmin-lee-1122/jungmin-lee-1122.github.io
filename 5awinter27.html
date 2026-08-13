@@ -1244,17 +1244,17 @@ strong{font-weight:800}
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   var mobile = window.matchMedia('(max-width:768px)').matches;
-  var count  = mobile ? 26 : 46;
+  var count  = mobile ? 42 : 78;
 
   for (var i = 0; i < count; i++) {
     var f = document.createElement('i');
-    var size = (Math.random() * (mobile ? 4 : 5) + 2);     // 2~7px
+    var size = (Math.random() * (mobile ? 7 : 10) + 4);    // 4~14px (모바일 4~11px)
     var depth = Math.random();                              // 0=가까움 1=멀리
     f.style.left = (Math.random() * 100) + '%';
     f.style.width = size + 'px';
     f.style.height = size + 'px';
-    f.style.opacity = (0.85 - depth * 0.55).toFixed(2);
-    f.style.filter = depth > 0.6 ? 'blur(1.2px)' : (depth > 0.3 ? 'blur(.5px)' : 'none');
+    f.style.opacity = (0.9 - depth * 0.5).toFixed(2);
+    f.style.filter = depth > 0.6 ? 'blur(2px)' : (depth > 0.3 ? 'blur(.8px)' : 'none');
     f.style.setProperty('--drift', (Math.random() * 60 - 26).toFixed(0) + 'px');
     f.style.animationDuration = (Math.random() * 7 + (mobile ? 9 : 8)) + 's';
     f.style.animationDelay = (-Math.random() * 16).toFixed(1) + 's';
