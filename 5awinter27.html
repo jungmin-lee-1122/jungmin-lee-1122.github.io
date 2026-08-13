@@ -55,7 +55,25 @@ strong{font-weight:800}
   background:#0a2258;   /* 이미지 로딩 전 색 */
   line-height:0;
 }
+.hero{--fall:44vw}            /* 눈이 떨어지는 거리 = 히어로 높이보다 조금 길게 */
 .hero picture{display:block}
+/* 눈 레이어 — 아래로 갈수록 사라지게(그라데이션 마스크) */
+.snow-layer{
+  position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.55) 74%,rgba(0,0,0,0) 96%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 46%,rgba(0,0,0,.55) 74%,rgba(0,0,0,0) 96%);
+}
+.snow-layer i{
+  position:absolute;top:-4%;display:block;border-radius:50%;
+  background:radial-gradient(circle at 34% 32%, #ffffff 0%, rgba(255,255,255,.85) 46%, rgba(255,255,255,.12) 100%);
+  animation:snowFall linear infinite;
+  will-change:transform;
+}
+@keyframes snowFall{
+  0%{transform:translate3d(0,0,0) scale(.85);opacity:0}
+  12%{opacity:1}
+  100%{transform:translate3d(var(--drift,14px),var(--fall),0) scale(1.05);opacity:0}
+}
 .hero img{display:block;width:100%;height:auto}
 /* 히어로 하단을 길게 남색으로 눌러 다음 배너로 넘어갈 준비 */
 .hero::after{
@@ -660,6 +678,7 @@ strong{font-weight:800}
   .sd-flow-card h3{font-size:clamp(19px,2.6vw,26px)}
   .sd-flow-card p{font-size:clamp(14px,1.9vw,18px)}
   .sd-flow-card small{font-size:clamp(13px,1.7vw,16px)}
+  .hero{--fall:60vw}
   .winter-section{
     padding:clamp(130px,17vw,190px) var(--pad) clamp(60px,9vw,110px);
     background-size:100% clamp(190px,24vw,240px), 100% clamp(150px,18vw,190px);
@@ -688,6 +707,7 @@ strong{font-weight:800}
   .section{padding:52px var(--pad)}
   .h2{font-size:26px;margin-bottom:26px}
   /* 배너 아래 카드가 파란 영역 안에 들어오도록 여백 보정 */
+  .hero{--fall:132vw}
   .change{padding-bottom:56px}
   .ch-cards{gap:14px}
   .ch-card{padding:28px 20px 30px;border-radius:16px}
@@ -799,6 +819,7 @@ strong{font-weight:800}
 
   <!-- ================= HERO (배너 이미지) ================= -->
   <header class="hero">
+    <div class="snow-layer" aria-hidden="true"></div>
     <picture>
       <source media="(max-width:768px)" srcset="hero-mo.webp?v=1">
       <img src="hero.webp?v=2"
@@ -1216,6 +1237,31 @@ strong{font-weight:800}
   </section>
 
 <script>
+// 히어로 눈 내리기
+(function(){
+  var layer = document.querySelector('.snow-layer');
+  if (!layer) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var mobile = window.matchMedia('(max-width:768px)').matches;
+  var count  = mobile ? 26 : 46;
+
+  for (var i = 0; i < count; i++) {
+    var f = document.createElement('i');
+    var size = (Math.random() * (mobile ? 4 : 5) + 2);     // 2~7px
+    var depth = Math.random();                              // 0=가까움 1=멀리
+    f.style.left = (Math.random() * 100) + '%';
+    f.style.width = size + 'px';
+    f.style.height = size + 'px';
+    f.style.opacity = (0.85 - depth * 0.55).toFixed(2);
+    f.style.filter = depth > 0.6 ? 'blur(1.2px)' : (depth > 0.3 ? 'blur(.5px)' : 'none');
+    f.style.setProperty('--drift', (Math.random() * 60 - 26).toFixed(0) + 'px');
+    f.style.animationDuration = (Math.random() * 7 + (mobile ? 9 : 8)) + 's';
+    f.style.animationDelay = (-Math.random() * 16).toFixed(1) + 's';
+    layer.appendChild(f);
+  }
+})();
+
 // 카드/말풍선 순차 등장
 (function(){
   var boxes = document.querySelectorAll('.ch-cards, .bubbles');
