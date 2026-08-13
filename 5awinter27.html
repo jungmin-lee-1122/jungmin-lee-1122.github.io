@@ -377,6 +377,75 @@ strong{font-weight:800}
 .cta-btn:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(0,0,0,.32)}
 .cta-btn:focus-visible{outline:3px solid #fff;outline-offset:4px}
 
+
+/* ---------- 모집요강 · 등록절차 (썸머스쿨 sd- 스타일 이식) ---------- */
+.rules-wrap{
+  --sd-blue:#064bb7;
+  --sd-blue2:#006fff;
+  --sd-navy:#0e2550;
+  --sd-sky:#eaf3ff;
+  --sd-sky2:#f5f9ff;
+  --sd-line:#d7e4f7;
+  --sd-red:#ff4d39;
+  --sd-max:1120px;
+  display:block;background:#fff;color:var(--sd-navy);letter-spacing:-0.04em;
+}
+.rules-wrap section{position:relative;padding:110px 20px;overflow:hidden}
+.rules-wrap .sd-inner{width:min(var(--sd-max),100%);margin:0 auto;position:relative;z-index:2}
+.rules-wrap .sd-title{
+  margin-top:0;font-size:clamp(38px,5vw,72px);
+  color:var(--sd-blue);font-weight:950;text-align:center;letter-spacing:-0.04em;
+}
+.rules-wrap .sd-title em{font-style:normal;color:#222}
+.rules-wrap .sd-desc{
+  margin-top:22px;font-size:21px;line-height:1.65;
+  color:#394760;font-weight:650;text-align:center;
+}
+/* 모집요강 */
+.sd-detail{
+  background-color:#eaf7ff;
+  background-image:linear-gradient(180deg,#eaf7ff 0%,#f7fbff 62%,#ffffff 100%);
+  overflow:hidden;
+}
+.sd-accordion{margin-top:42px;display:grid;gap:14px}
+.sd-acc-item{overflow:hidden;border-radius:24px;border:1px solid var(--sd-line);background:#fff}
+.sd-acc-title{
+  width:100%;min-height:82px;display:flex;align-items:center;gap:18px;
+  padding:0 30px;color:var(--sd-navy);background:#fff;
+  font-size:23px;font-weight:950;text-align:left;
+}
+.sd-acc-content{padding:0 30px 34px}
+.sd-info-table{width:100%;border-collapse:collapse;overflow:hidden;border-top:3px solid var(--sd-blue)}
+.sd-info-table th,.sd-info-table td{
+  border-bottom:1px solid #dbe4f1;padding:16px 18px;
+  font-size:16px;line-height:1.55;text-align:left;
+}
+.sd-info-table th{width:170px;background:#edf5ff;color:var(--sd-blue);font-weight:950}
+.sd-info-table td{color:#2e3d57;font-weight:650}
+.sd-notice{margin-top:18px;color:var(--sd-red);font-size:14px;line-height:1.5;font-weight:800}
+/* 등록 절차 */
+.sd-apply-flow{background:linear-gradient(180deg,#f7fbff 0%,#fff 100%)}
+.sd-flow-grid{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.sd-flow-card{
+  padding:26px 18px;border-radius:24px;background:#fff;border:1px solid var(--sd-line);
+  box-shadow:0 16px 34px rgba(10,69,150,.06);text-align:center;align-content:center;
+}
+.sd-flow-card small{color:var(--sd-blue);font-size:14px;font-weight:950}
+.sd-flow-card h3{margin-top:10px;font-size:21px}
+.sd-flow-card p{margin-top:12px;color:#53627a;font-size:15px;line-height:1.5;font-weight:600}
+@media (max-width:980px){
+  .rules-wrap section{padding:78px 18px}
+  .sd-flow-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .rules-wrap .sd-title{font-size:38px}
+  .rules-wrap .sd-desc{font-size:17px}
+  .sd-flow-grid{grid-template-columns:1fr}
+  .sd-acc-title{min-height:auto;padding:22px 20px;font-size:19px}
+  .sd-acc-content{padding:0 20px 26px}
+  .sd-info-table th,.sd-info-table td{display:block;width:100%}
+}
+
 /* ---------- REVEAL ---------- */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
 .reveal.on{opacity:1;transform:none}
@@ -640,6 +709,43 @@ strong{font-weight:800}
       </div>
     </div>
   </section>
+
+  <!-- ================= 모집요강 + 등록 절차 ================= -->
+  <div class="rules-wrap">
+    <section class="sd-detail" id="detail">
+      <div class="sd-inner">
+        <h2 class="sd-title reveal"><em>상세</em> 모집요강</h2>
+        <p class="sd-desc reveal">학년별 과정이 다르므로 학생의 학년에 맞는 요강을 확인해 주세요.</p>
+
+        <div class="sd-accordion">
+          <div class="sd-acc-item reveal">
+            <div class="sd-acc-title">2027 윈터스쿨 모집요강</div>
+            <div class="sd-acc-content">
+              <table class="sd-info-table">
+                <tr><th>개강일</th><td>2027.01.04(월)</td></tr>
+                <tr><th>모집대상</th><td>예비 고1 · 예비 고2 · 예비 고3</td></tr>
+                <tr><th>교육과정</th><td>국어 · 수학 · 영어 핵심 기반 / 통합사회 · 통합과학 수능 기반 / 내신 5등급제 대비 학업관리</td></tr>
+                <tr><th>반 편성</th><td>진단평가 응시 후 상담을 통해 최종 반 편성</td></tr>
+              </table>
+              <p class="sd-notice">※ 2028 대입 개편에 맞춰 학년별 커리큘럼이 다르게 운영됩니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sd-apply-flow" id="apply">
+      <div class="sd-inner">
+        <h2 class="sd-title reveal">등록 절차</h2>
+        <div class="sd-flow-grid">
+          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-000-0000</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 02</small><h3>진단평가/서류제출</h3><p>진단평가 또는 성적표 제출</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 03</small><h3>상담/반 편성</h3><p>진단평가 및 성적표 기반으로<br>상담 후 반 편성 진행</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 04</small><h3>등록 완료</h3><p>사전예약금 및 수강료 납부 후 등록 완료</p></article>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <!-- ================= CTA ================= -->
   <section class="cta">
