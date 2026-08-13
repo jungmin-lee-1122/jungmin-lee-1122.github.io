@@ -19,6 +19,11 @@
   --ink:#16233c;
   --gray:#5c6a83;
   --bg:#f2f6fc;
+  --ch-blue:#8dc0fa;       /* 달라지나요 섹션 배경 */
+  --ch-light:#f3f6fc;      /* 상단 밝은 영역 */
+  --ch-navy:#142a68;       /* 진한 남색 텍스트 */
+  --ch-badge:#6a8bf8;      /* 번호 배지 */
+  --ch-c1:#f2f2f2; --ch-c2:#fbe8e1; --ch-c3:#fdf4d7;
   --ask-blue:#4f85f7;      /* 말풍선 섹션 배경 */
   --ask-mint:#9be1fc;      /* 강조 민트 */
   --ask-bubble:#cbdcfd;    /* 밝은 말풍선 */
@@ -30,7 +35,7 @@
   --fade-hero:clamp(120px,14vw,290px);   /* 히어로 하단 페이드 길이 */
   --run-top:clamp(150px,17vw,360px);     /* 히어로 → 뉴스 전환 길이 */
   --line:#dfe7f4;
-  --inner:1560px;              /* 큰 화면에서 콘텐츠 최대 폭 */
+  --inner:2200px;              /* 큰 화면에서 콘텐츠 최대 폭 */
   --pad:clamp(20px,4vw,80px);  /* 좌우 여백 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -86,14 +91,13 @@ strong{font-weight:800}
 .news-foot{display:block;width:100%;height:auto;margin-top:-1px;position:relative;z-index:1}
 
 /* ---------- SECTION SHELL ---------- */
-.section{width:100%;padding:clamp(56px,7vw,130px) var(--pad)}
+.section{width:100%;padding:clamp(80px,9vw,220px) var(--pad)}
 .section-light{background:var(--bg)}
-.section-after-band{padding-top:clamp(20px,2.5vw,48px)}
 .section-white{background:#fff}
 .section-navy{background:linear-gradient(160deg,#0b2358,#123674);color:#fff}
 .h2{
-  text-align:center;font-size:clamp(26px,3.4vw,54px);font-weight:900;
-  letter-spacing:-.03em;line-height:1.35;margin-bottom:clamp(32px,4vw,64px);
+  text-align:center;font-size:clamp(34px,4.6vw,98px);font-weight:900;
+  letter-spacing:-.035em;line-height:1.3;margin-bottom:clamp(46px,5.4vw,130px);
 }
 .h2 .accent{color:var(--blue-600)}
 .section-navy .h2 .accent{color:var(--yellow)}
@@ -104,29 +108,92 @@ strong{font-weight:800}
 }
 
 /* ---------- GRIDS ---------- */
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,1.8vw,32px)}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(22px,2.4vw,64px)}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,1.6vw,28px)}
 .grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(12px,1.4vw,24px)}
 
-/* ---------- CHANGE CARDS ---------- */
-.change-card{
-  position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;
-  padding:clamp(38px,3.6vw,64px) clamp(20px,2vw,40px) clamp(30px,3vw,52px);
-  text-align:center;box-shadow:0 10px 30px rgba(20,50,110,.07);
+/* ---------- CHANGE SECTION (무엇이 달라지나요) ---------- */
+.change{
+  position:relative;width:100%;overflow:hidden;
+  background:var(--ch-blue);
+  padding:0 var(--pad) clamp(90px,10vw,220px);
 }
-.num-tab{
-  position:absolute;top:0;left:clamp(18px,2vw,36px);
-  width:clamp(38px,3vw,54px);height:clamp(44px,3.4vw,62px);
-  background:var(--navy-800);color:#fff;
-  font-size:clamp(13px,1vw,17px);font-weight:800;
-  display:flex;align-items:flex-start;justify-content:center;padding-top:.5em;
-  clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%);
+/* 위쪽 밝은 영역 + 아래로 볼록한 곡선 */
+.change-arc{
+  position:absolute;top:0;left:-6%;width:112%;
+  height:clamp(210px,26vw,560px);
+  background:var(--ch-light);
+  border-bottom-left-radius:50% 22%;
+  border-bottom-right-radius:50% 22%;
 }
-.icon{width:clamp(46px,4.2vw,78px);height:clamp(46px,4.2vw,78px);margin:0 auto clamp(16px,1.6vw,26px);color:var(--blue-600)}
-.change-card h3{font-size:clamp(17px,1.7vw,28px);font-weight:800;color:var(--navy-800);letter-spacing:-.03em}
-.change-card h3::after{content:"";display:block;width:44px;height:2px;background:var(--blue-100);margin:clamp(14px,1.4vw,22px) auto}
-.change-card p{font-size:clamp(13.5px,1.15vw,19px);color:var(--gray);line-height:1.85}
-.change-card p + p{margin-top:.9em}
+.change .inner{position:relative;z-index:1;max-width:2200px}
+.change-head{text-align:center;padding-top:clamp(46px,5vw,120px)}
+.pill-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(6px,.6vw,14px);
+}
+.ch-pill{
+  position:relative;
+  border:clamp(2px,.18vw,4px) solid var(--ch-navy);
+  color:var(--ch-navy);background:transparent;
+  border-radius:999px;
+  padding:clamp(9px,.9vw,20px) clamp(24px,2.4vw,58px);
+  font-size:clamp(16px,1.55vw,34px);font-weight:800;letter-spacing:-.03em;
+}
+.ch-pill::before,.ch-pill::after{
+  content:"";position:absolute;left:50%;translate:-50% 0;
+  width:0;height:0;border-left:clamp(7px,.65vw,15px) solid transparent;
+  border-right:clamp(7px,.65vw,15px) solid transparent;
+}
+.ch-pill::before{bottom:calc(-1 * clamp(13px,1.2vw,28px));border-top:clamp(13px,1.2vw,28px) solid var(--ch-navy)}
+.ch-pill::after{bottom:calc(-1 * clamp(9px,.85vw,20px));border-top:clamp(9px,.85vw,20px) solid var(--ch-light)}
+.ch-books{width:clamp(46px,4.4vw,100px);height:auto;margin-left:clamp(-14px,-1vw,-6px)}
+.change-head h2{
+  margin-top:clamp(22px,2.4vw,54px);
+  font-size:clamp(34px,5vw,104px);font-weight:900;
+  color:var(--ch-navy);letter-spacing:-.04em;line-height:1.25;
+}
+
+/* 카드 3장 */
+.ch-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:clamp(20px,2.4vw,56px);
+  margin-top:clamp(56px,7vw,170px);
+}
+.ch-card{
+  border-radius:clamp(18px,2vw,46px);
+  padding:clamp(30px,3.2vw,76px) clamp(20px,2.2vw,50px) clamp(34px,3.6vw,84px);
+  text-align:center;
+  opacity:0;transform:translateY(26px) scale(.94);
+}
+.ch-card:nth-child(1){background:var(--ch-c1)}
+.ch-card:nth-child(2){background:var(--ch-c2)}
+.ch-card:nth-child(3){background:var(--ch-c3)}
+.ch-badge{
+  width:clamp(46px,4.4vw,102px);height:clamp(52px,5vw,116px);
+  margin:0 auto clamp(24px,2.6vw,62px);
+  border-radius:50%;background:var(--ch-badge);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(19px,1.9vw,44px);font-weight:800;letter-spacing:-.02em;
+}
+.ch-card h3{
+  font-size:clamp(19px,2vw,44px);font-weight:800;
+  color:var(--ch-navy);letter-spacing:-.04em;line-height:1.35;
+}
+.ch-card p{
+  margin-top:clamp(20px,2.2vw,52px);
+  font-size:clamp(14px,1.4vw,31px);line-height:1.75;
+  color:#3c4b6b;letter-spacing:-.03em;
+}
+@keyframes cardIn{
+  0%{opacity:0;transform:translateY(26px) scale(.94)}
+  60%{opacity:1;transform:translateY(-6px) scale(1.02)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.ch-cards.on .ch-card{animation:cardIn .6s cubic-bezier(.34,1.4,.64,1) forwards}
+.ch-cards.on .ch-card:nth-child(1){animation-delay:.05s}
+.ch-cards.on .ch-card:nth-child(2){animation-delay:.27s}
+.ch-cards.on .ch-card:nth-child(3){animation-delay:.49s}
 
 /* ---------- ASK SECTION (오해 말풍선) ---------- */
 .ask{
@@ -300,8 +367,8 @@ strong{font-weight:800}
 /* ---------- GRADE CARDS ---------- */
 .grade{
   position:relative;border-radius:10px;overflow:hidden;color:#fff;
-  padding:clamp(28px,2.8vw,52px) clamp(20px,2.2vw,44px) clamp(72px,6vw,110px);
-  min-height:clamp(240px,26vw,420px);
+  padding:clamp(44px,4.6vw,110px) clamp(32px,3.6vw,90px) clamp(110px,10vw,230px);
+  min-height:clamp(380px,40vw,900px);
 }
 .g3{background:linear-gradient(150deg,#2f3f8f,#4b3f8e 60%,#3a4fa0)}
 .g2{background:linear-gradient(150deg,#123a7d,#1d5aa8 60%,#17457f)}
@@ -310,33 +377,33 @@ strong{font-weight:800}
 .grade > *{position:relative;z-index:1}
 .grade-tag{
   display:inline-block;background:rgba(255,255,255,.95);color:var(--navy-800);
-  font-size:clamp(12.5px,1.05vw,17px);font-weight:800;
-  padding:.35em 1.1em;border-radius:999px;margin-bottom:clamp(14px,1.4vw,24px);
+  font-size:clamp(17px,1.7vw,36px);font-weight:800;
+  padding:.35em 1.1em;border-radius:999px;margin-bottom:clamp(22px,2.4vw,56px);
 }
-.grade h3{font-size:clamp(19px,1.9vw,32px);font-weight:900;line-height:1.4;letter-spacing:-.03em;margin-bottom:.5em}
-.grade p{font-size:clamp(13px,1.15vw,19px);line-height:1.85;color:rgba(255,255,255,.9)}
+.grade h3{font-size:clamp(26px,2.9vw,64px);font-weight:900;line-height:1.4;letter-spacing:-.03em;margin-bottom:.5em}
+.grade p{font-size:clamp(17px,1.75vw,38px);line-height:1.85;color:rgba(255,255,255,.9)}
 .grade .g-icon{
   position:absolute;right:clamp(20px,2vw,44px);bottom:clamp(18px,2vw,40px);
-  width:clamp(38px,3.6vw,64px);height:clamp(38px,3.6vw,64px);color:rgba(255,255,255,.85);
+  width:clamp(56px,5.4vw,130px);height:clamp(56px,5.4vw,130px);color:rgba(255,255,255,.85);
 }
 
 /* ---------- CTA ---------- */
 .cta{
   width:100%;background:linear-gradient(120deg,#12439f,#1b56c8 55%,#1748a8);
-  color:#fff;padding:clamp(52px,6vw,110px) var(--pad);
+  color:#fff;padding:clamp(80px,9vw,220px) var(--pad);
 }
 .cta-row{display:flex;align-items:center;justify-content:space-between;gap:clamp(28px,4vw,80px);flex-wrap:wrap}
-.cta h2{font-size:clamp(24px,3vw,50px);font-weight:900;line-height:1.4;letter-spacing:-.03em}
+.cta h2{font-size:clamp(32px,4.1vw,92px);font-weight:900;line-height:1.4;letter-spacing:-.03em}
 .cta h2 .accent{color:var(--yellow)}
-.cta-sub{margin-top:.7em;font-size:clamp(14px,1.25vw,20px);color:#d5e3ff}
+.cta-sub{margin-top:.7em;font-size:clamp(18px,1.75vw,38px);color:#d5e3ff}
 .info-list{display:flex;gap:clamp(28px,4vw,80px);text-align:center}
-.info-list .icon{width:clamp(38px,3.4vw,60px);height:clamp(38px,3.4vw,60px);color:#fff;opacity:.95;margin-bottom:.5em}
-.info-list dt{font-size:clamp(12.5px,1.05vw,17px);color:#c7d9ff;margin-bottom:.3em}
-.info-list dd{font-size:clamp(14.5px,1.35vw,22px);font-weight:800}
+.info-list .icon{width:clamp(56px,5vw,120px);height:clamp(56px,5vw,120px);color:#fff;opacity:.95;margin-bottom:.5em}
+.info-list dt{font-size:clamp(17px,1.6vw,34px);color:#c7d9ff;margin-bottom:.3em}
+.info-list dd{font-size:clamp(20px,2vw,44px);font-weight:800}
 .cta-btn{
-  display:block;width:min(640px,100%);margin:clamp(34px,4vw,64px) auto 0;
+  display:block;width:min(1080px,100%);margin:clamp(50px,5.4vw,130px) auto 0;
   background:var(--yellow);color:#0f2b60;text-align:center;text-decoration:none;
-  font-size:clamp(16px,1.6vw,26px);font-weight:900;letter-spacing:-.02em;
+  font-size:clamp(22px,2.3vw,50px);font-weight:900;letter-spacing:-.02em;
   padding:.85em 1.2em;border-radius:999px;box-shadow:0 12px 30px rgba(0,0,0,.25);
   transition:transform .18s ease,box-shadow .18s ease;
 }
@@ -355,7 +422,8 @@ strong{font-weight:800}
 @media (max-width:860px){
   .bubble{white-space:normal;max-width:88%}
   .brow--a,.brow--b,.brow--c{transform:none}
-  .bubble.lift,.bubble.drop{transform:none}
+  .bubble.lift{margin-bottom:0}
+  .bubble.drop{margin-top:0}
   .ask-cursor{transform:translateX(28%)}
   .deco-tilt,.deco-small{display:none}
   .deco-stack{top:auto;bottom:4%;left:2%;opacity:.75}
@@ -367,6 +435,8 @@ strong{font-weight:800}
   .w-badge{position:static;transform:none;margin:0 auto;box-shadow:none}
 }
 @media (max-width:960px){
+  .ch-cards{grid-template-columns:1fr;gap:18px}
+  .change-arc{height:clamp(190px,40vw,320px)}
   .grid-3,.grid-4{grid-template-columns:1fr 1fr}
   .grid-5{grid-template-columns:1fr 1fr 1fr}
   .cta-row{flex-direction:column;align-items:flex-start}
@@ -377,7 +447,7 @@ strong{font-weight:800}
   .info-list{gap:14px}
 }
 @media (prefers-reduced-motion:reduce){
-  .bubble{opacity:1;transform:none;animation:none !important}
+  .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
   .reveal{opacity:1;transform:none;transition:none}
   .cta-btn{transition:none}
 }
@@ -399,40 +469,40 @@ strong{font-weight:800}
   </section>
 
   <!-- ================= 무엇이 달라지나요 ================= -->
-  <section class="section section-light section-after-band">
+  <section class="change">
+    <div class="change-arc" aria-hidden="true"></div>
     <div class="inner">
-      <h2 class="h2 reveal">2028 대입, <span class="accent">무엇이 달라지나요?</span></h2>
-      <div class="grid-3">
-        <article class="change-card reveal">
-          <span class="num-tab">01</span>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="10" y="6" width="28" height="36" rx="3"/><path d="M16 15h16M16 21h10"/>
-            <circle cx="30" cy="31" r="7"/><path d="M28.5 28.5l1.5-1v6"/>
+      <div class="change-head">
+        <div class="pill-row">
+          <span class="ch-pill">2028 대입,</span>
+          <svg class="ch-books" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g transform="rotate(-8 60 60)">
+              <rect x="12" y="66" width="96" height="16" rx="5" fill="#ffffff"/>
+              <rect x="16" y="56" width="92" height="14" rx="5" fill="#e8f0fb"/>
+              <rect x="10" y="30" width="100" height="30" rx="7" fill="#4a90e2"/>
+              <rect x="10" y="30" width="100" height="12" rx="6" fill="#7bb4ef"/>
+              <rect x="52" y="30" width="14" height="30" fill="#3d7fc9" opacity=".55"/>
+            </g>
           </svg>
+        </div>
+        <h2>무엇이 달라지나요?</h2>
+      </div>
+
+      <div class="ch-cards">
+        <article class="ch-card">
+          <div class="ch-badge">01</div>
           <h3>내신 5등급제 전면 적용</h3>
           <p>기존 9등급제 대비 1등급 범위 확대<br>상위 10%가 1등급!</p>
-          <p>같은 1등급 안에서 무엇으로<br>차이가 날까요?</p>
         </article>
-
-        <article class="change-card reveal">
-          <span class="num-tab">02</span>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="9" y="8" width="30" height="34" rx="3"/><path d="M18 5h12v6H18z"/>
-            <path d="M16 21l2.5 2.5L23 19M28 21.5h8"/><path d="M16 31l2.5 2.5L23 29M28 31.5h8"/>
-          </svg>
+        <article class="ch-card">
+          <div class="ch-badge">02</div>
           <h3>통합형 수능 체제</h3>
-          <p>국어·수학 선택과목 폐지<br>사회·과학은 통합사회, 통합과학<br>모두 응시!</p>
-          <p>전 영역의 기본기가 중요해집니다.</p>
+          <p>국어·수학 선택과목 폐지<br>사회·과학은 통합사회, 통합과학 모두 응시!</p>
         </article>
-
-        <article class="change-card reveal">
-          <span class="num-tab">03</span>
-          <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M6 20L24 10l18 10"/><path d="M10 20v14M18 20v14M30 20v14M38 20v14"/><path d="M6 38h36M8 34h32"/>
-          </svg>
+        <article class="ch-card">
+          <div class="ch-badge">03</div>
           <h3>고교학점제 &amp; 대학별 반영과목</h3>
-          <p>과목 선택이 곧 입시 전략!<br>대학은 모집단위별 반영과목을<br>안내하고 있습니다.</p>
-          <p>미리 준비하는 학생만이 유리합니다.</p>
+          <p>과목 선택이 곧 입시 전략!<br>미리 준비하는 학생만이 유리합니다.</p>
         </article>
       </div>
     </div>
@@ -501,15 +571,15 @@ strong{font-weight:800}
       </svg>
 
       <div class="bubbles">
-        <div class="brow brow--a reveal">
+        <div class="brow brow--a">
           <span class="bubble ghost">고1은 아직 수능 공부 안 해도 되겠지.</span>
           <span class="bubble solid drop">5등급제로 바뀌면 내신 따기는 오히려 쉬워진 거 아닌가?</span>
         </div>
-        <div class="brow brow--b reveal">
+        <div class="brow brow--b">
           <span class="bubble solid">문과니까 과학은 내신만 넘기면 되겠지.</span>
           <span class="bubble ghost lift">수시는 내신, 정시는 수능만 챙기면 되겠지.</span>
         </div>
-        <div class="brow brow--c reveal">
+        <div class="brow brow--c">
           <span class="bubble ghost">선택과목은 학교 가서 정해도 늦지 않겠지.</span>
           <span class="bubble solid drop">겨울방학엔 선행만 해두면 되는 거 아닌가?</span>
         </div>
@@ -656,16 +726,19 @@ strong{font-weight:800}
   </section>
 
 <script>
-// 말풍선 뽁뽁 등장
+// 카드/말풍선 순차 등장
 (function(){
-  var box = document.querySelector('.bubbles');
-  if (!box) return;
+  var boxes = document.querySelectorAll('.ch-cards, .bubbles');
+  if (!boxes.length) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-      !('IntersectionObserver' in window)) { box.classList.add('on'); return; }
+      !('IntersectionObserver' in window)) {
+    boxes.forEach(function(b){ b.classList.add('on'); });
+    return;
+  }
   var io = new IntersectionObserver(function(en){
-    en.forEach(function(e){ if (e.isIntersecting){ box.classList.add('on'); io.disconnect(); } });
-  }, { threshold: 0.25 });
-  io.observe(box);
+    en.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
+  }, { threshold: 0.2 });
+  boxes.forEach(function(b){ io.observe(b); });
 })();
 
 // 스크롤 등장
