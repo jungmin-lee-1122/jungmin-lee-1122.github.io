@@ -634,7 +634,10 @@ strong{font-weight:800}
   .sd-flow-card h3{font-size:clamp(19px,2.6vw,26px)}
   .sd-flow-card p{font-size:clamp(14px,1.9vw,18px)}
   .sd-flow-card small{font-size:clamp(13px,1.7vw,16px)}
-  .winter-section{padding:clamp(60px,9vw,110px) var(--pad)}
+  .winter-section{
+    padding:clamp(130px,17vw,190px) var(--pad) clamp(60px,9vw,110px);
+    background-size:100% clamp(190px,24vw,240px), 100% clamp(150px,18vw,190px);
+  }
   .winter-copy h2{font-size:clamp(28px,4.6vw,46px)}
   .winter-copy p{font-size:clamp(15px,2.1vw,20px)}
   .wcard{padding:clamp(24px,3.4vw,38px);min-height:clamp(230px,32vw,300px)}
@@ -682,7 +685,11 @@ strong{font-weight:800}
   .deco-stack{width:110px}
   .deco-open{width:118px}
 
-  .winter-section{padding:60px var(--pad)}
+  .winter-section{
+    padding:190px var(--pad) 60px;
+    /* 위쪽 전환을 길게 — 파랑에서 어둠까지 천천히 */
+    background-size:100% 280px, 100% 190px;
+  }
   .winter-copy h2{font-size:26px}
   .winter-copy p{font-size:15px;line-height:1.8}
   .wcards{gap:12px}
@@ -735,6 +742,7 @@ strong{font-weight:800}
 /* ===== 소형 기기 ===== */
 @media (max-width:430px){
   :root{--pad:16px}
+  .winter-section{padding-top:170px;background-size:100% 250px, 100% 170px}
   .ask-title{font-size:24px}
   .ask-punch{font-size:22px}
   .bubble{font-size:14px;padding:12px 16px}
