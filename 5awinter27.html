@@ -149,8 +149,20 @@ strong{font-weight:800}
   font-size:clamp(17px,1.7vw,36px);font-weight:800;
   padding:.35em 1.1em;border-radius:999px;margin-bottom:clamp(22px,2.4vw,56px);
 }
-.grade h3{font-size:clamp(26px,2.9vw,64px);font-weight:900;line-height:1.4;letter-spacing:-.03em;margin-bottom:.5em}
-.grade p{font-size:clamp(17px,1.75vw,38px);line-height:1.85;color:rgba(255,255,255,.9)}
+.grade h3{
+  white-space: nowrap;                    /* <br> 위치에서만 줄바꿈 */
+  font-size: clamp(20px, 2vw, 46px);      /* 기존 clamp(26px,2.9vw,64px) 에서 축소 */
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: -.03em;
+  margin-bottom: .5em;
+}
+.grade p{
+  white-space: nowrap;                    /* <br> 위치에서만 줄바꿈 */
+  font-size: clamp(14px, 1.35vw, 30px);   /* 기존 clamp(17px,1.75vw,38px) 에서 축소 */
+  line-height: 1.85;
+  color: rgba(255,255,255,.9);
+}
 .grade .g-icon{
   position:absolute;right:clamp(20px,2vw,44px);bottom:clamp(18px,2vw,40px);
   width:clamp(56px,5.4vw,130px);height:clamp(56px,5.4vw,130px);color:rgba(255,255,255,.85);
@@ -173,19 +185,6 @@ strong{font-weight:800}
   line-height:1.32;letter-spacing:-.04em;color:#eaf3ff;
   text-shadow:0 6px 22px rgba(6,32,92,.28);
 }
-/* 화면에 들어오면 흔들림 */
-.cta h2{--amp:1.5deg;--shift:9px;transform-origin:left center}
-.cta h2.shake{animation:ctaShake 1.15s cubic-bezier(.36,.07,.19,.97) both}
-@keyframes ctaShake{
-  0%{transform:rotate(0) translateX(0)}
-  12%{transform:rotate(calc(var(--amp) * -1)) translateX(calc(var(--shift) * -1))}
-  27%{transform:rotate(var(--amp)) translateX(var(--shift))}
-  42%{transform:rotate(calc(var(--amp) * -.62)) translateX(calc(var(--shift) * -.6))}
-  57%{transform:rotate(calc(var(--amp) * .42)) translateX(calc(var(--shift) * .4))}
-  72%{transform:rotate(calc(var(--amp) * -.22)) translateX(calc(var(--shift) * -.2))}
-  86%{transform:rotate(calc(var(--amp) * .1)) translateX(calc(var(--shift) * .08))}
-  100%{transform:rotate(0) translateX(0)}
-}
 .cta h2 .lead-line{color:#bfe0ff}          /* 첫 줄은 한 톤 낮게 */
 .cta h2 .strong-line{color:#ffffff}        /* 둘째 줄 본문은 흰색 */
 .cta h2 .accent{
@@ -194,7 +193,17 @@ strong{font-weight:800}
 }
 .cta-sub{
   margin-top:.8em;font-size:clamp(20px,2vw,44px);
-  color:#c9dcff;letter-spacing:-.03em;
+  color:#e5edfb;letter-spacing:-.03em;
+}
+
+.cta-sub .hl{
+  background:var(--ask-mint);
+  color:#04143a;
+  font-weight:800;
+  padding:.06em .3em .12em;
+  border-radius:.14em;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
 }
 /* 오른쪽 정보 — 세로 스택, 우측 정렬 */
 .info-list{
@@ -414,7 +423,7 @@ strong{font-weight:800}
 }
 .winter-copy p{
   margin-top:clamp(24px,2.6vw,48px);
-  font-size:clamp(16px,1.7vw,33px);line-height:1.95;color:#a7adb6;
+  font-size:clamp(16px,1.7vw,33px);line-height:1.95;color:#fffff;
   text-align:center;
 }
 
@@ -437,7 +446,7 @@ strong{font-weight:800}
 .wcard--right{text-align:right}
 .wcard .n{font-size:clamp(20px,2vw,40px);font-weight:800;color:var(--w-blue);line-height:1}
 .wcard .en{
-  margin-top:.4em;font-size:clamp(20px,2.05vw,45px);font-weight:800;
+  margin-top:.4em;font-size:clamp(20px,1.5vw,45px);font-weight:800;
   letter-spacing:.01em;color:#fff;line-height:1.2;
 }
 .wcard .ko{
@@ -455,8 +464,8 @@ strong{font-weight:800}
   text-align:center;line-height:1.5;color:#fff;
   box-shadow:0 0 0 clamp(11px,1.2vw,24px) var(--w-bg);
 }
-.w-badge small{font-size:clamp(13px,1.25vw,25px);font-weight:600;opacity:.95}
-.w-badge b{font-size:clamp(17px,1.75vw,35px);font-weight:800;letter-spacing:-.02em}
+.w-badge small{font-size:clamp(13px,1.65vw,25px);font-weight:600;opacity:.95}
+.w-badge b{font-size:clamp(17px,2.42vw,35px);font-weight:800;letter-spacing:-.02em}
 /* 아래 화살표 + 결론 바 */
 .w-arrow{
   width:0;height:0;margin:clamp(18px,1.9vw,38px) auto 0;
@@ -481,7 +490,7 @@ strong{font-weight:800}
   animation:glowPulse 3.4s ease-in-out infinite;
 }
 .w-conclusion b{
-  color:#fff;font-weight:900;
+  color:#fdf4d7;font-weight:900;
   box-shadow:inset 0 -.22em 0 rgba(255,255,255,.28);
 }
 /* 빛 훑고 지나가기 */
@@ -679,7 +688,7 @@ strong{font-weight:800}
   .grade p{font-size:clamp(15px,2vw,20px)}
   .grade .g-icon{width:clamp(40px,5.4vw,60px);height:clamp(40px,5.4vw,60px)}
   .cta{padding:clamp(64px,9vw,110px) var(--pad)}
-  .cta h2{font-size:clamp(30px,4.6vw,52px);--amp:1.3deg;--shift:7px}
+  .cta h2{font-size:clamp(30px,4.6vw,52px)}
   .cta-sub{font-size:clamp(16px,2.2vw,22px)}
   .rules-wrap section{padding:clamp(60px,8vw,100px) var(--pad)}
   .rules-wrap .sd-title{font-size:clamp(30px,4.6vw,54px)}
@@ -787,7 +796,7 @@ strong{font-weight:800}
   .cta{padding:56px var(--pad)}
   .cta .cta-row .info-list{margin-top:18px}
   .cta-sub{margin-top:.55em}
-  .cta h2{font-size:26px;line-height:1.35;--amp:1.1deg;--shift:5px}
+  .cta h2{font-size:26px;line-height:1.35}
   .cta-sub{font-size:15px}
   .info-list{gap:14px}
   .info-list > div{column-gap:14px}
@@ -823,7 +832,7 @@ strong{font-weight:800}
 @media (prefers-reduced-motion:reduce){
   .bubble,.ch-card{opacity:1;transform:none;animation:none !important}
   .bubble.done:hover,.bubble.done:active{animation:none !important}
-  .w-conclusion,.w-conclusion::after,.cta h2.shake{animation:none !important}
+  .w-conclusion,.w-conclusion::after{animation:none !important}
   .reveal{opacity:1;transform:none;transition:none}
 }
 </style>
@@ -980,8 +989,8 @@ strong{font-weight:800}
           </g>
         </svg>
       </div>
-      <p class="ask-kicker reveal">입시의 규칙이 바뀌는 지금</p>
-      <p class="ask-punch reveal"><span class="mint">준비의 순서도</span><br class="mo-br"> 바뀌어야 합니다!</p>
+      <p class="ask-kicker reveal">입시 규칙이 바뀌는 지금</p>
+      <p class="ask-punch reveal"><span class="mint">준비 순서도</span><br class="mo-br"> 바뀌어야 합니다!</p>
     </div>
   </section>
 
@@ -989,7 +998,7 @@ strong{font-weight:800}
   <section class="winter-section">
     <div class="winter-grid">
       <div class="winter-copy reveal">
-        <h2>그래서, <span class="hl">이번 겨울방학</span>이 중요합니다.</h2>
+        <h2>그래서, <br><span class="hl">이번 겨울방학</span>이 중요합니다.</h2>
         <p>
           학기 중에는 학교 수업과 내신에 쫓깁니다.<br>
           새 학년이 시작되기 전, 부족한 영역을 진단하고<br>
@@ -1058,31 +1067,31 @@ strong{font-weight:800}
     <div class="inner">
       <h2 class="h2 reveal">학년별 <span class="accent">맞춤 전략</span></h2>
       <div class="grid-3">
-        <article class="grade g3 reveal">
-          <span class="grade-tag">예비 고3</span>
-          <h3>첫 통합형 수능의 당사자</h3>
-          <p>선택과목 없는 국어·수학,<br>통합사회·통합과학까지<br>더 이상 시행착오를<br>미룰 시간이 없습니다.</p>
-          <svg class="g-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M24 12L6 20l18 8 18-8-18-8z"/><path d="M14 24v9c0 3 5 5 10 5s10-2 10-5v-9"/><path d="M42 20v10"/>
-          </svg>
-        </article>
-        <article class="grade g2 reveal">
-          <span class="grade-tag">예비 고2</span>
-          <h3>내신과 수능의<br>균형이 갈리는 시기</h3>
-          <p>학교 공부만 따라가는 고2가 아니라<br>수능 기반까지 함께 만드는<br>고2로 준비해야 합니다.</p>
-          <svg class="g-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M24 8v32M12 40h24M8 16h32M8 16l-4 12h8zM40 16l4 12h-8z"/>
-          </svg>
-        </article>
-        <article class="grade g1 reveal">
-          <span class="grade-tag">예비 고1</span>
-          <h3>첫 내신이 시작되기 전<br>마지막 겨울</h3>
-          <p>5등급제 첫 성적표가 나오기 전에<br>고등 학습의 기준부터<br>세워야 합니다.</p>
-          <svg class="g-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M24 14C20 10 13 10 8 12v24c5-2 12-2 16 2 4-4 11-4 16-2V12c-5-2-12-2-16 2z"/><path d="M24 14v24"/>
-          </svg>
-        </article>
-      </div>
+  <article class="grade g1 reveal">
+    <span class="grade-tag">예비 고1</span>
+    <h3>첫 내신이 시작되기 전<br>마지막 겨울</h3>
+    <p>5등급제 첫 성적표가 나오기 전에<br>고등 학습의 기준부터<br>세워야 합니다.</p>
+    <svg class="g-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M24 14C20 10 13 10 8 12v24c5-2 12-2 16 2 4-4 11-4 16-2V12c-5-2-12-2-16 2z"/><path d="M24 14v24"/>
+    </svg>
+  </article>
+  <article class="grade g2 reveal">
+    <span class="grade-tag">예비 고2</span>
+    <h3>내신과 수능의<br>균형이 갈리는 시기</h3>
+    <p>내신만 따라가는 고2가 아니라,<br>수능 학습도 시작해야 하는<br>고2로 준비해야 합니다.</p>
+    <svg class="g-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M24 8v32M12 40h24M8 16h32M8 16l-4 12h8zM40 16l4 12h-8z"/>
+    </svg>
+  </article>
+  <article class="grade g3 reveal">
+    <span class="grade-tag">예비 고3</span>
+    <h3>첫 통합형<br>수능의 당사자</h3>
+    <p>선택과목 없는 국어·수학,<br>통합사회·통합과학까지<br>더 이상 미룰 시간이 없습니다.</p>
+    <svg class="g-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M24 12L6 20l18 8 18-8-18-8z"/><path d="M14 24v9c0 3 5 5 10 5s10-2 10-5v-9"/><path d="M42 20v10"/>
+    </svg>
+  </article>
+</div>
     </div>
   </section>
 
@@ -1097,13 +1106,12 @@ strong{font-weight:800}
           <div class="sd-acc-item reveal">
             <div class="sd-acc-title"><span class="sd-i" aria-hidden="true">i</span>2027 윈터스쿨 모집요강</div>
             <div class="sd-acc-content">
-              <table class="sd-info-table">
-                <tr><th>개강일</th><td>2027.01.04(월)</td></tr>
-                <tr><th>모집대상</th><td>예비 고1 · 예비 고2 · 예비 고3</td></tr>
+            <table class="sd-info-table">
+                <tr><th>개강일</th><td>2027년 1월 4일(월)</td></tr>
+                <tr><th>모집대상</th><td>현 중3(예비고1) · 현 고1(예비고2) · 현 고2(예비고3)</td></tr>
                 <tr><th>교육과정</th><td>국어 · 수학 · 영어 핵심 기반 / 통합사회 · 통합과학 수능 기반 / 내신 5등급제 대비 학업관리</td></tr>
                 <tr><th>교육기간</th><td>2027년 1월 4일(월) ~ 2월 19일(금) <span class="sd-course-note">*7주과정</span></td></tr>
-                <tr><th>반 편성</th><td>진단평가 응시 후 상담을 통해 최종 반 편성</td></tr>
-              </table>
+            </table>
               <p class="sd-notice">※ 2028 대입 개편에 맞춰 학년별 커리큘럼이 다르게 운영됩니다.</p>
             </div>
           </div>
@@ -1115,7 +1123,7 @@ strong{font-weight:800}
       <div class="sd-inner">
         <h2 class="sd-title reveal"><em>윈터스쿨</em> 등록 절차</h2>
         <div class="sd-flow-grid">
-          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-347-5151</p></article>
+          <article class="sd-flow-card reveal"><small>STEP 01</small><h3>상담 신청</h3><p>상담예약 : 031-386-1881</p></article>
           <article class="sd-flow-card reveal"><small>STEP 02</small><h3>진단평가/서류제출</h3><p>진단평가 또는 성적표 제출</p></article>
           <article class="sd-flow-card reveal"><small>STEP 03</small><h3>상담/반 편성</h3><p>진단평가 및 성적표 기반으로<br>상담 후 반 편성 진행</p></article>
           <article class="sd-flow-card reveal"><small>STEP 04</small><h3>등록 완료</h3><p>사전예약금 및 수강료 납부 후 등록 완료</p></article>
@@ -1185,7 +1193,7 @@ strong{font-weight:800}
       <div class="cta-row">
         <div class="cta-copy reveal">
           <h2><span class="lead-line">2028 대입을 앞서는 선택,</span><br><span class="strong-line">지금 시작해야</span> <span class="accent">앞서갑니다.</span></h2>
-          <p class="cta-sub">2027 5A 윈터스쿨에서 새로운 입시의 첫걸음을 함께하세요.</p>
+          <p class="cta-sub"><span class="hl">2027 종로 윈터스쿨</span>에서 새로운 입시의 첫걸음을 함께하세요.</p>
         </div>
         <dl class="info-list reveal">
           <div>
@@ -1204,7 +1212,7 @@ strong{font-weight:800}
             <span class="info-ic"><svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M14 8l6 8-5 5c2 5 6 9 11 11l5-5 8 6-4 6c-1 1-3 1-4 1C19 38 10 29 7 16c0-1 0-3 1-4l6-4z"/>
             </svg></span>
-            <dt>상담 문의</dt><dd>031-347-5151</dd>
+            <dt>상담 문의</dt><dd>031-386-1881</dd>
           </div>
         </dl>
       </div>
@@ -1250,26 +1258,6 @@ strong{font-weight:800}
   </section>
 
 <script>
-// CTA 제목 흔들림 (화면에 들어올 때마다)
-(function(){
-  var h = document.querySelector('.cta h2');
-  if (!h) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!('IntersectionObserver' in window)) return;
-
-  new IntersectionObserver(function(en){
-    en.forEach(function(e){
-      if (e.isIntersecting) {
-        h.classList.remove('shake');
-        void h.offsetWidth;          // 리플로우로 애니메이션 초기화
-        h.classList.add('shake');
-      } else {
-        h.classList.remove('shake');
-      }
-    });
-  }, { threshold: 0.55 }).observe(h);
-})();
-
 // 히어로 눈 내리기
 (function(){
   var layer = document.querySelector('.snow-layer');
